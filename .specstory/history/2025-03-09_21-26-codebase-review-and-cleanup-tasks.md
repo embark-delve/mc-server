@@ -4208,6 +4208,1458 @@ git remote add origin git@github.com:embark-delve/mc-server.git
 
 _****_
 
+Now let's push to the remote repository using SSH:
+
+---
+
+_****_
+
+```bash
+git push -u origin main
+```
+
+```
+(.venv) shamil@MacBook-Pro minecraft-server % git push -u origin main
+To github.com:embark-delve/mc-server.git
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'github.com:embark-delve/mc-server.git'
+hint: Updates were rejected because the remote contains work that you do
+hint: not have locally. This is usually caused by another repository pushing
+hint: to the same ref. You may want to first integrate the remote changes
+hint: (e.g., 'git pull ...') before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+(.venv) shamil@MacBook-Pro minecraft-server %
+```
+
+---
+
+_****_
+
+It seems the remote repository already has content that doesn't match our local repository. Let's try to pull first to integrate the remote changes and then push:
+
+---
+
+_****_
+
+```bash
+git pull --rebase origin main
+```
+
+```
+(.venv) shamil@MacBook-Pro minecraft-server % git pull --rebase origin main
+error: cannot pull with rebase: You have unstaged changes.
+error: please commit or stash them.
+(.venv) shamil@MacBook-Pro minecraft-server %
+```
+
+---
+
+_****_
+
+It seems we have unstaged changes. Let's check the status:
+
+---
+
+_****_
+
+```bash
+git status
+```
+
+```
+(.venv) shamil@MacBook-Pro minecraft-server % git status
+On branch main
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   .specstory/history/2025-03-09_21-26-codebase-review-and-cleanup-tasks.md
+
+no changes added to commit (use "git add" and/or "git commit -a")
+(.venv) shamil@MacBook-Pro minecraft-server %
+```
+
+---
+
+_****_
+
+Let's commit the changes first:
+
+---
+
+_****_
+
+```bash
+git add .specstory/history/2025-03-09_21-26-codebase-review-and-cleanup-tasks.md
+```
+
+```
+(.venv) shamil@MacBook-Pro minecraft-server % 
+
+```
+
+---
+
+_****_
+
+```bash
+git commit -m "Update specstory history"
+```
+
+```
+(.venv) shamil@MacBook-Pro minecraft-server % git commit -m "Update specstory history"
+[main c63d30a] Update specstory history
+ 1 file changed, 307 insertions(+)
+(.venv) shamil@MacBook-Pro minecraft-server %
+```
+
+---
+
+_****_
+
+Now, since the remote repository has changes that we need to integrate, let's try a different approach. Let's clone the remote repository to a temporary directory, copy our files there, commit, and push:
+
+---
+
+_****_
+
+```bash
+cd .. && git clone git@github.com:embark-delve/mc-server.git temp-mc-server
+```
+
+```
+(.venv) shamil@MacBook-Pro minecraft-server % cd .. && git clone git@github.com:embark-delve/mc-server.git 
+temp-mc-server                                cd .. && git clone git@github.com:embark-delve/mc-server.git 
+temp-mc-server
+Cloning into 'temp-mc-server'...
+remote: Enumerating objects: 3, done.
+remote: Counting objects: 100% (3/3), done.
+remote: Compressing objects: 100% (2/2), done.
+remote: Total 3 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
+Receiving objects: 100% (3/3), done.
+(.venv) shamil@MacBook-Pro embark-delve %
+```
+
+---
+
+_****_
+
+Now let's see what's in the remote repository:
+
+---
+
+_****_
+
+```bash
+ls -la temp-mc-server
+```
+
+```
+(.venv) shamil@MacBook-Pro embark-delve % ls -la temp-mc-server
+total 8
+drwxr-xr-x@  4 shamil  staff   128 Mar  9 22:04 .
+drwxr-xr-x  36 shamil  staff  1152 Mar  9 22:04 ..
+drwxr-xr-x@ 12 shamil  staff   384 Mar  9 22:04 .git
+-rw-r--r--@  1 shamil  staff  1069 Mar  9 22:04 LICENSE
+(.venv) shamil@MacBook-Pro embark-delve %
+```
+
+---
+
+_****_
+
+The remote repository only has a LICENSE file. Now, let's copy our project files to the temporary directory, excluding the .git folder:
+
+---
+
+_****_
+
+```bash
+rsync -av --exclude='.git/' minecraft-server/ temp-mc-server/
+```
+
+```
+(.venv) shamil@MacBook-Pro embark-delve % 
+.venv/lib/python3.11/site-packages/setuptools/_distutils/__pycache__/errors.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/__pycache__/extension.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/__pycache__/fancy_getopt.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/__pycache__/file_util.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/__pycache__/filelist.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/__pycache__/log.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/__pycache__/msvc9compiler.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/__pycache__/msvccompiler.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/__pycache__/py38compat.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/__pycache__/py39compat.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/__pycache__/spawn.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/__pycache__/sysconfig.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/__pycache__/text_file.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/__pycache__/unixccompiler.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/__pycache__/util.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/__pycache__/version.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/__pycache__/versionpredicate.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/__init__.py
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/_framework_compat.py
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/bdist.py
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/bdist_dumb.py
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/bdist_rpm.py
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/build.py
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/build_clib.py
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/build_ext.py
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/build_py.py
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/build_scripts.py
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/check.py
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/clean.py
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/config.py
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/install.py
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/install_data.py
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/install_egg_info.py
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/install_headers.py
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/install_lib.py
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/install_scripts.py
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/py37compat.py
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/register.py
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/sdist.py
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/upload.py
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/__pycache__/
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/__pycache__/__init__.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/__pycache__/_framework_compat.cpython-311.
+pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/__pycache__/bdist.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/__pycache__/bdist_dumb.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/__pycache__/bdist_rpm.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/__pycache__/build.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/__pycache__/build_clib.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/__pycache__/build_ext.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/__pycache__/build_py.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/__pycache__/build_scripts.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/__pycache__/check.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/__pycache__/clean.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/__pycache__/config.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/__pycache__/install.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/__pycache__/install_data.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/__pycache__/install_egg_info.cpython-311.p
+yc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/__pycache__/install_headers.cpython-311.py
+c
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/__pycache__/install_lib.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/__pycache__/install_scripts.cpython-311.py
+c
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/__pycache__/py37compat.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/__pycache__/register.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/__pycache__/sdist.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_distutils/command/__pycache__/upload.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/
+.venv/lib/python3.11/site-packages/setuptools/_vendor/__init__.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/ordered_set.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/typing_extensions.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/zipp.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/__pycache__/
+.venv/lib/python3.11/site-packages/setuptools/_vendor/__pycache__/__init__.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/__pycache__/ordered_set.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/__pycache__/typing_extensions.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/__pycache__/zipp.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_metadata/
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_metadata/__init__.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_metadata/_adapters.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_metadata/_collections.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_metadata/_compat.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_metadata/_functools.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_metadata/_itertools.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_metadata/_meta.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_metadata/_text.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_metadata/__pycache__/
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_metadata/__pycache__/__init__.cpython-311.p
+yc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_metadata/__pycache__/_adapters.cpython-311.
+pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_metadata/__pycache__/_collections.cpython-3
+11.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_metadata/__pycache__/_compat.cpython-311.py
+c
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_metadata/__pycache__/_functools.cpython-311
+.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_metadata/__pycache__/_itertools.cpython-311
+.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_metadata/__pycache__/_meta.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_metadata/__pycache__/_text.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_resources/
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_resources/__init__.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_resources/_adapters.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_resources/_common.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_resources/_compat.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_resources/_itertools.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_resources/_legacy.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_resources/abc.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_resources/readers.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_resources/simple.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_resources/__pycache__/
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_resources/__pycache__/__init__.cpython-311.
+pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_resources/__pycache__/_adapters.cpython-311
+.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_resources/__pycache__/_common.cpython-311.p
+yc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_resources/__pycache__/_compat.cpython-311.p
+yc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_resources/__pycache__/_itertools.cpython-31
+1.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_resources/__pycache__/_legacy.cpython-311.p
+yc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_resources/__pycache__/abc.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_resources/__pycache__/readers.cpython-311.p
+yc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/importlib_resources/__pycache__/simple.cpython-311.py
+c
+.venv/lib/python3.11/site-packages/setuptools/_vendor/jaraco/
+.venv/lib/python3.11/site-packages/setuptools/_vendor/jaraco/__init__.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/jaraco/context.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/jaraco/functools.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/jaraco/__pycache__/
+.venv/lib/python3.11/site-packages/setuptools/_vendor/jaraco/__pycache__/__init__.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/jaraco/__pycache__/context.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/jaraco/__pycache__/functools.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/jaraco/text/
+.venv/lib/python3.11/site-packages/setuptools/_vendor/jaraco/text/__init__.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/jaraco/text/__pycache__/
+.venv/lib/python3.11/site-packages/setuptools/_vendor/jaraco/text/__pycache__/__init__.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/more_itertools/
+.venv/lib/python3.11/site-packages/setuptools/_vendor/more_itertools/__init__.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/more_itertools/more.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/more_itertools/recipes.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/more_itertools/__pycache__/
+.venv/lib/python3.11/site-packages/setuptools/_vendor/more_itertools/__pycache__/__init__.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/more_itertools/__pycache__/more.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/more_itertools/__pycache__/recipes.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/packaging/
+.venv/lib/python3.11/site-packages/setuptools/_vendor/packaging/__about__.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/packaging/__init__.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/packaging/_manylinux.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/packaging/_musllinux.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/packaging/_structures.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/packaging/markers.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/packaging/requirements.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/packaging/specifiers.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/packaging/tags.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/packaging/utils.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/packaging/version.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/packaging/__pycache__/
+.venv/lib/python3.11/site-packages/setuptools/_vendor/packaging/__pycache__/__about__.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/packaging/__pycache__/__init__.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/packaging/__pycache__/_manylinux.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/packaging/__pycache__/_musllinux.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/packaging/__pycache__/_structures.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/packaging/__pycache__/markers.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/packaging/__pycache__/requirements.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/packaging/__pycache__/specifiers.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/packaging/__pycache__/tags.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/packaging/__pycache__/utils.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/packaging/__pycache__/version.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/pyparsing/
+.venv/lib/python3.11/site-packages/setuptools/_vendor/pyparsing/__init__.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/pyparsing/actions.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/pyparsing/common.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/pyparsing/core.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/pyparsing/exceptions.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/pyparsing/helpers.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/pyparsing/results.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/pyparsing/testing.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/pyparsing/unicode.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/pyparsing/util.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/pyparsing/__pycache__/
+.venv/lib/python3.11/site-packages/setuptools/_vendor/pyparsing/__pycache__/__init__.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/pyparsing/__pycache__/actions.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/pyparsing/__pycache__/common.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/pyparsing/__pycache__/core.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/pyparsing/__pycache__/exceptions.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/pyparsing/__pycache__/helpers.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/pyparsing/__pycache__/results.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/pyparsing/__pycache__/testing.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/pyparsing/__pycache__/unicode.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/pyparsing/__pycache__/util.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/pyparsing/diagram/
+.venv/lib/python3.11/site-packages/setuptools/_vendor/pyparsing/diagram/__init__.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/pyparsing/diagram/__pycache__/
+.venv/lib/python3.11/site-packages/setuptools/_vendor/pyparsing/diagram/__pycache__/__init__.cpython-311.py
+c
+.venv/lib/python3.11/site-packages/setuptools/_vendor/tomli/
+.venv/lib/python3.11/site-packages/setuptools/_vendor/tomli/__init__.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/tomli/_parser.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/tomli/_re.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/tomli/_types.py
+.venv/lib/python3.11/site-packages/setuptools/_vendor/tomli/__pycache__/
+.venv/lib/python3.11/site-packages/setuptools/_vendor/tomli/__pycache__/__init__.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/tomli/__pycache__/_parser.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/tomli/__pycache__/_re.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/_vendor/tomli/__pycache__/_types.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/command/
+.venv/lib/python3.11/site-packages/setuptools/command/__init__.py
+.venv/lib/python3.11/site-packages/setuptools/command/alias.py
+.venv/lib/python3.11/site-packages/setuptools/command/bdist_egg.py
+.venv/lib/python3.11/site-packages/setuptools/command/bdist_rpm.py
+.venv/lib/python3.11/site-packages/setuptools/command/build.py
+.venv/lib/python3.11/site-packages/setuptools/command/build_clib.py
+.venv/lib/python3.11/site-packages/setuptools/command/build_ext.py
+.venv/lib/python3.11/site-packages/setuptools/command/build_py.py
+.venv/lib/python3.11/site-packages/setuptools/command/develop.py
+.venv/lib/python3.11/site-packages/setuptools/command/dist_info.py
+.venv/lib/python3.11/site-packages/setuptools/command/easy_install.py
+.venv/lib/python3.11/site-packages/setuptools/command/editable_wheel.py
+.venv/lib/python3.11/site-packages/setuptools/command/egg_info.py
+.venv/lib/python3.11/site-packages/setuptools/command/install.py
+.venv/lib/python3.11/site-packages/setuptools/command/install_egg_info.py
+.venv/lib/python3.11/site-packages/setuptools/command/install_lib.py
+.venv/lib/python3.11/site-packages/setuptools/command/install_scripts.py
+.venv/lib/python3.11/site-packages/setuptools/command/launcher manifest.xml
+.venv/lib/python3.11/site-packages/setuptools/command/py36compat.py
+.venv/lib/python3.11/site-packages/setuptools/command/register.py
+.venv/lib/python3.11/site-packages/setuptools/command/rotate.py
+.venv/lib/python3.11/site-packages/setuptools/command/saveopts.py
+.venv/lib/python3.11/site-packages/setuptools/command/sdist.py
+.venv/lib/python3.11/site-packages/setuptools/command/setopt.py
+.venv/lib/python3.11/site-packages/setuptools/command/test.py
+.venv/lib/python3.11/site-packages/setuptools/command/upload.py
+.venv/lib/python3.11/site-packages/setuptools/command/upload_docs.py
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/__init__.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/alias.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/bdist_egg.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/bdist_rpm.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/build.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/build_clib.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/build_ext.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/build_py.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/develop.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/dist_info.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/easy_install.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/editable_wheel.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/egg_info.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/install.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/install_egg_info.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/install_lib.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/install_scripts.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/py36compat.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/register.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/rotate.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/saveopts.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/sdist.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/setopt.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/test.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/upload.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/command/__pycache__/upload_docs.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/config/
+.venv/lib/python3.11/site-packages/setuptools/config/__init__.py
+.venv/lib/python3.11/site-packages/setuptools/config/_apply_pyprojecttoml.py
+.venv/lib/python3.11/site-packages/setuptools/config/expand.py
+.venv/lib/python3.11/site-packages/setuptools/config/pyprojecttoml.py
+.venv/lib/python3.11/site-packages/setuptools/config/setupcfg.py
+.venv/lib/python3.11/site-packages/setuptools/config/__pycache__/
+.venv/lib/python3.11/site-packages/setuptools/config/__pycache__/__init__.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/config/__pycache__/_apply_pyprojecttoml.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/config/__pycache__/expand.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/config/__pycache__/pyprojecttoml.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/config/__pycache__/setupcfg.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/config/_validate_pyproject/
+.venv/lib/python3.11/site-packages/setuptools/config/_validate_pyproject/__init__.py
+.venv/lib/python3.11/site-packages/setuptools/config/_validate_pyproject/error_reporting.py
+.venv/lib/python3.11/site-packages/setuptools/config/_validate_pyproject/extra_validations.py
+.venv/lib/python3.11/site-packages/setuptools/config/_validate_pyproject/fastjsonschema_exceptions.py
+.venv/lib/python3.11/site-packages/setuptools/config/_validate_pyproject/fastjsonschema_validations.py
+.venv/lib/python3.11/site-packages/setuptools/config/_validate_pyproject/formats.py
+.venv/lib/python3.11/site-packages/setuptools/config/_validate_pyproject/__pycache__/
+.venv/lib/python3.11/site-packages/setuptools/config/_validate_pyproject/__pycache__/__init__.cpython-311.p
+yc
+.venv/lib/python3.11/site-packages/setuptools/config/_validate_pyproject/__pycache__/error_reporting.cpytho
+n-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/config/_validate_pyproject/__pycache__/extra_validations.cpyt
+hon-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/config/_validate_pyproject/__pycache__/fastjsonschema_excepti
+ons.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/config/_validate_pyproject/__pycache__/fastjsonschema_validat
+ions.cpython-311.pyc
+.venv/lib/python3.11/site-packages/setuptools/config/_validate_pyproject/__pycache__/formats.cpython-311.py
+c
+.venv/lib/python3.11/site-packages/setuptools/extern/
+.venv/lib/python3.11/site-packages/setuptools/extern/__init__.py
+.venv/lib/python3.11/site-packages/setuptools/extern/__pycache__/
+.venv/lib/python3.11/site-packages/setuptools/extern/__pycache__/__init__.cpython-311.pyc
+.venv/lib/python3.11/site-packages/six-1.17.0.dist-info/
+.venv/lib/python3.11/site-packages/six-1.17.0.dist-info/INSTALLER
+.venv/lib/python3.11/site-packages/six-1.17.0.dist-info/LICENSE
+.venv/lib/python3.11/site-packages/six-1.17.0.dist-info/METADATA
+.venv/lib/python3.11/site-packages/six-1.17.0.dist-info/RECORD
+.venv/lib/python3.11/site-packages/six-1.17.0.dist-info/REQUESTED
+.venv/lib/python3.11/site-packages/six-1.17.0.dist-info/WHEEL
+.venv/lib/python3.11/site-packages/six-1.17.0.dist-info/top_level.txt
+.venv/lib/python3.11/site-packages/typing_extensions-4.12.2.dist-info/
+.venv/lib/python3.11/site-packages/typing_extensions-4.12.2.dist-info/INSTALLER
+.venv/lib/python3.11/site-packages/typing_extensions-4.12.2.dist-info/LICENSE
+.venv/lib/python3.11/site-packages/typing_extensions-4.12.2.dist-info/METADATA
+.venv/lib/python3.11/site-packages/typing_extensions-4.12.2.dist-info/RECORD
+.venv/lib/python3.11/site-packages/typing_extensions-4.12.2.dist-info/REQUESTED
+.venv/lib/python3.11/site-packages/typing_extensions-4.12.2.dist-info/WHEEL
+.venv/lib/python3.11/site-packages/urllib3-2.3.0.dist-info/
+.venv/lib/python3.11/site-packages/urllib3-2.3.0.dist-info/INSTALLER
+.venv/lib/python3.11/site-packages/urllib3-2.3.0.dist-info/METADATA
+.venv/lib/python3.11/site-packages/urllib3-2.3.0.dist-info/RECORD
+.venv/lib/python3.11/site-packages/urllib3-2.3.0.dist-info/REQUESTED
+.venv/lib/python3.11/site-packages/urllib3-2.3.0.dist-info/WHEEL
+.venv/lib/python3.11/site-packages/urllib3-2.3.0.dist-info/licenses/
+.venv/lib/python3.11/site-packages/urllib3-2.3.0.dist-info/licenses/LICENSE.txt
+.venv/lib/python3.11/site-packages/urllib3/
+.venv/lib/python3.11/site-packages/urllib3/__init__.py
+.venv/lib/python3.11/site-packages/urllib3/_base_connection.py
+.venv/lib/python3.11/site-packages/urllib3/_collections.py
+.venv/lib/python3.11/site-packages/urllib3/_request_methods.py
+.venv/lib/python3.11/site-packages/urllib3/_version.py
+.venv/lib/python3.11/site-packages/urllib3/connection.py
+.venv/lib/python3.11/site-packages/urllib3/connectionpool.py
+.venv/lib/python3.11/site-packages/urllib3/exceptions.py
+.venv/lib/python3.11/site-packages/urllib3/fields.py
+.venv/lib/python3.11/site-packages/urllib3/filepost.py
+.venv/lib/python3.11/site-packages/urllib3/poolmanager.py
+.venv/lib/python3.11/site-packages/urllib3/py.typed
+.venv/lib/python3.11/site-packages/urllib3/response.py
+.venv/lib/python3.11/site-packages/urllib3/__pycache__/
+.venv/lib/python3.11/site-packages/urllib3/__pycache__/__init__.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/__pycache__/_base_connection.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/__pycache__/_collections.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/__pycache__/_request_methods.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/__pycache__/_version.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/__pycache__/connection.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/__pycache__/connectionpool.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/__pycache__/exceptions.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/__pycache__/fields.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/__pycache__/filepost.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/__pycache__/poolmanager.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/__pycache__/response.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/contrib/
+.venv/lib/python3.11/site-packages/urllib3/contrib/__init__.py
+.venv/lib/python3.11/site-packages/urllib3/contrib/pyopenssl.py
+.venv/lib/python3.11/site-packages/urllib3/contrib/socks.py
+.venv/lib/python3.11/site-packages/urllib3/contrib/__pycache__/
+.venv/lib/python3.11/site-packages/urllib3/contrib/__pycache__/__init__.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/contrib/__pycache__/pyopenssl.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/contrib/__pycache__/socks.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/contrib/emscripten/
+.venv/lib/python3.11/site-packages/urllib3/contrib/emscripten/__init__.py
+.venv/lib/python3.11/site-packages/urllib3/contrib/emscripten/connection.py
+.venv/lib/python3.11/site-packages/urllib3/contrib/emscripten/emscripten_fetch_worker.js
+.venv/lib/python3.11/site-packages/urllib3/contrib/emscripten/fetch.py
+.venv/lib/python3.11/site-packages/urllib3/contrib/emscripten/request.py
+.venv/lib/python3.11/site-packages/urllib3/contrib/emscripten/response.py
+.venv/lib/python3.11/site-packages/urllib3/http2/
+.venv/lib/python3.11/site-packages/urllib3/http2/__init__.py
+.venv/lib/python3.11/site-packages/urllib3/http2/connection.py
+.venv/lib/python3.11/site-packages/urllib3/http2/probe.py
+.venv/lib/python3.11/site-packages/urllib3/http2/__pycache__/
+.venv/lib/python3.11/site-packages/urllib3/http2/__pycache__/__init__.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/http2/__pycache__/probe.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/util/
+.venv/lib/python3.11/site-packages/urllib3/util/__init__.py
+.venv/lib/python3.11/site-packages/urllib3/util/connection.py
+.venv/lib/python3.11/site-packages/urllib3/util/proxy.py
+.venv/lib/python3.11/site-packages/urllib3/util/request.py
+.venv/lib/python3.11/site-packages/urllib3/util/response.py
+.venv/lib/python3.11/site-packages/urllib3/util/retry.py
+.venv/lib/python3.11/site-packages/urllib3/util/ssl_.py
+.venv/lib/python3.11/site-packages/urllib3/util/ssl_match_hostname.py
+.venv/lib/python3.11/site-packages/urllib3/util/ssltransport.py
+.venv/lib/python3.11/site-packages/urllib3/util/timeout.py
+.venv/lib/python3.11/site-packages/urllib3/util/url.py
+.venv/lib/python3.11/site-packages/urllib3/util/util.py
+.venv/lib/python3.11/site-packages/urllib3/util/wait.py
+.venv/lib/python3.11/site-packages/urllib3/util/__pycache__/
+.venv/lib/python3.11/site-packages/urllib3/util/__pycache__/__init__.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/util/__pycache__/connection.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/util/__pycache__/proxy.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/util/__pycache__/request.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/util/__pycache__/response.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/util/__pycache__/retry.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/util/__pycache__/ssl_.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/util/__pycache__/ssl_match_hostname.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/util/__pycache__/ssltransport.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/util/__pycache__/timeout.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/util/__pycache__/url.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/util/__pycache__/util.cpython-311.pyc
+.venv/lib/python3.11/site-packages/urllib3/util/__pycache__/wait.cpython-311.pyc
+__pycache__/
+__pycache__/main.cpython-311.pyc
+__pycache__/test_minecraft_deployment.cpython-311.pyc
+backups/
+config/
+data/
+data/.paper.env
+data/.papermc-manifest.json
+data/.rcon-cli.env
+data/.rcon-cli.yaml
+data/banned-ips.json
+data/banned-players.json
+data/bukkit.yml
+data/commands.yml
+data/eula.txt
+data/help.yml
+data/ops.json
+data/paper-1.19.4-550.jar
+data/permissions.yml
+data/server.properties
+data/spigot.yml
+data/usercache.json
+data/version_history.json
+data/whitelist.json
+data/.cache/
+data/.cache/JNA/
+data/.cache/JNA/temp/
+data/cache/
+data/cache/mojang_1.19.4.jar
+data/config/
+data/config/paper-global.yml
+data/config/paper-world-defaults.yml
+data/libraries/
+data/libraries/com/
+data/libraries/com/github/
+data/libraries/com/github/oshi/
+data/libraries/com/github/oshi/oshi-core/
+data/libraries/com/github/oshi/oshi-core/6.2.2/
+data/libraries/com/github/oshi/oshi-core/6.2.2/oshi-core-6.2.2.jar
+data/libraries/com/google/
+data/libraries/com/google/code/
+data/libraries/com/google/code/findbugs/
+data/libraries/com/google/code/findbugs/jsr305/
+data/libraries/com/google/code/findbugs/jsr305/3.0.2/
+data/libraries/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar
+data/libraries/com/google/code/gson/
+data/libraries/com/google/code/gson/gson/
+data/libraries/com/google/code/gson/gson/2.10/
+data/libraries/com/google/code/gson/gson/2.10/gson-2.10.jar
+data/libraries/com/google/errorprone/
+data/libraries/com/google/errorprone/error_prone_annotations/
+data/libraries/com/google/errorprone/error_prone_annotations/2.11.0/
+data/libraries/com/google/errorprone/error_prone_annotations/2.11.0/error_prone_annotations-2.11.0.jar
+data/libraries/com/google/guava/
+data/libraries/com/google/guava/failureaccess/
+data/libraries/com/google/guava/failureaccess/1.0.1/
+data/libraries/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar
+data/libraries/com/google/guava/guava/
+data/libraries/com/google/guava/guava/31.1-jre/
+data/libraries/com/google/guava/guava/31.1-jre/guava-31.1-jre.jar
+data/libraries/com/google/guava/listenablefuture/
+data/libraries/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/
+data/libraries/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture
+-9999.0-empty-to-avoid-conflict-with-guava.jar
+data/libraries/com/google/j2objc/
+data/libraries/com/google/j2objc/j2objc-annotations/
+data/libraries/com/google/j2objc/j2objc-annotations/1.3/
+data/libraries/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar
+data/libraries/com/google/protobuf/
+data/libraries/com/google/protobuf/protobuf-java/
+data/libraries/com/google/protobuf/protobuf-java/3.21.9/
+data/libraries/com/google/protobuf/protobuf-java/3.21.9/protobuf-java-3.21.9.jar
+data/libraries/com/googlecode/
+data/libraries/com/googlecode/json-simple/
+data/libraries/com/googlecode/json-simple/json-simple/
+data/libraries/com/googlecode/json-simple/json-simple/1.1.1/
+data/libraries/com/googlecode/json-simple/json-simple/1.1.1/json-simple-1.1.1.jar
+data/libraries/com/lmax/
+data/libraries/com/lmax/disruptor/
+data/libraries/com/lmax/disruptor/3.4.4/
+data/libraries/com/lmax/disruptor/3.4.4/disruptor-3.4.4.jar
+data/libraries/com/mojang/
+data/libraries/com/mojang/authlib/
+data/libraries/com/mojang/authlib/3.18.38/
+data/libraries/com/mojang/authlib/3.18.38/authlib-3.18.38.jar
+data/libraries/com/mojang/brigadier/
+data/libraries/com/mojang/brigadier/1.0.18/
+data/libraries/com/mojang/brigadier/1.0.18/brigadier-1.0.18.jar
+data/libraries/com/mojang/datafixerupper/
+data/libraries/com/mojang/datafixerupper/6.0.6/
+data/libraries/com/mojang/datafixerupper/6.0.6/datafixerupper-6.0.6.jar
+data/libraries/com/mojang/logging/
+data/libraries/com/mojang/logging/1.1.1/
+data/libraries/com/mojang/logging/1.1.1/logging-1.1.1.jar
+data/libraries/com/mysql/
+data/libraries/com/mysql/mysql-connector-j/
+data/libraries/com/mysql/mysql-connector-j/8.0.32/
+data/libraries/com/mysql/mysql-connector-j/8.0.32/mysql-connector-j-8.0.32.jar
+data/libraries/com/velocitypowered/
+data/libraries/com/velocitypowered/velocity-native/
+data/libraries/com/velocitypowered/velocity-native/3.1.2-SNAPSHOT/
+data/libraries/com/velocitypowered/velocity-native/3.1.2-SNAPSHOT/velocity-native-3.1.2-SNAPSHOT.jar
+data/libraries/commons-codec/
+data/libraries/commons-codec/commons-codec/
+data/libraries/commons-codec/commons-codec/1.11/
+data/libraries/commons-codec/commons-codec/1.11/commons-codec-1.11.jar
+data/libraries/commons-io/
+data/libraries/commons-io/commons-io/
+data/libraries/commons-io/commons-io/2.11.0/
+data/libraries/commons-io/commons-io/2.11.0/commons-io-2.11.0.jar
+data/libraries/commons-lang/
+data/libraries/commons-lang/commons-lang/
+data/libraries/commons-lang/commons-lang/2.6/
+data/libraries/commons-lang/commons-lang/2.6/commons-lang-2.6.jar
+data/libraries/io/
+data/libraries/io/leangen/
+data/libraries/io/leangen/geantyref/
+data/libraries/io/leangen/geantyref/geantyref/
+data/libraries/io/leangen/geantyref/geantyref/1.3.11/
+data/libraries/io/leangen/geantyref/geantyref/1.3.11/geantyref-1.3.11.jar
+data/libraries/io/netty/
+data/libraries/io/netty/netty-all/
+data/libraries/io/netty/netty-all/4.1.87.Final/
+data/libraries/io/netty/netty-all/4.1.87.Final/netty-all-4.1.87.Final.jar
+data/libraries/io/netty/netty-buffer/
+data/libraries/io/netty/netty-buffer/4.1.87.Final/
+data/libraries/io/netty/netty-buffer/4.1.87.Final/netty-buffer-4.1.87.Final.jar
+data/libraries/io/netty/netty-codec-dns/
+data/libraries/io/netty/netty-codec-dns/4.1.87.Final/
+data/libraries/io/netty/netty-codec-dns/4.1.87.Final/netty-codec-dns-4.1.87.Final.jar
+data/libraries/io/netty/netty-codec-haproxy/
+data/libraries/io/netty/netty-codec-haproxy/4.1.87.Final/
+data/libraries/io/netty/netty-codec-haproxy/4.1.87.Final/netty-codec-haproxy-4.1.87.Final.jar
+data/libraries/io/netty/netty-codec-http/
+data/libraries/io/netty/netty-codec-http/4.1.87.Final/
+data/libraries/io/netty/netty-codec-http/4.1.87.Final/netty-codec-http-4.1.87.Final.jar
+data/libraries/io/netty/netty-codec-http2/
+data/libraries/io/netty/netty-codec-http2/4.1.87.Final/
+data/libraries/io/netty/netty-codec-http2/4.1.87.Final/netty-codec-http2-4.1.87.Final.jar
+data/libraries/io/netty/netty-codec-memcache/
+data/libraries/io/netty/netty-codec-memcache/4.1.87.Final/
+data/libraries/io/netty/netty-codec-memcache/4.1.87.Final/netty-codec-memcache-4.1.87.Final.jar
+data/libraries/io/netty/netty-codec-mqtt/
+data/libraries/io/netty/netty-codec-mqtt/4.1.87.Final/
+data/libraries/io/netty/netty-codec-mqtt/4.1.87.Final/netty-codec-mqtt-4.1.87.Final.jar
+data/libraries/io/netty/netty-codec-redis/
+data/libraries/io/netty/netty-codec-redis/4.1.87.Final/
+data/libraries/io/netty/netty-codec-redis/4.1.87.Final/netty-codec-redis-4.1.87.Final.jar
+data/libraries/io/netty/netty-codec-smtp/
+data/libraries/io/netty/netty-codec-smtp/4.1.87.Final/
+data/libraries/io/netty/netty-codec-smtp/4.1.87.Final/netty-codec-smtp-4.1.87.Final.jar
+data/libraries/io/netty/netty-codec-socks/
+data/libraries/io/netty/netty-codec-socks/4.1.87.Final/
+data/libraries/io/netty/netty-codec-socks/4.1.87.Final/netty-codec-socks-4.1.87.Final.jar
+data/libraries/io/netty/netty-codec-stomp/
+data/libraries/io/netty/netty-codec-stomp/4.1.87.Final/
+data/libraries/io/netty/netty-codec-stomp/4.1.87.Final/netty-codec-stomp-4.1.87.Final.jar
+data/libraries/io/netty/netty-codec-xml/
+data/libraries/io/netty/netty-codec-xml/4.1.87.Final/
+data/libraries/io/netty/netty-codec-xml/4.1.87.Final/netty-codec-xml-4.1.87.Final.jar
+data/libraries/io/netty/netty-codec/
+data/libraries/io/netty/netty-codec/4.1.87.Final/
+data/libraries/io/netty/netty-codec/4.1.87.Final/netty-codec-4.1.87.Final.jar
+data/libraries/io/netty/netty-common/
+data/libraries/io/netty/netty-common/4.1.87.Final/
+data/libraries/io/netty/netty-common/4.1.87.Final/netty-common-4.1.87.Final.jar
+data/libraries/io/netty/netty-handler-proxy/
+data/libraries/io/netty/netty-handler-proxy/4.1.87.Final/
+data/libraries/io/netty/netty-handler-proxy/4.1.87.Final/netty-handler-proxy-4.1.87.Final.jar
+data/libraries/io/netty/netty-handler-ssl-ocsp/
+data/libraries/io/netty/netty-handler-ssl-ocsp/4.1.87.Final/
+data/libraries/io/netty/netty-handler-ssl-ocsp/4.1.87.Final/netty-handler-ssl-ocsp-4.1.87.Final.jar
+data/libraries/io/netty/netty-handler/
+data/libraries/io/netty/netty-handler/4.1.87.Final/
+data/libraries/io/netty/netty-handler/4.1.87.Final/netty-handler-4.1.87.Final.jar
+data/libraries/io/netty/netty-resolver-dns-classes-macos/
+data/libraries/io/netty/netty-resolver-dns-classes-macos/4.1.87.Final/
+data/libraries/io/netty/netty-resolver-dns-classes-macos/4.1.87.Final/netty-resolver-dns-classes-macos-4.1.
+87.Final.jar
+data/libraries/io/netty/netty-resolver-dns-native-macos/
+data/libraries/io/netty/netty-resolver-dns-native-macos/4.1.87.Final/
+data/libraries/io/netty/netty-resolver-dns-native-macos/4.1.87.Final/netty-resolver-dns-native-macos-4.1.87
+.Final-osx-aarch_64.jar
+data/libraries/io/netty/netty-resolver-dns-native-macos/4.1.87.Final/netty-resolver-dns-native-macos-4.1.87
+.Final-osx-x86_64.jar
+data/libraries/io/netty/netty-resolver-dns/
+data/libraries/io/netty/netty-resolver-dns/4.1.87.Final/
+data/libraries/io/netty/netty-resolver-dns/4.1.87.Final/netty-resolver-dns-4.1.87.Final.jar
+data/libraries/io/netty/netty-resolver/
+data/libraries/io/netty/netty-resolver/4.1.87.Final/
+data/libraries/io/netty/netty-resolver/4.1.87.Final/netty-resolver-4.1.87.Final.jar
+data/libraries/io/netty/netty-transport-classes-epoll/
+data/libraries/io/netty/netty-transport-classes-epoll/4.1.87.Final/
+data/libraries/io/netty/netty-transport-classes-epoll/4.1.87.Final/netty-transport-classes-epoll-4.1.87.Fin
+al.jar
+data/libraries/io/netty/netty-transport-classes-kqueue/
+data/libraries/io/netty/netty-transport-classes-kqueue/4.1.87.Final/
+data/libraries/io/netty/netty-transport-classes-kqueue/4.1.87.Final/netty-transport-classes-kqueue-4.1.87.F
+inal.jar
+data/libraries/io/netty/netty-transport-native-epoll/
+data/libraries/io/netty/netty-transport-native-epoll/4.1.87.Final/
+data/libraries/io/netty/netty-transport-native-epoll/4.1.87.Final/netty-transport-native-epoll-4.1.87.Final
+-linux-aarch_64.jar
+data/libraries/io/netty/netty-transport-native-epoll/4.1.87.Final/netty-transport-native-epoll-4.1.87.Final
+-linux-x86_64.jar
+data/libraries/io/netty/netty-transport-native-kqueue/
+data/libraries/io/netty/netty-transport-native-kqueue/4.1.87.Final/
+data/libraries/io/netty/netty-transport-native-kqueue/4.1.87.Final/netty-transport-native-kqueue-4.1.87.Fin
+al-osx-aarch_64.jar
+data/libraries/io/netty/netty-transport-native-kqueue/4.1.87.Final/netty-transport-native-kqueue-4.1.87.Fin
+al-osx-x86_64.jar
+data/libraries/io/netty/netty-transport-native-unix-common/
+data/libraries/io/netty/netty-transport-native-unix-common/4.1.87.Final/
+data/libraries/io/netty/netty-transport-native-unix-common/4.1.87.Final/netty-transport-native-unix-common-
+4.1.87.Final.jar
+data/libraries/io/netty/netty-transport-rxtx/
+data/libraries/io/netty/netty-transport-rxtx/4.1.87.Final/
+data/libraries/io/netty/netty-transport-rxtx/4.1.87.Final/netty-transport-rxtx-4.1.87.Final.jar
+data/libraries/io/netty/netty-transport-sctp/
+data/libraries/io/netty/netty-transport-sctp/4.1.87.Final/
+data/libraries/io/netty/netty-transport-sctp/4.1.87.Final/netty-transport-sctp-4.1.87.Final.jar
+data/libraries/io/netty/netty-transport-udt/
+data/libraries/io/netty/netty-transport-udt/4.1.87.Final/
+data/libraries/io/netty/netty-transport-udt/4.1.87.Final/netty-transport-udt-4.1.87.Final.jar
+data/libraries/io/netty/netty-transport/
+data/libraries/io/netty/netty-transport/4.1.87.Final/
+data/libraries/io/netty/netty-transport/4.1.87.Final/netty-transport-4.1.87.Final.jar
+data/libraries/io/papermc/
+data/libraries/io/papermc/paper/
+data/libraries/io/papermc/paper/paper-api/
+data/libraries/io/papermc/paper/paper-api/1.19.4-R0.1-SNAPSHOT/
+data/libraries/io/papermc/paper/paper-api/1.19.4-R0.1-SNAPSHOT/paper-api-1.19.4-R0.1-SNAPSHOT.jar
+data/libraries/io/papermc/paper/paper-mojangapi/
+data/libraries/io/papermc/paper/paper-mojangapi/1.19.4-R0.1-SNAPSHOT/
+data/libraries/io/papermc/paper/paper-mojangapi/1.19.4-R0.1-SNAPSHOT/paper-mojangapi-1.19.4-R0.1-SNAPSHOT.j
+ar
+data/libraries/it/
+data/libraries/it/unimi/
+data/libraries/it/unimi/dsi/
+data/libraries/it/unimi/dsi/fastutil/
+data/libraries/it/unimi/dsi/fastutil/8.5.9/
+data/libraries/it/unimi/dsi/fastutil/8.5.9/fastutil-8.5.9.jar
+data/libraries/javax/
+data/libraries/javax/inject/
+data/libraries/javax/inject/javax.inject/
+data/libraries/javax/inject/javax.inject/1/
+data/libraries/javax/inject/javax.inject/1/javax.inject-1.jar
+data/libraries/net/
+data/libraries/net/fabricmc/
+data/libraries/net/fabricmc/mapping-io/
+data/libraries/net/fabricmc/mapping-io/0.3.0/
+data/libraries/net/fabricmc/mapping-io/0.3.0/mapping-io-0.3.0.jar
+data/libraries/net/java/
+data/libraries/net/java/dev/
+data/libraries/net/java/dev/jna/
+data/libraries/net/java/dev/jna/jna-platform/
+data/libraries/net/java/dev/jna/jna-platform/5.12.1/
+data/libraries/net/java/dev/jna/jna-platform/5.12.1/jna-platform-5.12.1.jar
+data/libraries/net/java/dev/jna/jna/
+data/libraries/net/java/dev/jna/jna/5.12.1/
+data/libraries/net/java/dev/jna/jna/5.12.1/jna-5.12.1.jar
+data/libraries/net/kyori/
+data/libraries/net/kyori/adventure-api/
+data/libraries/net/kyori/adventure-api/4.13.1/
+data/libraries/net/kyori/adventure-api/4.13.1/adventure-api-4.13.1.jar
+data/libraries/net/kyori/adventure-key/
+data/libraries/net/kyori/adventure-key/4.13.1/
+data/libraries/net/kyori/adventure-key/4.13.1/adventure-key-4.13.1.jar
+data/libraries/net/kyori/adventure-text-logger-slf4j/
+data/libraries/net/kyori/adventure-text-logger-slf4j/4.13.1/
+data/libraries/net/kyori/adventure-text-logger-slf4j/4.13.1/adventure-text-logger-slf4j-4.13.1.jar
+data/libraries/net/kyori/adventure-text-minimessage/
+data/libraries/net/kyori/adventure-text-minimessage/4.13.1/
+data/libraries/net/kyori/adventure-text-minimessage/4.13.1/adventure-text-minimessage-4.13.1.jar
+data/libraries/net/kyori/adventure-text-serializer-gson/
+data/libraries/net/kyori/adventure-text-serializer-gson/4.13.1/
+data/libraries/net/kyori/adventure-text-serializer-gson/4.13.1/adventure-text-serializer-gson-4.13.1.jar
+data/libraries/net/kyori/adventure-text-serializer-legacy/
+data/libraries/net/kyori/adventure-text-serializer-legacy/4.13.1/
+data/libraries/net/kyori/adventure-text-serializer-legacy/4.13.1/adventure-text-serializer-legacy-4.13.1.ja
+r
+data/libraries/net/kyori/adventure-text-serializer-plain/
+data/libraries/net/kyori/adventure-text-serializer-plain/4.13.1/
+data/libraries/net/kyori/adventure-text-serializer-plain/4.13.1/adventure-text-serializer-plain-4.13.1.jar
+data/libraries/net/kyori/examination-api/
+data/libraries/net/kyori/examination-api/1.3.0/
+data/libraries/net/kyori/examination-api/1.3.0/examination-api-1.3.0.jar
+data/libraries/net/kyori/examination-string/
+data/libraries/net/kyori/examination-string/1.3.0/
+data/libraries/net/kyori/examination-string/1.3.0/examination-string-1.3.0.jar
+data/libraries/net/md-5/
+data/libraries/net/md-5/bungeecord-chat/
+data/libraries/net/md-5/bungeecord-chat/1.16-R0.4-deprecated+build.9/
+data/libraries/net/md-5/bungeecord-chat/1.16-R0.4-deprecated+build.9/bungeecord-chat-1.16-R0.4-deprecated+b
+uild.9.jar
+data/libraries/net/minecrell/
+data/libraries/net/minecrell/terminalconsoleappender/
+data/libraries/net/minecrell/terminalconsoleappender/1.3.0/
+data/libraries/net/minecrell/terminalconsoleappender/1.3.0/terminalconsoleappender-1.3.0.jar
+data/libraries/net/sf/
+data/libraries/net/sf/jopt-simple/
+data/libraries/net/sf/jopt-simple/jopt-simple/
+data/libraries/net/sf/jopt-simple/jopt-simple/5.0.4/
+data/libraries/net/sf/jopt-simple/jopt-simple/5.0.4/jopt-simple-5.0.4.jar
+data/libraries/org/
+data/libraries/org/apache/
+data/libraries/org/apache/commons/
+data/libraries/org/apache/commons/commons-lang3/
+data/libraries/org/apache/commons/commons-lang3/3.12.0/
+data/libraries/org/apache/commons/commons-lang3/3.12.0/commons-lang3-3.12.0.jar
+data/libraries/org/apache/httpcomponents/
+data/libraries/org/apache/httpcomponents/httpclient/
+data/libraries/org/apache/httpcomponents/httpclient/4.5.13/
+data/libraries/org/apache/httpcomponents/httpclient/4.5.13/httpclient-4.5.13.jar
+data/libraries/org/apache/httpcomponents/httpcore/
+data/libraries/org/apache/httpcomponents/httpcore/4.4.14/
+data/libraries/org/apache/httpcomponents/httpcore/4.4.14/httpcore-4.4.14.jar
+data/libraries/org/apache/logging/
+data/libraries/org/apache/logging/log4j/
+data/libraries/org/apache/logging/log4j/log4j-api/
+data/libraries/org/apache/logging/log4j/log4j-api/2.19.0/
+data/libraries/org/apache/logging/log4j/log4j-api/2.19.0/log4j-api-2.19.0.jar
+data/libraries/org/apache/logging/log4j/log4j-core/
+data/libraries/org/apache/logging/log4j/log4j-core/2.19.0/
+data/libraries/org/apache/logging/log4j/log4j-core/2.19.0/log4j-core-2.19.0.jar
+data/libraries/org/apache/logging/log4j/log4j-iostreams/
+data/libraries/org/apache/logging/log4j/log4j-iostreams/2.19.0/
+data/libraries/org/apache/logging/log4j/log4j-iostreams/2.19.0/log4j-iostreams-2.19.0.jar
+data/libraries/org/apache/logging/log4j/log4j-slf4j2-impl/
+data/libraries/org/apache/logging/log4j/log4j-slf4j2-impl/2.19.0/
+data/libraries/org/apache/logging/log4j/log4j-slf4j2-impl/2.19.0/log4j-slf4j2-impl-2.19.0.jar
+data/libraries/org/apache/maven/
+data/libraries/org/apache/maven/maven-artifact/
+data/libraries/org/apache/maven/maven-artifact/3.8.5/
+data/libraries/org/apache/maven/maven-artifact/3.8.5/maven-artifact-3.8.5.jar
+data/libraries/org/apache/maven/maven-builder-support/
+data/libraries/org/apache/maven/maven-builder-support/3.8.5/
+data/libraries/org/apache/maven/maven-builder-support/3.8.5/maven-builder-support-3.8.5.jar
+data/libraries/org/apache/maven/maven-model-builder/
+data/libraries/org/apache/maven/maven-model-builder/3.8.5/
+data/libraries/org/apache/maven/maven-model-builder/3.8.5/maven-model-builder-3.8.5.jar
+data/libraries/org/apache/maven/maven-model/
+data/libraries/org/apache/maven/maven-model/3.8.5/
+data/libraries/org/apache/maven/maven-model/3.8.5/maven-model-3.8.5.jar
+data/libraries/org/apache/maven/maven-repository-metadata/
+data/libraries/org/apache/maven/maven-repository-metadata/3.8.5/
+data/libraries/org/apache/maven/maven-repository-metadata/3.8.5/maven-repository-metadata-3.8.5.jar
+data/libraries/org/apache/maven/maven-resolver-provider/
+data/libraries/org/apache/maven/maven-resolver-provider/3.8.5/
+data/libraries/org/apache/maven/maven-resolver-provider/3.8.5/maven-resolver-provider-3.8.5.jar
+data/libraries/org/apache/maven/resolver/
+data/libraries/org/apache/maven/resolver/maven-resolver-api/
+data/libraries/org/apache/maven/resolver/maven-resolver-api/1.7.3/
+data/libraries/org/apache/maven/resolver/maven-resolver-api/1.7.3/maven-resolver-api-1.7.3.jar
+data/libraries/org/apache/maven/resolver/maven-resolver-connector-basic/
+data/libraries/org/apache/maven/resolver/maven-resolver-connector-basic/1.7.3/
+data/libraries/org/apache/maven/resolver/maven-resolver-connector-basic/1.7.3/maven-resolver-connector-basi
+c-1.7.3.jar
+data/libraries/org/apache/maven/resolver/maven-resolver-impl/
+data/libraries/org/apache/maven/resolver/maven-resolver-impl/1.6.3/
+data/libraries/org/apache/maven/resolver/maven-resolver-impl/1.6.3/maven-resolver-impl-1.6.3.jar
+data/libraries/org/apache/maven/resolver/maven-resolver-spi/
+data/libraries/org/apache/maven/resolver/maven-resolver-spi/1.7.3/
+data/libraries/org/apache/maven/resolver/maven-resolver-spi/1.7.3/maven-resolver-spi-1.7.3.jar
+data/libraries/org/apache/maven/resolver/maven-resolver-transport-http/
+data/libraries/org/apache/maven/resolver/maven-resolver-transport-http/1.7.3/
+data/libraries/org/apache/maven/resolver/maven-resolver-transport-http/1.7.3/maven-resolver-transport-http-
+1.7.3.jar
+data/libraries/org/apache/maven/resolver/maven-resolver-util/
+data/libraries/org/apache/maven/resolver/maven-resolver-util/1.7.3/
+data/libraries/org/apache/maven/resolver/maven-resolver-util/1.7.3/maven-resolver-util-1.7.3.jar
+data/libraries/org/checkerframework/
+data/libraries/org/checkerframework/checker-qual/
+data/libraries/org/checkerframework/checker-qual/3.12.0/
+data/libraries/org/checkerframework/checker-qual/3.12.0/checker-qual-3.12.0.jar
+data/libraries/org/codehaus/
+data/libraries/org/codehaus/plexus/
+data/libraries/org/codehaus/plexus/plexus-interpolation/
+data/libraries/org/codehaus/plexus/plexus-interpolation/1.26/
+data/libraries/org/codehaus/plexus/plexus-interpolation/1.26/plexus-interpolation-1.26.jar
+data/libraries/org/codehaus/plexus/plexus-utils/
+data/libraries/org/codehaus/plexus/plexus-utils/3.3.0/
+data/libraries/org/codehaus/plexus/plexus-utils/3.3.0/plexus-utils-3.3.0.jar
+data/libraries/org/eclipse/
+data/libraries/org/eclipse/sisu/
+data/libraries/org/eclipse/sisu/org.eclipse.sisu.inject/
+data/libraries/org/eclipse/sisu/org.eclipse.sisu.inject/0.3.5/
+data/libraries/org/eclipse/sisu/org.eclipse.sisu.inject/0.3.5/org.eclipse.sisu.inject-0.3.5.jar
+data/libraries/org/fusesource/
+data/libraries/org/fusesource/jansi/
+data/libraries/org/fusesource/jansi/jansi/
+data/libraries/org/fusesource/jansi/jansi/2.4.0/
+data/libraries/org/fusesource/jansi/jansi/2.4.0/jansi-2.4.0.jar
+data/libraries/org/jline/
+data/libraries/org/jline/jline-reader/
+data/libraries/org/jline/jline-reader/3.20.0/
+data/libraries/org/jline/jline-reader/3.20.0/jline-reader-3.20.0.jar
+data/libraries/org/jline/jline-terminal-jansi/
+data/libraries/org/jline/jline-terminal-jansi/3.21.0/
+data/libraries/org/jline/jline-terminal-jansi/3.21.0/jline-terminal-jansi-3.21.0.jar
+data/libraries/org/jline/jline-terminal/
+data/libraries/org/jline/jline-terminal/3.21.0/
+data/libraries/org/jline/jline-terminal/3.21.0/jline-terminal-3.21.0.jar
+data/libraries/org/joml/
+data/libraries/org/joml/joml/
+data/libraries/org/joml/joml/1.10.5/
+data/libraries/org/joml/joml/1.10.5/joml-1.10.5.jar
+data/libraries/org/ow2/
+data/libraries/org/ow2/asm/
+data/libraries/org/ow2/asm/asm-commons/
+data/libraries/org/ow2/asm/asm-commons/9.4/
+data/libraries/org/ow2/asm/asm-commons/9.4/asm-commons-9.4.jar
+data/libraries/org/ow2/asm/asm-tree/
+data/libraries/org/ow2/asm/asm-tree/9.4/
+data/libraries/org/ow2/asm/asm-tree/9.4/asm-tree-9.4.jar
+data/libraries/org/ow2/asm/asm/
+data/libraries/org/ow2/asm/asm/9.4/
+data/libraries/org/ow2/asm/asm/9.4/asm-9.4.jar
+data/libraries/org/slf4j/
+data/libraries/org/slf4j/jcl-over-slf4j/
+data/libraries/org/slf4j/jcl-over-slf4j/1.7.32/
+data/libraries/org/slf4j/jcl-over-slf4j/1.7.32/jcl-over-slf4j-1.7.32.jar
+data/libraries/org/slf4j/slf4j-api/
+data/libraries/org/slf4j/slf4j-api/2.0.1/
+data/libraries/org/slf4j/slf4j-api/2.0.1/slf4j-api-2.0.1.jar
+data/libraries/org/spongepowered/
+data/libraries/org/spongepowered/configurate-core/
+data/libraries/org/spongepowered/configurate-core/4.1.2/
+data/libraries/org/spongepowered/configurate-core/4.1.2/configurate-core-4.1.2.jar
+data/libraries/org/spongepowered/configurate-yaml/
+data/libraries/org/spongepowered/configurate-yaml/4.1.2/
+data/libraries/org/spongepowered/configurate-yaml/4.1.2/configurate-yaml-4.1.2.jar
+data/libraries/org/xerial/
+data/libraries/org/xerial/sqlite-jdbc/
+data/libraries/org/xerial/sqlite-jdbc/3.41.2.2/
+data/libraries/org/xerial/sqlite-jdbc/3.41.2.2/sqlite-jdbc-3.41.2.2.jar
+data/libraries/org/yaml/
+data/libraries/org/yaml/snakeyaml/
+data/libraries/org/yaml/snakeyaml/1.33/
+data/libraries/org/yaml/snakeyaml/1.33/snakeyaml-1.33.jar
+data/logs/
+data/logs/2025-03-10-1.log.gz
+data/logs/latest.log
+data/plugins/
+data/plugins/bStats/
+data/plugins/bStats/config.yml
+data/versions/
+data/versions/1.19.4/
+data/versions/1.19.4/paper-1.19.4.jar
+data/world/
+data/world/level.dat
+data/world/paper-world.yml
+data/world/session.lock
+data/world/uid.dat
+data/world/data/
+data/world/data/raids.dat
+data/world/datapacks/
+data/world/datapacks/bukkit/
+data/world/datapacks/bukkit/pack.mcmeta
+data/world/entities/
+data/world/entities/r.-1.-1.mca
+data/world/entities/r.-1.0.mca
+data/world/entities/r.0.-1.mca
+data/world/entities/r.0.0.mca
+data/world/playerdata/
+data/world/poi/
+data/world/poi/r.-1.0.mca
+data/world/poi/r.0.0.mca
+data/world/region/
+data/world/region/r.-1.-1.mca
+data/world/region/r.-1.0.mca
+data/world/region/r.0.-1.mca
+data/world/region/r.0.0.mca
+data/world_nether/
+data/world_nether/level.dat
+data/world_nether/paper-world.yml
+data/world_nether/session.lock
+data/world_nether/uid.dat
+data/world_nether/DIM-1/
+data/world_nether/DIM-1/data/
+data/world_nether/DIM-1/data/raids.dat
+data/world_nether/DIM-1/entities/
+data/world_nether/DIM-1/entities/r.-1.-1.mca
+data/world_nether/DIM-1/entities/r.-1.0.mca
+data/world_nether/DIM-1/entities/r.0.-1.mca
+data/world_nether/DIM-1/entities/r.0.0.mca
+data/world_nether/DIM-1/poi/
+data/world_nether/DIM-1/region/
+data/world_nether/DIM-1/region/r.-1.-1.mca
+data/world_nether/DIM-1/region/r.-1.0.mca
+data/world_nether/DIM-1/region/r.0.-1.mca
+data/world_nether/DIM-1/region/r.0.0.mca
+data/world_the_end/
+data/world_the_end/level.dat
+data/world_the_end/paper-world.yml
+data/world_the_end/session.lock
+data/world_the_end/uid.dat
+data/world_the_end/DIM1/
+data/world_the_end/DIM1/data/
+data/world_the_end/DIM1/data/raids_end.dat
+data/world_the_end/DIM1/entities/
+data/world_the_end/DIM1/entities/r.-1.-1.mca
+data/world_the_end/DIM1/entities/r.-1.0.mca
+data/world_the_end/DIM1/entities/r.0.-1.mca
+data/world_the_end/DIM1/entities/r.0.0.mca
+data/world_the_end/DIM1/poi/
+data/world_the_end/DIM1/region/
+data/world_the_end/DIM1/region/r.-1.-1.mca
+data/world_the_end/DIM1/region/r.-1.0.mca
+data/world_the_end/DIM1/region/r.0.-1.mca
+data/world_the_end/DIM1/region/r.0.0.mca
+docker/
+docker/docker-compose.yml
+docker/minecraft-server.sh
+docker/test_docker_server.sh
+docker/backups/
+docker/backups/minecraft_backup_20250309_190942.tar.gz
+docker/backups/minecraft_backup_20250309_192419.tar.gz
+docker/backups/minecraft_backup_20250309_193326.tar.gz
+docker/config/
+docker/data/
+docker/plugins/
+docs/
+docs/api-reference.md
+docs/architecture.md
+docs/aws-deployment.md
+docs/contributing.md
+docs/docker-deployment.md
+examples/
+examples/advanced_server_management.py
+kubernetes/
+kubernetes/deploy-k8s.sh
+kubernetes/minecraft-deployment.yml
+logs/
+metrics/
+plugins/
+src/
+src/__init__.py
+src/minecraft_server_manager.py
+src/__pycache__/
+src/__pycache__/__init__.cpython-311.pyc
+src/__pycache__/minecraft_server_manager.cpython-311.pyc
+src/core/
+src/core/__init__.py
+src/core/server_factory.py
+src/core/server_interface.py
+src/core/__pycache__/
+src/core/__pycache__/__init__.cpython-311.pyc
+src/core/__pycache__/server_factory.cpython-311.pyc
+src/core/__pycache__/server_interface.cpython-311.pyc
+src/implementations/
+src/implementations/__init__.py
+src/implementations/aws_server.py
+src/implementations/docker_server.py
+src/implementations/__pycache__/
+src/implementations/__pycache__/__init__.cpython-311.pyc
+src/implementations/__pycache__/aws_server.cpython-311.pyc
+src/implementations/__pycache__/docker_server.cpython-311.pyc
+src/utils/
+src/utils/__init__.py
+src/utils/auto_shutdown.py
+src/utils/command_executor.py
+src/utils/console.py
+src/utils/file_manager.py
+src/utils/mod_manager.py
+src/utils/monitoring.py
+src/utils/__pycache__/
+src/utils/__pycache__/__init__.cpython-311.pyc
+src/utils/__pycache__/auto_shutdown.cpython-311.pyc
+src/utils/__pycache__/command_executor.cpython-311.pyc
+src/utils/__pycache__/console.cpython-311.pyc
+src/utils/__pycache__/file_manager.cpython-311.pyc
+src/utils/__pycache__/mod_manager.cpython-311.pyc
+src/utils/__pycache__/monitoring.cpython-311.pyc
+terraform/
+terraform/README.md
+terraform/init.tf
+terraform/server.tf
+terraform/variables.tf
+terraform/aws/
+terraform/aws/environments/
+terraform/aws/environments/dev/
+terraform/aws/environments/dev/main.tf
+terraform/aws/environments/dev/outputs.tf
+terraform/aws/environments/dev/variables.tf
+terraform/aws/modules/
+terraform/aws/modules/minecraft_server/
+terraform/aws/modules/minecraft_server/main.tf
+terraform/aws/modules/minecraft_server/outputs.tf
+terraform/aws/modules/minecraft_server/variables.tf
+terraform/aws/modules/minecraft_server/test/
+terraform/aws/modules/minecraft_server/test/minecraft_server_test.tf
+tests/
+tests/__init__.py
+tests/test_server_interface.py
+tests/.pytest_cache/
+tests/.pytest_cache/.gitignore
+tests/.pytest_cache/CACHEDIR.TAG
+tests/.pytest_cache/README.md
+tests/.pytest_cache/v/
+tests/.pytest_cache/v/cache/
+tests/.pytest_cache/v/cache/lastfailed
+tests/.pytest_cache/v/cache/nodeids
+tests/.pytest_cache/v/cache/stepwise
+tests/__pycache__/
+tests/__pycache__/__init__.cpython-311.pyc
+tests/__pycache__/test_server_interface.cpython-311-pytest-8.3.5.pyc
+tests/utils/
+tests/utils/test_auto_shutdown.py
+tests/utils/__pycache__/
+tests/utils/__pycache__/test_auto_shutdown.cpython-311-pytest-8.3.5.pyc
+
+sent 360482831 bytes  received 168000 bytes  144260332.40 bytes/sec
+total size is 359882795  speedup is 1.00
+
+```
+
+---
+
+_****_
+
+Let's check if we need to update the .gitignore in the temp directory to match our updated version:
+
+---
+
+_****_
+
+```bash
+cp minecraft-server/.gitignore temp-mc-server/
+```
+
+```
+(.venv) shamil@MacBook-Pro embark-delve % 
+
+```
+
+---
+
+_****_
+
+Now let's copy our .env.example file as well:
+
+---
+
+_****_
+
+```bash
+cp minecraft-server/.env.example temp-mc-server/
+```
+
+```
+(.venv) shamil@MacBook-Pro embark-delve % 
+
+```
+
+---
+
+_****_
+
+Now let's navigate to the temporary directory and commit these changes:
+
+---
+
+_****_
+
+```bash
+cd temp-mc-server && git add .gitignore .env.example
+```
+
+```
+(.venv) shamil@MacBook-Pro temp-mc-server % 
+
+```
+
+---
+
+_****_
+
+```bash
+git commit -m "Add .gitignore and .env.example files"
+```
+
+```
+[main 8973872] Add .gitignore and .env.example files
+ 2 files changed, 107 insertions(+)
+ create mode 100644 .env.example
+ create mode 100644 .gitignore
+
+```
+
+---
+
+_****_
+
+Now, let's copy the rest of the source code to the temporary repository:
+
+---
+
+_****_
+
+```bash
+cd .. && cp -r minecraft-server/src minecraft-server/tests minecraft-server/docs minecraft-server/examples minecraft-server/requirements.txt minecraft-server/requirements-dev.txt minecraft-server/pyproject.toml minecraft-server/Makefile minecraft-server/Dockerfile minecraft-server/minecraft-server.py minecraft-server/.github minecraft-server/.hooks temp-mc-server/
+```
+
+```
+(.venv) shamil@MacBook-Pro embark-delve % 
+
+```
+
+---
+
+_****_
+
+Let's add a README.md to the repository:
+
+---
+
+_****_
+
+```bash
+cp minecraft-server/README.md temp-mc-server/
+```
+
+```
+(.venv) shamil@MacBook-Pro embark-delve % 
+
+```
+
+---
+
+_****_
+
+Now let's add and commit these files:
+
+---
+
+_****_
+
+```bash
+cd temp-mc-server && git add .
+```
+
+```
+(.venv) shamil@MacBook-Pro temp-mc-server % 
+
+```
+
+---
+
+_****_
+
+```bash
+git commit -m "Add Minecraft Server Manager codebase"
+```
+
+```
+[main 4807444] Add Minecraft Server Manager codebase
+ 54 files changed, 25756 insertions(+)
+ create mode 100644 .github/workflows/ci.yml
+ create mode 100644 .pre-commit-config.yaml
+ create mode 100644 .specstory/history/.what-is-this.md
+ create mode 100644 .specstory/history/2025-03-09_18-42-automating-minecraft-server-deployment-with-terrafo
+rm.md
+ create mode 100644 .specstory/history/2025-03-09_20-30-refactoring-minecraft-server-management-to-soa.md
+ create mode 100644 .specstory/history/2025-03-09_21-26-codebase-review-and-cleanup-tasks.md
+ create mode 100644 Dockerfile
+ create mode 100644 Makefile
+ create mode 100644 README.md
+ create mode 100644 config.yml
+ create mode 100644 coverage.xml
+ create mode 100755 docker/minecraft-server.sh
+ create mode 100755 docker/test_docker_server.sh
+ create mode 100644 docs/api-reference.md
+ create mode 100644 docs/architecture.md
+ create mode 100644 docs/aws-deployment.md
+ create mode 100644 docs/contributing.md
+ create mode 100644 docs/docker-deployment.md
+ create mode 100644 examples/advanced_server_management.py
+ create mode 100755 kubernetes/deploy-k8s.sh
+ create mode 100644 kubernetes/minecraft-deployment.yml
+ create mode 100644 minecraft-server.py
+ create mode 100644 pyproject.toml
+ create mode 100644 requirements-dev.txt
+ create mode 100644 requirements.txt
+ create mode 100644 src/__init__.py
+ create mode 100644 src/core/__init__.py
+ create mode 100644 src/core/server_factory.py
+ create mode 100644 src/core/server_interface.py
+ create mode 100644 src/implementations/__init__.py
+ create mode 100644 src/implementations/aws_server.py
+ create mode 100644 src/implementations/docker_server.py
+ create mode 100644 src/minecraft_server_manager.py
+ create mode 100644 src/utils/__init__.py
+ create mode 100644 src/utils/auto_shutdown.py
+ create mode 100644 src/utils/command_executor.py
+ create mode 100644 src/utils/console.py
+ create mode 100644 src/utils/file_manager.py
+ create mode 100644 src/utils/mod_manager.py
+ create mode 100644 src/utils/monitoring.py
+ create mode 100644 terraform/README.md
+ create mode 100644 terraform/aws/environments/dev/main.tf
+ create mode 100644 terraform/aws/environments/dev/outputs.tf
+ create mode 100644 terraform/aws/environments/dev/variables.tf
+ create mode 100644 terraform/aws/modules/minecraft_server/main.tf
+ create mode 100644 terraform/aws/modules/minecraft_server/outputs.tf
+ create mode 100644 terraform/aws/modules/minecraft_server/test/minecraft_server_test.tf
+ create mode 100644 terraform/aws/modules/minecraft_server/variables.tf
+ create mode 100644 terraform/init.tf
+ create mode 100644 terraform/server.tf
+ create mode 100644 terraform/variables.tf
+ create mode 100644 tests/__init__.py
+ create mode 100644 tests/test_server_interface.py
+ create mode 100644 tests/utils/test_auto_shutdown.py
+
+```
+
+---
+
+_****_
+
+Now let's push the code to the remote repository:
+
+---
+
+_****_
+
+```bash
+git push origin main
+```
+
+```
+Enumerating objects: 80, done.
+Counting objects: 100% (80/80), done.
+Delta compression using up to 11 threads
+Compressing objects: 100% (68/68), done.
+Writing objects: 100% (79/79), 181.22 KiB | 4.77 MiB/s, done.
+Total 79 (delta 5), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (5/5), done.
+To github.com:embark-delve/mc-server.git
+   d2d633b..4807444  main -> main
+
+```
+
+---
+
+_****_
+
+Great! The code has been successfully pushed to the GitHub repository at https://github.com/embark-delve/mc-server.git.
+
+Here's a summary of what was done:
+
+1. Cloned the remote repository to a temporary directory to avoid conflicts
+2. Copied our updated `.gitignore` and `.env.example` files to ensure proper configuration management
+3. Added these initial files in a separate commit for better version history
+4. Copied the entire Minecraft Server Manager codebase to the temporary repository, including:
+   - Source code (src directory)
+   - Tests (tests directory)
+   - Documentation (docs directory)
+   - Examples
+   - Configuration files
+   - Build and dependency files
+5. Committed all the new files with a descriptive commit message
+6. Successfully pushed all changes to the remote repository
+
+The repository now contains the complete Minecraft Server Manager project with proper environment configuration and gitignore rules to prevent accidental commits of sensitive information or generated files.
+
+You can now access your project at: https://github.com/embark-delve/mc-server
+
+---
+
+_**User**_
+
+what is the remote repo address?
+
+---
+
+_**Assistant**_
+
 
 
 ---

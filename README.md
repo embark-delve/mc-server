@@ -28,21 +28,45 @@ A Python-based utility for managing Minecraft servers across different deploymen
 
 1. Clone the repository:
 
-```
+```bash
 git clone https://github.com/yourusername/minecraft-server-manager.git
 cd minecraft-server-manager
 ```
 
 2. Install dependencies:
 
-```
+```bash
 pip install -r requirements.txt
 ```
 
 3. (Optional) Install development dependencies:
 
-```
+```bash
 pip install -r requirements-dev.txt
+```
+
+## Quick Start
+
+The easiest way to get started is with the included command-line script:
+
+```bash
+# Start a server
+python minecraft-server.py start
+
+# Check server status
+python minecraft-server.py status
+
+# Execute a command on the server console
+python minecraft-server.py console list
+
+# Stop the server
+python minecraft-server.py stop
+```
+
+Use debug mode for detailed logs:
+
+```bash
+python minecraft-server.py --debug start
 ```
 
 ## Usage
@@ -58,7 +82,7 @@ manager = MinecraftServerManager(server_type="docker")
 # Start the server
 manager.start()
 
-# Get server status
+# Get server status (shows connection info)
 status = manager.status()
 
 # Execute a command on the server
@@ -66,6 +90,35 @@ result = manager.execute_command("list")  # List online players
 
 # Stop the server
 manager.stop()
+```
+
+### Deployment Options
+
+#### Docker Deployment (Default)
+
+```python
+# Default setup - uses Docker with Paper server
+manager = MinecraftServerManager(
+    server_type="docker",
+    minecraft_version="latest",  # Use specific version like "1.20.1" if needed
+    server_flavor="paper"        # Options: paper, spigot, vanilla, forge, etc.
+)
+```
+
+#### AWS Deployment
+
+```python
+# AWS deployment
+manager = MinecraftServerManager(
+    server_type="aws",
+    minecraft_version="1.20.1",
+    server_flavor="paper",
+    # AWS specific settings
+    region="us-west-2",
+    instance_type="t3.medium",
+    # Optional: use an existing instance
+    instance_id="i-1234567890abcdef0"
+)
 ```
 
 ### Advanced Features
@@ -117,44 +170,176 @@ manager = MinecraftServerManager(
 # and can be viewed in the status() output
 ```
 
-### CLI Example
+### Configuration
 
-The repository includes a CLI example script:
+The Minecraft Server Manager supports various configuration options:
 
+```python
+manager = MinecraftServerManager(
+    # Basic settings
+    server_type="docker",              # "docker" or "aws"
+    base_dir=Path("/path/to/server"),  # Server files location
+    minecraft_version="1.20.1",        # Minecraft version
+    server_flavor="paper",             # Server type (paper, spigot, vanilla, etc.)
+
+    # Performance settings
+    memory="4G",                       # Memory allocation
+
+    # Auto-shutdown settings
+    auto_shutdown_enabled=True,        # Enable auto-shutdown
+    auto_shutdown_timeout=120,         # Minutes of inactivity before shutdown
+
+    # Monitoring settings
+    monitoring_enabled=True,           # Enable performance monitoring
+    enable_prometheus=True,            # Export metrics to Prometheus
+    enable_cloudwatch=False            # Export metrics to CloudWatch
+)
 ```
-python examples/advanced_server_management.py --action start
-python examples/advanced_server_management.py --action status
-python examples/advanced_server_management.py --action install-mod --mod-id sodium
+
+### CLI Script Options
+
+```bash
+python minecraft-server.py --help
 ```
 
-Run with `--help` to see all available options:
+Common options:
 
+```bash
+# Use a specific Minecraft version
+python minecraft-server.py --version 1.20.1 start
+
+# Specify server flavor
+python minecraft-server.py --flavor forge start
+
+# Set memory allocation
+python minecraft-server.py --memory 4G start
+
+# Disable auto-shutdown
+python minecraft-server.py --disable-auto-shutdown start
+
+# Enable debug logging
+python minecraft-server.py --debug start
 ```
-python examples/advanced_server_management.py --help
-```
 
-## Configuration
+## Troubleshooting
 
-The Minecraft Server Manager can be configured with various options:
+### Common Issues
 
-- **server_type**: Deployment type (docker or aws)
-- **minecraft_version**: Version of Minecraft to run
-- **server_flavor**: Server type (paper, spigot, vanilla, etc.)
-- **auto_shutdown_enabled**: Whether to enable auto-shutdown
-- **auto_shutdown_timeout**: Minutes of inactivity before shutdown
-- **monitoring_enabled**: Whether to enable performance monitoring
+#### Server Won't Start
+
+**Problem**: The server keeps restarting or fails to initialize.
+
+**Solutions**:
+
+1. Check the Docker logs:
+
+   ```bash
+   docker logs minecraft-server
+   ```
+
+2. Verify Java compatibility:
+   If you see `UnsupportedClassVersionError`, you need to update the Java version:
+
+   ```yaml
+   # In docker-compose.yml
+   image: itzg/minecraft-server:java21 # Use java17 for older Minecraft versions
+   ```
+
+3. Ensure you have enough memory:
+   ```bash
+   # Increase memory allocation
+   python minecraft-server.py --memory 4G start
+   ```
+
+#### Connection Issues
+
+**Problem**: Can't connect to the server from Minecraft.
+
+**Solutions**:
+
+1. Check server status to verify it's running:
+
+   ```bash
+   python minecraft-server.py status
+   ```
+
+2. Ensure you're using the correct IP address (check the status output)
+
+3. Verify the port is open and not blocked by a firewall:
+
+   ```bash
+   # Test port connectivity
+   telnet localhost 25565
+   ```
+
+4. For AWS servers, check security group settings to allow port 25565
+
+#### "Address already in use" Error
+
+**Problem**: Docker complains that the port is already in use.
+
+**Solution**:
+
+1. Check for existing containers using the port:
+
+   ```bash
+   docker ps -a | grep 25565
+   ```
+
+2. Stop and remove the conflicting container:
+   ```bash
+   docker stop <container_id>
+   docker rm <container_id>
+   ```
+
+### Logs and Debugging
+
+1. Enable debug mode for verbose logging:
+
+   ```bash
+   python minecraft-server.py --debug start
+   ```
+
+2. Check Minecraft server logs:
+
+   ```bash
+   docker exec minecraft-server cat /data/logs/latest.log
+   ```
+
+3. View Docker container logs:
+   ```bash
+   docker logs minecraft-server
+   ```
+
+### Detailed Troubleshooting Guide
+
+For more detailed troubleshooting steps and solutions to common problems, refer to the [Troubleshooting Guide](docs/troubleshooting.md).
+
+## Documentation
+
+### Core Documentation
+
+- [Server Configuration Guide](docs/server-configuration.md) - Complete reference for all server settings
+- [Server Flavors Guide](docs/server-flavors.md) - Comparison of different server types (Vanilla, Paper, Forge, etc.)
+- [Mods and Plugins Guide](docs/mods-and-plugins.md) - Managing and configuring mods and plugins
+
+### Additional Guides
+
+- [Docker Deployment](docs/docker-deployment.md) - Detailed Docker deployment instructions
+- [AWS Deployment](docs/aws-deployment.md) - Deploying to AWS cloud
+- [API Reference](docs/api-reference.md) - Complete Python API documentation
 
 ## Development
 
 ### Running Tests
 
-```
+```bash
 pytest
 ```
 
 ### Code Quality
 
-```
+```bash
 ruff check src tests
 ```
 

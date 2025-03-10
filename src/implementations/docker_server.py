@@ -167,63 +167,116 @@ class DockerServer(MinecraftServer):
     def start(self) -> bool:
         """Start the Minecraft server"""
         Console.print_header("Starting Minecraft Server")
+        Console.print_info("Starting Minecraft server...")
 
-        if self.is_running():
-            Console.print_warning("Server is already running!")
-            return True
-
-        Console.print_success("Starting Minecraft server...")
-
-        # Create or update docker-compose.yml
+        # Create Docker compose file
         self._create_docker_compose_file()
 
-        # Start the container
-        CommandExecutor.run(self.docker_compose_cmd +
-                            ["up", "-d"], cwd=self.base_dir)
+        # Add debug logging
+        logger.debug("Docker compose file created, launching container...")
 
-        # Check server startup
-        Console.print_info("Checking server startup...")
+        # Start the server
+        try:
+            Console.print_info("Running: docker compose up -d")
+            docker_result = CommandExecutor.run(
+                self.docker_compose_cmd + ["up", "-d"],
+                cwd=self.base_dir,
+                capture_output=True
+            )
 
-        # Wait for the server to initialize (checks 10 times with 5-second intervals)
-        for i in range(1, 11):
-            try:
-                result = CommandExecutor.run(
-                    ["docker", "logs", self.container_name],
+            if docker_result.returncode != 0:
+                logger.error(
+                    f"Failed to start Docker container: {docker_result.stderr}")
+                Console.print_error(
+                    f"Failed to start Docker container: {docker_result.stderr}")
+                return False
+
+            logger.debug(f"Docker compose output: {docker_result.stdout}")
+
+            # Wait for server to start
+            Console.print_info("Checking server startup...")
+
+            # Try up to 10 times to see if the server is responsive
+            max_attempts = 10
+            for attempt in range(1, max_attempts + 1):
+                logger.debug(f"Startup check attempt {attempt}/{max_attempts}")
+                Console.print_info(
+                    f"Waiting for server to initialize... ({attempt}/{max_attempts})")
+
+                # Sleep to give the server time to initialize
+                time.sleep(5)
+
+                # Check if container is running (not just created)
+                container_status = CommandExecutor.run(
+                    ["docker", "inspect", "-f",
+                        "{{.State.Status}}", self.container_name],
                     capture_output=True,
-                    verbose=False,
-                    check=False
+                    verbose=False
                 )
 
-                if "Done" in result.stdout:
-                    Console.print_success("Server started successfully!")
-                    Console.print_colored(
-                        "Connect to server at: localhost:25565", Console.PURPLE)
+                logger.debug(
+                    f"Container status: {container_status.stdout.strip()}")
 
-                    # Start auto-shutdown monitoring
+                # Get container logs to help diagnose issues
+                if attempt % 3 == 0:  # Check logs every 3 attempts
+                    container_logs = CommandExecutor.run(
+                        ["docker", "logs", "--tail", "30", self.container_name],
+                        capture_output=True,
+                        verbose=False
+                    )
+                    logger.debug(
+                        f"Recent container logs: {container_logs.stdout}")
+
+                    # Check for common error patterns
+                    if "UnsupportedClassVersionError" in container_logs.stdout:
+                        logger.error(
+                            "Java version mismatch detected. The container is using an older Java version than required.")
+                        Console.print_error(
+                            "Java version mismatch detected. The container is using an older Java version than required.")
+                        Console.print_info(
+                            "Try updating the Docker image to use a newer Java version (e.g., java21)")
+
+                if self.is_running():
+                    logger.info("Server started successfully!")
+                    Console.print_success("Server started successfully!")
+
+                    # Start auto-shutdown if enabled
                     if self.auto_shutdown_enabled:
                         self.auto_shutdown.start_monitoring()
-                        Console.print_info(
-                            f"Auto-shutdown enabled. Server will shut down after "
-                            f"{self.auto_shutdown.inactivity_threshold} minutes of inactivity."
-                        )
-
-                    # Start monitoring
-                    if self.monitoring_enabled and self.monitor:
-                        self.monitor.start()
-                        Console.print_info("Server monitoring started.")
 
                     return True
-            except Exception:
-                pass
+
+                # If container is failing/restarting, don't wait for all attempts
+                if container_status.stdout.strip() in ["restarting", "exited"]:
+                    logger.error(
+                        f"Container is in '{container_status.stdout.strip()}' state, indicating startup problems")
+
+                    # Get the logs to show error
+                    failure_logs = CommandExecutor.run(
+                        ["docker", "logs", "--tail", "50", self.container_name],
+                        capture_output=True,
+                        verbose=False
+                    )
+                    logger.error(f"Container logs: {failure_logs.stdout}")
+
+                    # Try to provide specific feedback on common issues
+                    if "Error: A JNI error has occurred" in failure_logs.stdout:
+                        Console.print_error(
+                            "Java error detected. Check logs for more details.")
+                    elif "UnsupportedClassVersionError" in failure_logs.stdout:
+                        Console.print_error(
+                            "Java version mismatch. The Minecraft server requires a newer Java version.")
+                        Console.print_info(
+                            "Edit the docker-compose.yml file to use java21 image: itzg/minecraft-server:java21")
 
             Console.print_warning(
-                f"Waiting for server to initialize... ({i}/10)")
-            time.sleep(5)
+                "Server is starting but taking longer than expected.\nCheck logs with: server.get_logs()")
+            return False
 
-        Console.print_warning(
-            "Server is starting but taking longer than expected.")
-        Console.print_warning("Check logs with: server.get_logs()")
-        return False
+        except Exception as e:
+            logger.error(f"Error starting server: {e}")
+            Console.print_error(f"Failed to start the server: {e}")
+            return False
 
     def stop(self) -> bool:
         """Stop the Minecraft server"""
@@ -565,7 +618,7 @@ class DockerServer(MinecraftServer):
 
 services:
   minecraft:
-    image: itzg/minecraft-server:java17
+    image: itzg/minecraft-server:java21
     container_name: {self.container_name}
     ports:
       - "25565:25565"

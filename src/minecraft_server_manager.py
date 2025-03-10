@@ -122,6 +122,38 @@ class MinecraftServerManager:
                 for player in status.get('players', []):
                     Console.print_info(f"  - {player}")
 
+            # Display connection information with rich formatting
+            Console.print_header("Connection Information")
+
+            # For Docker servers (local)
+            if status.get('server_type') == 'Docker':
+                Console.print_success(
+                    "Local Connection: [bold cyan]localhost[/bold cyan] or [bold cyan]127.0.0.1[/bold cyan]")
+                # Try to get the local machine's IP for LAN connections
+                import socket
+                try:
+                    hostname = socket.gethostname()
+                    local_ip = socket.gethostbyname(hostname)
+                    Console.print_success(
+                        f"LAN Connection: [bold cyan]{local_ip}[/bold cyan]")
+                except Exception:
+                    Console.print_warning("Could not determine LAN IP address")
+
+            # For AWS servers (remote)
+            elif status.get('server_type') == 'AWS EC2':
+                if 'public_ip' in status and status['public_ip'] != 'Unknown':
+                    Console.print_success(
+                        f"Public Connection: [bold cyan]{status['public_ip']}[/bold cyan]")
+                if 'private_ip' in status and status['private_ip'] != 'Unknown':
+                    Console.print_success(
+                        f"Private Connection: [bold cyan]{status['private_ip']}[/bold cyan]")
+
+            # For any server type
+            Console.print_info(
+                "Default Minecraft Port: [bold cyan]25565[/bold cyan]")
+            Console.print_info(
+                "Connection String: [bold cyan]<ip_address>:25565[/bold cyan]")
+
             # Display monitoring metrics if available
             metrics = [
                 ('system_cpu_percent', 'System CPU Usage', '%'),
