@@ -206,10 +206,11 @@ class FileManager:
             return "0 B"
 
         units = ["B", "KB", "MB", "GB", "TB"]
+        size = float(size_bytes)
         unit_index = 0
 
-        while size_bytes >= BYTES_IN_KB and unit_index < len(units) - 1:
-            size_bytes /= BYTES_IN_KB
+        while size >= BYTES_IN_KB and unit_index < len(units) - 1:
+            size /= BYTES_IN_KB
             unit_index += 1
 
-        return f"{size_bytes:.2f} {units[unit_index]}"
+        return f"{size:.2f} {units[unit_index]}"

@@ -169,7 +169,8 @@ class ModManager:
             )
 
             if not download_url:
-                logger.error(f"Could not find download URL for mod {mod_identifier}")
+                logger.error(
+                    f"Could not find download URL for mod {mod_identifier}")
                 return False
 
             # Download and install the mod
@@ -239,12 +240,14 @@ class ModManager:
         source = mod_info.get("source")
 
         if not source:
-            logger.warning(f"Source information missing for mod {mod_identifier}")
+            logger.warning(
+                f"Source information missing for mod {mod_identifier}")
             return False
 
         # Uninstall the old version
         if not self.uninstall_mod(mod_identifier):
-            logger.warning(f"Failed to uninstall old version of mod {mod_identifier}")
+            logger.warning(
+                f"Failed to uninstall old version of mod {mod_identifier}")
             return False
 
         # Install the new version
@@ -282,48 +285,69 @@ class ModManager:
         self, mod_identifier: str, version: Optional[str] = None
     ) -> Tuple[Dict[str, Any], str]:
         """Get mod info from Modrinth"""
-        # Implementation details would go here
-        # This would make API calls to Modrinth
-        # For example purposes, we're returning dummy data
+        # This is a mock implementation
+        logger.info(f"Getting info for mod {mod_identifier} from Modrinth")
+
+        # In a real implementation, this would call the Modrinth API
+        # and use the version parameter to get a specific version
+        version_str = version or "latest"
+
+        # Mock response
         mod_info = {
-            "name": "Example Mod",
-            "version": "1.0.0",
+            "name": f"Modrinth Mod {mod_identifier}",
+            "version": version_str,
+            "filename": f"{mod_identifier}-{version_str}.jar",
             "mc_version": self.minecraft_version,
-            "author": "Example Author",
-            "description": "An example mod",
         }
-        download_url = "https://example.com/mods/example-mod.jar"
+
+        download_url = f"https://modrinth.com/mod/{mod_identifier}/download/{version_str}"
+
         return mod_info, download_url
 
     def _get_curseforge_download_info(
         self, mod_identifier: str, version: Optional[str] = None
     ) -> Tuple[Dict[str, Any], str]:
         """Get mod info from CurseForge"""
-        # Implementation details would go here
-        # This would make API calls to CurseForge
+        # This is a mock implementation
+        logger.info(f"Getting info for mod {mod_identifier} from CurseForge")
+
+        # In a real implementation, this would call the CurseForge API
+        # and use the version parameter to get a specific version
+        version_str = version or "latest"
+
+        # Mock response
         mod_info = {
-            "name": "Example Mod",
-            "version": "1.0.0",
+            "name": f"CurseForge Mod {mod_identifier}",
+            "version": version_str,
+            "filename": f"{mod_identifier}-{version_str}.jar",
             "mc_version": self.minecraft_version,
-            "author": "Example Author",
-            "description": "An example mod",
         }
-        download_url = "https://example.com/mods/example-mod.jar"
+
+        download_url = f"https://curseforge.com/minecraft/mc-mods/{mod_identifier}/download/{version_str}"
+
         return mod_info, download_url
 
     def _get_bukkit_spigot_download_info(
         self, mod_identifier: str, source: str, version: Optional[str] = None
     ) -> Tuple[Dict[str, Any], str]:
         """Get mod info from Bukkit/Spigot"""
-        # Implementation details would go here
+        # This is a mock implementation
+        logger.info(f"Getting info for mod {mod_identifier} from {source}")
+
+        # In a real implementation, this would call the Bukkit/Spigot API
+        # and use the source and version parameters to get a specific version
+        version_str = version or "latest"
+
+        # Mock response
         mod_info = {
-            "name": "Example Plugin",
-            "version": "1.0.0",
+            "name": f"{source.capitalize()} Plugin {mod_identifier}",
+            "version": version_str,
+            "filename": f"{mod_identifier}-{version_str}.jar",
             "mc_version": self.minecraft_version,
-            "author": "Example Author",
-            "description": "An example plugin",
         }
-        download_url = "https://example.com/plugins/example-plugin.jar"
+
+        download_url = f"https://{source}.org/resources/{mod_identifier}/download/{version_str}"
+
         return mod_info, download_url
 
     def _download_and_install_mod(
@@ -333,18 +357,7 @@ class ModManager:
         download_url: str,
         source: str,
     ) -> bool:
-        """
-        Download and install a mod
-
-        Args:
-            mod_identifier: ID of the mod
-            mod_info: Information about the mod
-            download_url: URL to download the mod
-            source: Source of the mod
-
-        Returns:
-            bool: True if installation succeeded, False otherwise
-        """
+        """Download and install a mod from the given URL"""
         # Create a temporary file for downloading
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             temp_path = temp_file.name
@@ -353,12 +366,10 @@ class ModManager:
             # Download the file
             logger.info(f"Downloading mod from {download_url}")
 
-            # For demo purposes, we're not actually downloading
-            # In a real implementation, this would use requests:
-            # response = requests.get(download_url, stream=True)
-            # with open(temp_path, 'wb') as f:
-            #     for chunk in response.iter_content(chunk_size=8192):
-            #         f.write(chunk)
+            # For demo purposes, we're creating an empty file
+            # In a real implementation, this would download the actual file
+            with open(temp_path, 'wb') as f:
+                f.write(b"Mock mod file content")
 
             # Get mod filename from info or extract from URL
             mod_filename = mod_info.get("filename")
@@ -375,19 +386,17 @@ class ModManager:
             self.installed_mods[mod_identifier] = {
                 "name": mod_info.get("name", mod_identifier),
                 "version": mod_info.get("version", "unknown"),
-                "mc_version": mod_info.get("mc_version", self.minecraft_version),
                 "source": source,
-                "filename": mod_filename,
-                "installed_at": datetime.datetime.now().isoformat(),
-                "info": mod_info,
+                "file": str(mod_path),
+                "installed_date": datetime.datetime.now().isoformat(),
             }
-
             self._save_installed_mods()
+
             logger.info(f"Successfully installed mod {mod_identifier}")
             return True
 
         except Exception as e:
-            logger.error(f"Error downloading and installing mod: {e}")
+            logger.error(f"Failed to install mod {mod_identifier}: {e}")
             # Clean up temp file if it exists
             if os.path.exists(temp_path):
                 os.unlink(temp_path)
@@ -422,6 +431,53 @@ class ModManager:
                     }
 
             except Exception as e:
-                logger.warning(f"Error checking for updates to mod {mod_id}: {e}")
+                logger.warning(
+                    f"Error checking for updates to mod {mod_id}: {e}")
 
         return updates
+
+    def download_mod(self, mod_id: str, source: str, version: Optional[str] = None) -> bool:
+        """Download a mod from the specified source"""
+        logger.info(f"Downloading mod {mod_id} from {source}")
+
+        try:
+            # Get mod info and download URL
+            mod_info, download_url = self._get_mod_download_info(
+                mod_id, source, version
+            )
+
+            # Create a temporary directory for downloading
+            with tempfile.TemporaryDirectory() as temp_dir:
+                temp_path = Path(temp_dir) / f"{mod_id}.jar"
+
+                # For demo purposes, we're creating an empty file
+                # In a real implementation, this would download the file
+                with open(temp_path, "w") as f:
+                    f.write(f"Mock mod file for {mod_id}")
+
+                # Get mod filename from info or extract from URL
+                mod_filename = mod_info.get("filename", f"{mod_id}.jar")
+                if not mod_filename.endswith(".jar"):
+                    mod_filename += ".jar"
+
+                # Copy to mods directory
+                target_path = self.mods_dir / mod_filename
+                shutil.copy(temp_path, target_path)
+
+                # Update installed mods cache
+                self.installed_mods[mod_id] = {
+                    "id": mod_id,
+                    "name": mod_info.get("name", mod_id),
+                    "version": mod_info.get("version", "unknown"),
+                    "source": source,
+                    "file": str(target_path),
+                    "installed_date": datetime.datetime.now().isoformat(),
+                }
+                self._save_installed_mods()
+
+                logger.info(f"Successfully installed mod {mod_id}")
+                return True
+
+        except Exception as e:
+            logger.error(f"Failed to download mod {mod_id}: {e}")
+            return False

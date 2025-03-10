@@ -17,7 +17,8 @@ from unittest.mock import MagicMock, patch
 from src.core.server_factory import ServerFactory
 from src.implementations.docker_server import DockerServer
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.insert(0, os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..")))
 
 
 class TestServerInterface(unittest.TestCase):
@@ -58,7 +59,9 @@ class TestServerInterface(unittest.TestCase):
         """Test DockerServer.is_running when server is running"""
         # Mock the command execution
         mock_process = MagicMock()
-        mock_process.stdout = "minecraft-server"
+        # Format the output to match what the docker ps command would return
+        mock_process.stdout = "minecraft-server\n"
+        mock_process.returncode = 0
         mock_run.return_value = mock_process
 
         # Create server instance
