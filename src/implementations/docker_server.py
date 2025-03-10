@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
 """
-Docker-based Minecraft Server implementation
+Docker-based Minecraft server implementation
 """
 
+import contextlib
 import logging
 import os
 import shutil
@@ -20,10 +21,7 @@ from src.utils.mod_manager import ModManager
 from src.utils.monitoring import ServerMonitor
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-logger = logging.getLogger("docker_server")
+logger = logging.getLogger(__name__)
 
 
 class DockerServer(MinecraftServer):
@@ -44,6 +42,7 @@ class DockerServer(MinecraftServer):
         monitoring_enabled: bool = True,
         enable_prometheus: bool = True,
         enable_cloudwatch: bool = False,
+        java_version: str = "java21",
     ):
         """
         Initialize a Docker-based Minecraft server
@@ -62,6 +61,7 @@ class DockerServer(MinecraftServer):
             monitoring_enabled: Whether to enable monitoring
             enable_prometheus: Whether to enable Prometheus metrics
             enable_cloudwatch: Whether to enable CloudWatch metrics
+            java_version: Java version to use
         """
         # Set the base directory
         self.base_dir = (
@@ -87,6 +87,7 @@ class DockerServer(MinecraftServer):
         self.java_flags = (
             "-XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200"
         )
+        self.java_version = java_version
 
         # Docker compose command
         self.docker_compose_cmd = ["docker", "compose"]
@@ -314,6 +315,26 @@ class DockerServer(MinecraftServer):
             Console.print_info("Server is already stopped")
             return True
 
+        # Stop auto-shutdown monitoring
+        if self.auto_shutdown_enabled:
+            self.auto_shutdown.stop_monitoring()
+
+        # Stop monitoring
+        if self.monitoring_enabled and self.monitor:
+            self.monitor.stop()
+
+        Console.print_success("Stopping Minecraft server...")
+
+        # Send stop command to server console first for clean shutdown
+        try:
+            self.execute_command("stop")
+            # Wait for server to stop gracefully
+            time.sleep(5)
+        except Exception as e:
+            Console.print_warning(
+                f"Could not send stop command, forcing shutdown... Error: {e}"
+            )
+
         # Force stop if still running
         CommandExecutor.run(
             [*self.docker_compose_cmd, "down"], cwd=self.base_dir)
@@ -436,7 +457,7 @@ class DockerServer(MinecraftServer):
         return result.stdout
 
     def backup(self) -> Optional[Path]:
-        """Create a backup of the server"""
+        """Create a backup of the Minecraft server"""
         Console.print_header("Backing Up Minecraft Server")
 
         # Check if server is running and warn
@@ -449,12 +470,10 @@ class DockerServer(MinecraftServer):
             )
 
             # Notify server of backup
-            try:
+            with contextlib.suppress(Exception):
                 self.execute_command(
                     "say SERVER BACKUP STARTING - Possible lag incoming"
                 )
-            except Exception:
-                pass
 
         try:
             # Create the backup
@@ -473,10 +492,8 @@ class DockerServer(MinecraftServer):
 
             # Notify server if running
             if self.is_running():
-                try:
+                with contextlib.suppress(Exception):
                     self.execute_command("say SERVER BACKUP COMPLETED")
-                except Exception:
-                    pass
 
             return backup_path
         except Exception as e:

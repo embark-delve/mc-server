@@ -13,6 +13,9 @@ from typing import List, Optional, Tuple
 
 from src.utils.console import Console
 
+# Constants
+BYTES_IN_KB = 1024
+
 
 class FileManager:
     """Utility class for managing files and directories"""
@@ -74,7 +77,8 @@ class FileManager:
         """
         # Ensure source directory exists
         if not os.path.exists(source_dir):
-            raise FileNotFoundError(f"Source directory not found: {source_dir}")
+            raise FileNotFoundError(
+                f"Source directory not found: {source_dir}")
 
         # Ensure backup directory exists
         os.makedirs(backup_dir, exist_ok=True)
@@ -144,7 +148,8 @@ class FileManager:
             to_remove = backup_files[keep_count:]
 
             for backup_file in to_remove:
-                Console.print_warning(f"Removing old backup: {backup_file.name}")
+                Console.print_warning(
+                    f"Removing old backup: {backup_file.name}")
                 os.remove(backup_file)
                 removed_count += 1
 
@@ -177,7 +182,8 @@ class FileManager:
             # move the extracted contents there
             if target_dir and target_dir != extract_dir:
                 # Get the directory that was created by the extraction
-                extracted_dirs = [d for d in extract_dir.iterdir() if d.is_dir()]
+                extracted_dirs = [
+                    d for d in extract_dir.iterdir() if d.is_dir()]
                 if extracted_dirs:
                     source = extracted_dirs[0]
 
@@ -192,3 +198,18 @@ class FileManager:
         except Exception as e:
             Console.print_error(f"Error extracting backup: {e}")
             return False
+
+    @staticmethod
+    def format_size(size_bytes: int) -> str:
+        """Format file size in a human-readable format"""
+        if size_bytes == 0:
+            return "0 B"
+
+        units = ["B", "KB", "MB", "GB", "TB"]
+        unit_index = 0
+
+        while size_bytes >= BYTES_IN_KB and unit_index < len(units) - 1:
+            size_bytes /= BYTES_IN_KB
+            unit_index += 1
+
+        return f"{size_bytes:.2f} {units[unit_index]}"

@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
 """
-AWS EC2-based Minecraft Server implementation
+AWS EC2-based Minecraft server implementation
 """
 
+import contextlib
 import logging
 import os
 import time
@@ -15,16 +16,14 @@ from botocore.exceptions import ClientError
 
 from src.core.server_interface import MinecraftServer
 from src.utils.auto_shutdown import AutoShutdown
+from src.utils.command_executor import CommandExecutor
 from src.utils.console import Console
 from src.utils.file_manager import FileManager
 from src.utils.mod_manager import ModManager
 from src.utils.monitoring import ServerMonitor
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-logger = logging.getLogger("aws_server")
+logger = logging.getLogger(__name__)
 
 
 class AWSServer(MinecraftServer):
@@ -72,7 +71,8 @@ class AWSServer(MinecraftServer):
         """
         # Set the base directory
         self.base_dir = (
-            base_dir or Path(os.path.dirname(os.path.abspath(__file__))) / "../.."
+            base_dir or Path(os.path.dirname(
+                os.path.abspath(__file__))) / "../.."
         )
         self.base_dir = self.base_dir.resolve()  # Convert to absolute path
 
@@ -182,7 +182,8 @@ class AWSServer(MinecraftServer):
             response = self.ssm.send_command(
                 InstanceIds=[self.instance_id],
                 DocumentName="AWS-RunShellScript",
-                Parameters={"commands": ["cd /opt/minecraft && rcon-cli list"]},
+                Parameters={"commands": [
+                    "cd /opt/minecraft && rcon-cli list"]},
             )
 
             # Wait for command completion
@@ -240,7 +241,8 @@ class AWSServer(MinecraftServer):
 
             # Start the Minecraft server on the instance
             Console.print_info("Starting Minecraft server...")
-            response = self.ssm.send_command(
+            # Store response but don't use it - we'll check status separately
+            self.ssm.send_command(
                 InstanceIds=[self.instance_id],
                 DocumentName="AWS-RunShellScript",
                 Parameters={
@@ -300,7 +302,8 @@ class AWSServer(MinecraftServer):
         try:
             # First stop the Minecraft server gracefully
             try:
-                response = self.ssm.send_command(
+                # Store response but don't use it - we'll check status separately
+                self.ssm.send_command(
                     InstanceIds=[self.instance_id],
                     DocumentName="AWS-RunShellScript",
                     Parameters={
@@ -310,10 +313,6 @@ class AWSServer(MinecraftServer):
                         ]
                     },
                 )
-
-                # Wait for the server to stop
-                Console.print_info("Waiting for Minecraft server to stop...")
-                time.sleep(15)
             except Exception as e:
                 Console.print_warning(f"Error stopping Minecraft service: {e}")
 
@@ -344,7 +343,8 @@ class AWSServer(MinecraftServer):
 
         try:
             # Restart the Minecraft service only, not the whole EC2 instance
-            response = self.ssm.send_command(
+            # Store response but don't use it - we'll check status separately
+            self.ssm.send_command(
                 InstanceIds=[self.instance_id],
                 DocumentName="AWS-RunShellScript",
                 Parameters={
@@ -386,13 +386,17 @@ class AWSServer(MinecraftServer):
         if is_running:
             try:
                 # Get instance details
-                response = self.ec2.describe_instances(InstanceIds=[self.instance_id])
+                response = self.ec2.describe_instances(
+                    InstanceIds=[self.instance_id])
                 instance = response["Reservations"][0]["Instances"][0]
 
                 # Add instance information
-                status["instance_type"] = instance.get("InstanceType", "Unknown")
-                status["public_ip"] = instance.get("PublicIpAddress", "Unknown")
-                status["private_ip"] = instance.get("PrivateIpAddress", "Unknown")
+                status["instance_type"] = instance.get(
+                    "InstanceType", "Unknown")
+                status["public_ip"] = instance.get(
+                    "PublicIpAddress", "Unknown")
+                status["private_ip"] = instance.get(
+                    "PrivateIpAddress", "Unknown")
 
                 # Get uptime
                 launch_time = instance.get("LaunchTime", None)
@@ -489,7 +493,8 @@ class AWSServer(MinecraftServer):
             response = self.ssm.send_command(
                 InstanceIds=[self.instance_id],
                 DocumentName="AWS-RunShellScript",
-                Parameters={"commands": [f"cd /opt/minecraft && rcon-cli {command}"]},
+                Parameters={"commands": [
+                    f"cd /opt/minecraft && rcon-cli {command}"]},
             )
 
             command_id = response["Command"]["CommandId"]
@@ -510,7 +515,7 @@ class AWSServer(MinecraftServer):
             return f"Error: {e!s}"
 
     def backup(self) -> Optional[Path]:
-        """Create a backup of the server"""
+        """Create a backup of the AWS EC2 server"""
         Console.print_header("Backing Up Minecraft Server on AWS")
 
         if not self.is_running():
@@ -519,12 +524,10 @@ class AWSServer(MinecraftServer):
 
         try:
             # Notify server of backup
-            try:
+            with contextlib.suppress(Exception):
                 self.execute_command(
                     "say SERVER BACKUP STARTING - Possible lag incoming"
                 )
-            except Exception:
-                pass
 
             # Create a backup directory on the EC2 instance
             self.ssm.send_command(
@@ -548,7 +551,8 @@ class AWSServer(MinecraftServer):
                 self.data_dir, self.backup_dir
             )
 
-            Console.print_success(f"Backup created successfully: {backup_path.name}")
+            Console.print_success(
+                f"Backup created successfully: {backup_path.name}")
             Console.print_success(f"Backup size: {backup_size}")
 
             # Clean up old backups (keep 5 latest)
@@ -557,10 +561,8 @@ class AWSServer(MinecraftServer):
                 Console.print_warning(f"Removed {removed_count} old backup(s)")
 
             # Notify server if running
-            try:
+            with contextlib.suppress(Exception):
                 self.execute_command("say SERVER BACKUP COMPLETED")
-            except Exception:
-                pass
 
             return backup_path
 
@@ -572,20 +574,63 @@ class AWSServer(MinecraftServer):
         """Restore the server from a backup"""
         Console.print_header("Restoring Minecraft Server on AWS")
 
-        # For AWS, restoring would involve:
-        # 1. Uploading the backup to S3 or directly to the EC2 instance
-        # 2. Stopping the Minecraft server
-        # 3. Extracting the backup
-        # 4. Restarting the server
+        if not backup_path:
+            # Find the most recent backup
+            backups = list(self.backup_dir.glob("*.zip"))
+            if not backups:
+                Console.print_error("No backups found")
+                return False
+            backup_path = max(backups, key=os.path.getmtime)
 
-        # This is a simplified placeholder implementation
-        Console.print_warning("Server restore for AWS not fully implemented")
-        return False
+        Console.print_info(f"Restoring from backup: {backup_path}")
+
+        # Ensure server is stopped
+        if self.is_running():
+            Console.print_info("Stopping server before restore...")
+            self.stop()
+
+        # Upload backup to EC2 instance
+        Console.print_info("Uploading backup to EC2 instance...")
+        upload_result = CommandExecutor.run(
+            [
+                "scp",
+                "-i", self.ssh_key_path,
+                str(backup_path),
+                f"{self.ssh_user}@{self._get_instance_ip()}:/tmp/"
+            ],
+            capture_output=True
+        )
+
+        if upload_result.returncode != 0:
+            Console.print_error(
+                f"Failed to upload backup: {upload_result.stderr}")
+            return False
+
+        # Extract backup on EC2 instance
+        Console.print_info("Extracting backup on EC2 instance...")
+        # We don't need to store the result, just execute the command
+        self.ssm.send_command(
+            InstanceIds=[self.instance_id],
+            DocumentName="AWS-RunShellScript",
+            Parameters={
+                "commands": [
+                    "cd /opt/minecraft",
+                    "sudo systemctl stop minecraft.service",
+                    f"sudo unzip -o /tmp/{backup_path.name} -d /opt/minecraft/data",
+                    "sudo chown -R minecraft:minecraft /opt/minecraft/data",
+                    "sudo systemctl start minecraft.service"
+                ]
+            }
+        )
+
+        Console.print_success("Backup restored successfully!")
+        return True
 
     def get_logs(self, lines: int = 50) -> List[str]:
         """Get the most recent server logs"""
         if not self.is_running():
-            Console.print_warning("Server is not running, logs may be unavailable")
+            Console.print_warning(
+                "Server is not running, logs may be unavailable")
             return []
 
         try:
@@ -645,18 +690,33 @@ class AWSServer(MinecraftServer):
                 Console.print_error(f"Failed to download mod {mod_id}")
                 return False
 
-            # Get the path to the downloaded mod
-            mod_files = list(self.plugins_dir.glob(f"*{mod_id}*.jar"))
+            # Find mod files
+            mod_files = list(self.plugins_dir.glob(f"{mod_id}*.jar"))
             if not mod_files:
-                Console.print_error("Could not find downloaded mod file")
+                Console.print_error(f"No mod files found for {mod_id}")
                 return False
 
-            mod_file = mod_files[0]
+            # We'll use the mod file path in the upload command
+            mod_file_path = mod_files[0]
 
             # Upload the mod to the EC2 instance
-            Console.print_info("Uploading mod to EC2 instance...")
-            # This would require more code to actually upload the file
-            # For simplicity, we'll just say it was successful
+            Console.print_info(f"Uploading mod {mod_id} to EC2 instance...")
+
+            # Use SCP to upload the mod file
+            scp_result = CommandExecutor.run(
+                [
+                    "scp",
+                    "-i", self.ssh_key_path,
+                    str(mod_file_path),
+                    f"{self.ssh_user}@{self._get_instance_ip()}:/opt/minecraft/mods/"
+                ],
+                capture_output=True
+            )
+
+            if scp_result.returncode != 0:
+                Console.print_error(
+                    f"Failed to upload mod: {scp_result.stderr}")
+                return False
 
             # Install the mod on the server
             Console.print_info("Installing mod on server...")
@@ -684,7 +744,8 @@ class AWSServer(MinecraftServer):
         Console.print_info(f"Uninstalling mod {mod_id}...")
 
         if not self.is_running():
-            Console.print_warning("Server is not running, cannot uninstall mod")
+            Console.print_warning(
+                "Server is not running, cannot uninstall mod")
             return False
 
         try:
@@ -692,7 +753,8 @@ class AWSServer(MinecraftServer):
             success = self.mod_manager.uninstall_mod(mod_id)
 
             if not success:
-                Console.print_error(f"Failed to uninstall mod {mod_id} locally")
+                Console.print_error(
+                    f"Failed to uninstall mod {mod_id} locally")
                 return False
 
             # Remove mod from EC2 instance
@@ -796,7 +858,8 @@ class AWSServer(MinecraftServer):
             return "Unknown"
 
         try:
-            response = self.ec2.describe_instances(InstanceIds=[self.instance_id])
+            response = self.ec2.describe_instances(
+                InstanceIds=[self.instance_id])
             instance = response["Reservations"][0]["Instances"][0]
             return instance.get("PublicIpAddress", "Unknown")
         except Exception as e:

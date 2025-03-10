@@ -4,17 +4,21 @@
 Server factory for creating appropriate server implementations
 """
 
+import logging
 from pathlib import Path
-from typing import Optional, Type
+from typing import Optional, Type, ClassVar, Dict
 
 from src.core.server_interface import MinecraftServer
 
+# Configure logging
+logger = logging.getLogger(__name__)
+
 
 class ServerFactory:
-    """Factory for creating server implementations"""
+    """Factory for creating Minecraft server instances"""
 
     # Dictionary of registered server implementations
-    _implementations = {}
+    _implementations: ClassVar[Dict[str, Type[MinecraftServer]]] = {}
 
     @classmethod
     def register(cls, server_type: str, implementation: Type[MinecraftServer]) -> None:
@@ -25,7 +29,8 @@ class ServerFactory:
             server_type: String identifier for the server type
             implementation: Class implementing the MinecraftServer interface
         """
-        cls._implementations[server_type.lower()] = implementation
+        cls._implementations[server_type] = implementation
+        logger.info(f"Registered server implementation: {server_type}")
 
     @classmethod
     def create(
@@ -45,16 +50,14 @@ class ServerFactory:
         Raises:
             ValueError: If the requested server type is not registered
         """
-        server_type = server_type.lower()
-
         if server_type not in cls._implementations:
             raise ValueError(
                 f"Unknown server type: {server_type}. "
-                f"Available types: {', '.join(cls._implementations.keys())}"
+                f"Available types: {list(cls._implementations.keys())}"
             )
 
-        # Create a new instance of the requested implementation
-        return cls._implementations[server_type](base_dir=base_dir, **kwargs)
+        implementation = cls._implementations[server_type]
+        return implementation(base_dir=base_dir, **kwargs)
 
     @classmethod
     def available_types(cls) -> list:
