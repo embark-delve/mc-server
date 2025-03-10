@@ -4,20 +4,20 @@
 Tests for the server interface and implementations
 """
 
-from src.utils.console import Console
-from src.implementations.docker_server import DockerServer
-from src.core.server_factory import ServerFactory
-import unittest
-import tempfile
-import shutil
 import os
-from pathlib import Path
-from unittest.mock import patch, MagicMock
+import shutil
 
 # Add parent directory to path
 import sys
-sys.path.insert(0, os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..')))
+import tempfile
+import unittest
+from pathlib import Path
+from unittest.mock import MagicMock, patch
+
+from src.core.server_factory import ServerFactory
+from src.implementations.docker_server import DockerServer
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
 class TestServerInterface(unittest.TestCase):
@@ -26,7 +26,7 @@ class TestServerInterface(unittest.TestCase):
     def setUp(self):
         """Set up test environment"""
         # Disable console output during tests
-        self.console_patch = patch('src.utils.console.Console.print_colored')
+        self.console_patch = patch("src.utils.console.Console.print_colored")
         self.mock_console = self.console_patch.start()
 
         # Create a temporary directory for testing
@@ -43,6 +43,7 @@ class TestServerInterface(unittest.TestCase):
 
     def test_server_factory_registration(self):
         """Test server factory registration"""
+
         # Register a mock implementation
         class MockServer(DockerServer):
             pass
@@ -52,7 +53,7 @@ class TestServerInterface(unittest.TestCase):
         # Check if the implementation is registered
         self.assertIn("mock", ServerFactory.available_types())
 
-    @patch('src.implementations.docker_server.CommandExecutor.run')
+    @patch("src.implementations.docker_server.CommandExecutor.run")
     def test_docker_server_is_running_true(self, mock_run):
         """Test DockerServer.is_running when server is running"""
         # Mock the command execution
@@ -67,7 +68,7 @@ class TestServerInterface(unittest.TestCase):
         self.assertTrue(server.is_running())
         mock_run.assert_called_once()
 
-    @patch('src.implementations.docker_server.CommandExecutor.run')
+    @patch("src.implementations.docker_server.CommandExecutor.run")
     def test_docker_server_is_running_false(self, mock_run):
         """Test DockerServer.is_running when server is not running"""
         # Mock the command execution
@@ -82,8 +83,8 @@ class TestServerInterface(unittest.TestCase):
         self.assertFalse(server.is_running())
         mock_run.assert_called_once()
 
-    @patch('src.implementations.docker_server.CommandExecutor.run')
-    @patch('src.implementations.docker_server.DockerServer.is_running')
+    @patch("src.implementations.docker_server.CommandExecutor.run")
+    @patch("src.implementations.docker_server.DockerServer.is_running")
     def test_docker_server_start_when_not_running(self, mock_is_running, mock_run):
         """Test DockerServer.start when server is not running"""
         # Mock is_running to return False
@@ -100,7 +101,7 @@ class TestServerInterface(unittest.TestCase):
         # We don't need to verify the exact number of calls, just that it was called at least once
         self.assertGreater(mock_run.call_count, 0)
 
-    @patch('src.implementations.docker_server.DockerServer.is_running')
+    @patch("src.implementations.docker_server.DockerServer.is_running")
     def test_docker_server_start_when_already_running(self, mock_is_running):
         """Test DockerServer.start when server is already running"""
         # Mock is_running to return True
@@ -113,10 +114,12 @@ class TestServerInterface(unittest.TestCase):
         self.assertTrue(server.start())
         mock_is_running.assert_called_once()
 
-    @patch('src.implementations.docker_server.CommandExecutor.run')
-    @patch('src.implementations.docker_server.DockerServer.is_running')
-    @patch('src.implementations.docker_server.DockerServer.execute_command')
-    def test_docker_server_stop_when_running(self, mock_execute, mock_is_running, mock_run):
+    @patch("src.implementations.docker_server.CommandExecutor.run")
+    @patch("src.implementations.docker_server.DockerServer.is_running")
+    @patch("src.implementations.docker_server.DockerServer.execute_command")
+    def test_docker_server_stop_when_running(
+        self, mock_execute, mock_is_running, mock_run
+    ):
         """Test DockerServer.stop when server is running"""
         # Mock is_running to return True
         mock_is_running.return_value = True
@@ -130,7 +133,7 @@ class TestServerInterface(unittest.TestCase):
         mock_execute.assert_called_once_with("stop")
         mock_run.assert_called_once()
 
-    @patch('src.implementations.docker_server.DockerServer.is_running')
+    @patch("src.implementations.docker_server.DockerServer.is_running")
     def test_docker_server_stop_when_not_running(self, mock_is_running):
         """Test DockerServer.stop when server is not running"""
         # Mock is_running to return False
@@ -143,8 +146,8 @@ class TestServerInterface(unittest.TestCase):
         self.assertTrue(server.stop())
         mock_is_running.assert_called_once()
 
-    @patch('src.implementations.docker_server.DockerServer.stop')
-    @patch('src.implementations.docker_server.DockerServer.start')
+    @patch("src.implementations.docker_server.DockerServer.stop")
+    @patch("src.implementations.docker_server.DockerServer.start")
     def test_docker_server_restart(self, mock_start, mock_stop):
         """Test DockerServer.restart"""
         # Mock stop and start to return True
@@ -159,7 +162,7 @@ class TestServerInterface(unittest.TestCase):
         mock_stop.assert_called_once()
         mock_start.assert_called_once()
 
-    @patch('src.implementations.docker_server.DockerServer.is_running')
+    @patch("src.implementations.docker_server.DockerServer.is_running")
     def test_docker_server_execute_command_not_running(self, mock_is_running):
         """Test DockerServer.execute_command when server is not running"""
         # Mock is_running to return False
@@ -173,8 +176,8 @@ class TestServerInterface(unittest.TestCase):
             server.execute_command("test")
         mock_is_running.assert_called_once()
 
-    @patch('src.implementations.docker_server.DockerServer.is_running')
-    @patch('src.implementations.docker_server.CommandExecutor.run')
+    @patch("src.implementations.docker_server.DockerServer.is_running")
+    @patch("src.implementations.docker_server.CommandExecutor.run")
     def test_docker_server_execute_command_running(self, mock_run, mock_is_running):
         """Test DockerServer.execute_command when server is running"""
         # Mock is_running to return True
@@ -195,5 +198,5 @@ class TestServerInterface(unittest.TestCase):
         mock_run.assert_called_once()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

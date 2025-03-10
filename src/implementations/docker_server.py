@@ -4,25 +4,24 @@
 Docker-based Minecraft Server implementation
 """
 
-import os
-import time
-import shutil
 import logging
-from typing import Dict, List, Optional, Union, Set
+import os
+import shutil
+import time
 from pathlib import Path
+from typing import Dict, List, Optional, Set, Union
 
 from src.core.server_interface import MinecraftServer
-from src.utils.console import Console
-from src.utils.command_executor import CommandExecutor
-from src.utils.file_manager import FileManager
 from src.utils.auto_shutdown import AutoShutdown
+from src.utils.command_executor import CommandExecutor
+from src.utils.console import Console
+from src.utils.file_manager import FileManager
 from src.utils.mod_manager import ModManager
 from src.utils.monitoring import ServerMonitor
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger("docker_server")
 
@@ -44,7 +43,7 @@ class DockerServer(MinecraftServer):
         auto_shutdown_timeout: int = 120,  # 2 hours in minutes
         monitoring_enabled: bool = True,
         enable_prometheus: bool = True,
-        enable_cloudwatch: bool = False
+        enable_cloudwatch: bool = False,
     ):
         """
         Initialize a Docker-based Minecraft server
@@ -65,8 +64,10 @@ class DockerServer(MinecraftServer):
             enable_cloudwatch: Whether to enable CloudWatch metrics
         """
         # Set the base directory
-        self.base_dir = base_dir or Path(
-            os.path.dirname(os.path.abspath(__file__))) / "../.."
+        self.base_dir = (
+            base_dir or Path(os.path.dirname(
+                os.path.abspath(__file__))) / "../.."
+        )
         self.base_dir = self.base_dir.resolve()  # Convert to absolute path
 
         # Set container name
@@ -83,7 +84,9 @@ class DockerServer(MinecraftServer):
         self.minecraft_version = minecraft_version
         self.server_type = server_type.lower()
         self.memory = "2G"  # Default memory allocation
-        self.java_flags = "-XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200"
+        self.java_flags = (
+            "-XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200"
+        )
 
         # Docker compose command
         self.docker_compose_cmd = ["docker", "compose"]
@@ -97,14 +100,14 @@ class DockerServer(MinecraftServer):
             shutdown_callback=self.stop,
             inactivity_threshold=auto_shutdown_timeout,
             check_interval=5,  # Check every 5 minutes
-            enabled=auto_shutdown_enabled
+            enabled=auto_shutdown_enabled,
         )
 
         # Initialize mod manager
         self.mod_manager = ModManager(
             server_type=self.server_type,
             minecraft_version=self.minecraft_version,
-            mods_dir=self.plugins_dir
+            mods_dir=self.plugins_dir,
         )
 
         # Initialize monitoring
@@ -115,7 +118,7 @@ class DockerServer(MinecraftServer):
                 server_name=self.container_name,
                 enable_prometheus=enable_prometheus,
                 enable_cloudwatch=enable_cloudwatch,
-                metrics_dir=self.base_dir / "metrics"
+                metrics_dir=self.base_dir / "metrics",
             )
         else:
             self.monitor = None
@@ -125,21 +128,23 @@ class DockerServer(MinecraftServer):
 
     def _ensure_directories(self) -> None:
         """Ensure all required directories exist"""
-        FileManager.ensure_directories([
-            self.data_dir,
-            self.backup_dir,
-            self.plugins_dir,
-            self.config_dir,
-            self.logs_dir,
-            self.base_dir / "metrics"
-        ])
+        FileManager.ensure_directories(
+            [
+                self.data_dir,
+                self.backup_dir,
+                self.plugins_dir,
+                self.config_dir,
+                self.logs_dir,
+                self.base_dir / "metrics",
+            ]
+        )
 
     def is_running(self) -> bool:
         """Check if the Minecraft server is running"""
         result = CommandExecutor.run(
             ["docker", "ps", "--format", "{{.Names}}"],
             capture_output=True,
-            verbose=False
+            verbose=False,
         )
         return self.container_name in result.stdout
 
@@ -169,6 +174,12 @@ class DockerServer(MinecraftServer):
         Console.print_header("Starting Minecraft Server")
         Console.print_info("Starting Minecraft server...")
 
+        # First check if server is already running
+        if self.is_running():
+            logger.info("Server is already running")
+            Console.print_success("Server is already running!")
+            return True
+
         # Create Docker compose file
         self._create_docker_compose_file()
 
@@ -179,16 +190,18 @@ class DockerServer(MinecraftServer):
         try:
             Console.print_info("Running: docker compose up -d")
             docker_result = CommandExecutor.run(
-                self.docker_compose_cmd + ["up", "-d"],
+                [*self.docker_compose_cmd, "up", "-d"],
                 cwd=self.base_dir,
-                capture_output=True
+                capture_output=True,
             )
 
             if docker_result.returncode != 0:
                 logger.error(
-                    f"Failed to start Docker container: {docker_result.stderr}")
+                    f"Failed to start Docker container: {docker_result.stderr}"
+                )
                 Console.print_error(
-                    f"Failed to start Docker container: {docker_result.stderr}")
+                    f"Failed to start Docker container: {docker_result.stderr}"
+                )
                 return False
 
             logger.debug(f"Docker compose output: {docker_result.stdout}")
@@ -201,17 +214,23 @@ class DockerServer(MinecraftServer):
             for attempt in range(1, max_attempts + 1):
                 logger.debug(f"Startup check attempt {attempt}/{max_attempts}")
                 Console.print_info(
-                    f"Waiting for server to initialize... ({attempt}/{max_attempts})")
+                    f"Waiting for server to initialize... ({attempt}/{max_attempts})"
+                )
 
                 # Sleep to give the server time to initialize
                 time.sleep(5)
 
                 # Check if container is running (not just created)
                 container_status = CommandExecutor.run(
-                    ["docker", "inspect", "-f",
-                        "{{.State.Status}}", self.container_name],
+                    [
+                        "docker",
+                        "inspect",
+                        "-f",
+                        "{{.State.Status}}",
+                        self.container_name,
+                    ],
                     capture_output=True,
-                    verbose=False
+                    verbose=False,
                 )
 
                 logger.debug(
@@ -222,7 +241,7 @@ class DockerServer(MinecraftServer):
                     container_logs = CommandExecutor.run(
                         ["docker", "logs", "--tail", "30", self.container_name],
                         capture_output=True,
-                        verbose=False
+                        verbose=False,
                     )
                     logger.debug(
                         f"Recent container logs: {container_logs.stdout}")
@@ -230,11 +249,14 @@ class DockerServer(MinecraftServer):
                     # Check for common error patterns
                     if "UnsupportedClassVersionError" in container_logs.stdout:
                         logger.error(
-                            "Java version mismatch detected. The container is using an older Java version than required.")
+                            "Java version mismatch detected. The container is using an older Java version than required."
+                        )
                         Console.print_error(
-                            "Java version mismatch detected. The container is using an older Java version than required.")
+                            "Java version mismatch detected. The container is using an older Java version than required."
+                        )
                         Console.print_info(
-                            "Try updating the Docker image to use a newer Java version (e.g., java21)")
+                            "Try updating the Docker image to use a newer Java version (e.g., java21)"
+                        )
 
                 if self.is_running():
                     logger.info("Server started successfully!")
@@ -249,28 +271,33 @@ class DockerServer(MinecraftServer):
                 # If container is failing/restarting, don't wait for all attempts
                 if container_status.stdout.strip() in ["restarting", "exited"]:
                     logger.error(
-                        f"Container is in '{container_status.stdout.strip()}' state, indicating startup problems")
+                        f"Container is in '{container_status.stdout.strip()}' state, indicating startup problems"
+                    )
 
                     # Get the logs to show error
                     failure_logs = CommandExecutor.run(
                         ["docker", "logs", "--tail", "50", self.container_name],
                         capture_output=True,
-                        verbose=False
+                        verbose=False,
                     )
                     logger.error(f"Container logs: {failure_logs.stdout}")
 
                     # Try to provide specific feedback on common issues
                     if "Error: A JNI error has occurred" in failure_logs.stdout:
                         Console.print_error(
-                            "Java error detected. Check logs for more details.")
+                            "Java error detected. Check logs for more details."
+                        )
                     elif "UnsupportedClassVersionError" in failure_logs.stdout:
                         Console.print_error(
-                            "Java version mismatch. The Minecraft server requires a newer Java version.")
+                            "Java version mismatch. The Minecraft server requires a newer Java version."
+                        )
                         Console.print_info(
-                            "Edit the docker-compose.yml file to use java21 image: itzg/minecraft-server:java21")
+                            "Edit the docker-compose.yml file to use java21 image: itzg/minecraft-server:java21"
+                        )
 
             Console.print_warning(
-                "Server is starting but taking longer than expected.\nCheck logs with: server.get_logs()")
+                "Server is starting but taking longer than expected.\nCheck logs with: server.get_logs()"
+            )
             return False
 
         except Exception as e:
@@ -281,33 +308,15 @@ class DockerServer(MinecraftServer):
     def stop(self) -> bool:
         """Stop the Minecraft server"""
         Console.print_header("Stopping Minecraft Server")
+        Console.print_info("Stopping Minecraft server...")
 
         if not self.is_running():
-            Console.print_warning("Server is not running!")
+            Console.print_info("Server is already stopped")
             return True
 
-        # Stop auto-shutdown monitoring
-        if self.auto_shutdown_enabled:
-            self.auto_shutdown.stop_monitoring()
-
-        # Stop monitoring
-        if self.monitoring_enabled and self.monitor:
-            self.monitor.stop()
-
-        Console.print_success("Stopping Minecraft server...")
-
-        # Send stop command to server console first for clean shutdown
-        try:
-            self.execute_command("stop")
-            # Wait for server to stop gracefully
-            time.sleep(5)
-        except Exception as e:
-            Console.print_warning(
-                f"Could not send stop command, forcing shutdown... Error: {e}")
-
         # Force stop if still running
-        CommandExecutor.run(self.docker_compose_cmd +
-                            ["down"], cwd=self.base_dir)
+        CommandExecutor.run(
+            [*self.docker_compose_cmd, "down"], cwd=self.base_dir)
         Console.print_success("Server stopped successfully!")
         return True
 
@@ -334,7 +343,7 @@ class DockerServer(MinecraftServer):
             "container_name": self.container_name,
             "data_directory": str(self.data_dir),
             "plugins_directory": str(self.plugins_dir),
-            "config_directory": str(self.config_dir)
+            "config_directory": str(self.config_dir),
         }
 
         # If the server is running, get additional information
@@ -342,17 +351,22 @@ class DockerServer(MinecraftServer):
             try:
                 # Get container info
                 _ = CommandExecutor.run(
-                    ["docker", "inspect", self.container_name,
-                        "--format", "{{json .}}"],
+                    [
+                        "docker",
+                        "inspect",
+                        self.container_name,
+                        "--format",
+                        "{{json .}}",
+                    ],
                     capture_output=True,
-                    verbose=False
+                    verbose=False,
                 )
 
                 # Get server version from logs
                 logs = CommandExecutor.run(
                     ["docker", "logs", self.container_name, "--tail", "100"],
                     capture_output=True,
-                    verbose=False
+                    verbose=False,
                 )
 
                 # Extract useful information
@@ -361,8 +375,10 @@ class DockerServer(MinecraftServer):
 
                 # Try to extract Minecraft version from logs
                 import re
+
                 version_match = re.search(
-                    r"Starting minecraft server version ([\d\.]+)", logs.stdout)
+                    r"Starting minecraft server version ([\d\.]+)", logs.stdout
+                )
                 if version_match:
                     status["version"] = version_match.group(1)
                 else:
@@ -388,8 +404,12 @@ class DockerServer(MinecraftServer):
                     metrics = self.monitor.get_metrics()
                     for key, value in metrics.items():
                         # Add a subset of interesting metrics to status
-                        if key in ["system_cpu_percent", "system_memory_percent",
-                                   "container_cpu_percent", "container_memory_percent"]:
+                        if key in [
+                            "system_cpu_percent",
+                            "system_memory_percent",
+                            "container_cpu_percent",
+                            "container_memory_percent",
+                        ]:
                             status[key] = value
 
             except Exception as e:
@@ -406,7 +426,7 @@ class DockerServer(MinecraftServer):
         Console.print_info(f"Executing command: {command}")
         result = CommandExecutor.run(
             ["docker", "exec", self.container_name, "rcon-cli", command],
-            capture_output=True
+            capture_output=True,
         )
 
         # Record activity for auto-shutdown
@@ -422,22 +442,24 @@ class DockerServer(MinecraftServer):
         # Check if server is running and warn
         if self.is_running():
             Console.print_warning(
-                "Creating backup while server is running. This might cause data corruption.")
+                "Creating backup while server is running. This might cause data corruption."
+            )
             Console.print_warning(
-                "It's recommended to stop the server before backing up.")
+                "It's recommended to stop the server before backing up."
+            )
 
             # Notify server of backup
             try:
                 self.execute_command(
-                    "say SERVER BACKUP STARTING - Possible lag incoming")
+                    "say SERVER BACKUP STARTING - Possible lag incoming"
+                )
             except Exception:
                 pass
 
         try:
             # Create the backup
             backup_path, backup_size = FileManager.create_backup(
-                self.data_dir,
-                self.backup_dir
+                self.data_dir, self.backup_dir
             )
 
             Console.print_success(
@@ -492,10 +514,7 @@ class DockerServer(MinecraftServer):
         # Extract and restore
         Console.print_info(f"Restoring from backup: {backup_path}")
         success = FileManager.extract_backup(
-            backup_path,
-            temp_dir,
-            self.data_dir
-        )
+            backup_path, temp_dir, self.data_dir)
 
         # Clean up temp directory
         if os.path.exists(temp_dir):
@@ -518,7 +537,7 @@ class DockerServer(MinecraftServer):
             ["docker", "logs", "--tail", str(lines), self.container_name],
             capture_output=True,
             verbose=False,
-            check=False  # Don't fail if server isn't running
+            check=False,  # Don't fail if server isn't running
         )
 
         return result.stdout.splitlines()
@@ -539,7 +558,8 @@ class DockerServer(MinecraftServer):
         # Check server type compatibility
         if not self.mod_manager.is_compatible(source):
             Console.print_error(
-                f"Server type '{self.server_type}' is not compatible with {source} mods")
+                f"Server type '{self.server_type}' is not compatible with {source} mods"
+            )
             return False
 
         Console.print_info(f"Installing mod {mod_id} from {source}...")
@@ -585,7 +605,9 @@ class DockerServer(MinecraftServer):
         """
         return self.mod_manager.list_installed_mods()
 
-    def configure_auto_shutdown(self, enabled: bool, timeout_minutes: int = 120) -> None:
+    def configure_auto_shutdown(
+        self, enabled: bool, timeout_minutes: int = 120
+    ) -> None:
         """
         Configure auto-shutdown behavior
 
@@ -610,66 +632,65 @@ class DockerServer(MinecraftServer):
             Console.print_info("Auto-shutdown disabled.")
 
     def _create_docker_compose_file(self) -> None:
-        """Create or update docker-compose.yml with current settings"""
-        compose_file = self.base_dir / "docker-compose.yml"
-
-        # Basic docker-compose template
-        compose_content = f"""version: '3'
+        """Create the docker-compose.yml file"""
+        docker_compose_content = f"""
+version: '3'
 
 services:
   minecraft:
-    image: itzg/minecraft-server:java21
+    image: itzg/minecraft-server:{self.java_version}
     container_name: {self.container_name}
     ports:
       - "25565:25565"
     environment:
       # EULA Agreement
       EULA: "TRUE"
-      
+
       # Server type and version
       TYPE: "{self.server_type.upper()}"
       VERSION: "{self.minecraft_version}"
-      
+
       # Performance settings
       MEMORY: "{self.memory}"
       JVM_XX_OPTS: "{self.java_flags}"
       USE_AIKAR_FLAGS: "true"
-      
+
       # Game settings
       DIFFICULTY: "normal"
       MODE: "survival"
       MOTD: "Minecraft Server"
-      
+
       # Security settings
       ENABLE_RCON: "true"
       RCON_PASSWORD: "minecraft"
       RCON_PORT: 25575
       ENFORCE_SECURE_PROFILE: "false"
-      
+
       # Auto-shutdown
       ENABLE_AUTOPAUSE: "{str(self.auto_shutdown_enabled).lower()}"
       AUTOPAUSE_TIMEOUT_EST: "{self.auto_shutdown.inactivity_threshold * 60}"
-      
+
     volumes:
       - ./data:/data
       - ./plugins:/plugins
       - ./config:/config
-      - ./logs:/logs
+
     restart: unless-stopped
-"""
+    """
 
         # Write the file
-        with open(compose_file, 'w') as f:
-            f.write(compose_content)
+        with open(self.base_dir / "docker-compose.yml", "w") as f:
+            f.write(docker_compose_content)
 
-        Console.print_info(f"Created Docker Compose file: {compose_file}")
+        Console.print_info(
+            f"Created Docker Compose file: {self.base_dir / 'docker-compose.yml'}")
 
     def update_server_configuration(
         self,
         memory: Optional[str] = None,
         minecraft_version: Optional[str] = None,
         server_type: Optional[str] = None,
-        java_flags: Optional[str] = None
+        java_flags: Optional[str] = None,
     ) -> None:
         """
         Update server configuration

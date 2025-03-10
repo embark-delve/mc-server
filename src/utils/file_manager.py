@@ -4,10 +4,10 @@
 File manager utility for handling file operations like backups
 """
 
+import datetime
+import glob
 import os
 import shutil
-import glob
-import datetime
 from pathlib import Path
 from typing import List, Optional, Tuple
 
@@ -43,7 +43,7 @@ class FileManager:
         size_bytes = os.path.getsize(file_path)
 
         # Convert bytes to human-readable format
-        units = ['B', 'KB', 'MB', 'GB', 'TB']
+        units = ["B", "KB", "MB", "GB", "TB"]
         size = float(size_bytes)
         unit_index = 0
 
@@ -55,9 +55,7 @@ class FileManager:
 
     @staticmethod
     def create_backup(
-        source_dir: Path,
-        backup_dir: Path,
-        backup_name: Optional[str] = None
+        source_dir: Path, backup_dir: Path, backup_name: Optional[str] = None
     ) -> Tuple[Path, str]:
         """
         Create a backup of a directory
@@ -76,8 +74,7 @@ class FileManager:
         """
         # Ensure source directory exists
         if not os.path.exists(source_dir):
-            raise FileNotFoundError(
-                f"Source directory not found: {source_dir}")
+            raise FileNotFoundError(f"Source directory not found: {source_dir}")
 
         # Ensure backup directory exists
         os.makedirs(backup_dir, exist_ok=True)
@@ -93,14 +90,14 @@ class FileManager:
         Console.print_info(f"Creating backup: {backup_path}")
         shutil.make_archive(
             # Remove .zip as make_archive adds it
-            str(backup_path.with_suffix('')),
-            'zip',
+            str(backup_path.with_suffix("")),
+            "zip",
             root_dir=source_dir.parent,
-            base_dir=source_dir.name
+            base_dir=source_dir.name,
         )
 
         # Correct the path to include .zip extension
-        backup_path = backup_path.with_suffix('.zip')
+        backup_path = backup_path.with_suffix(".zip")
 
         # Get the size of the backup
         backup_size = FileManager.get_file_size(backup_path)
@@ -147,8 +144,7 @@ class FileManager:
             to_remove = backup_files[keep_count:]
 
             for backup_file in to_remove:
-                Console.print_warning(
-                    f"Removing old backup: {backup_file.name}")
+                Console.print_warning(f"Removing old backup: {backup_file.name}")
                 os.remove(backup_file)
                 removed_count += 1
 
@@ -156,9 +152,7 @@ class FileManager:
 
     @staticmethod
     def extract_backup(
-        backup_path: Path,
-        extract_dir: Path,
-        target_dir: Optional[Path] = None
+        backup_path: Path, extract_dir: Path, target_dir: Optional[Path] = None
     ) -> bool:
         """
         Extract a backup file to a directory
@@ -177,14 +171,13 @@ class FileManager:
 
             # Extract the backup
             Console.print_info(f"Extracting backup: {backup_path}")
-            shutil.unpack_archive(str(backup_path), str(extract_dir), 'zip')
+            shutil.unpack_archive(str(backup_path), str(extract_dir), "zip")
 
             # If target_dir is specified and different from extract_dir,
             # move the extracted contents there
             if target_dir and target_dir != extract_dir:
                 # Get the directory that was created by the extraction
-                extracted_dirs = [
-                    d for d in extract_dir.iterdir() if d.is_dir()]
+                extracted_dirs = [d for d in extract_dir.iterdir() if d.is_dir()]
                 if extracted_dirs:
                     source = extracted_dirs[0]
 

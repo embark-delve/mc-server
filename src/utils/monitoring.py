@@ -5,25 +5,27 @@ Monitoring utilities for Minecraft servers
 Collects metrics and exports them to Prometheus or CloudWatch
 """
 
-import os
-import time
 import json
-import threading
 import logging
+import os
 import platform
 import subprocess
-from typing import Dict, List, Optional, Union, Any, Callable
+import threading
+import time
 from pathlib import Path
+from typing import Any, Dict, Optional
 
 # Import optional dependencies - these will be available only if installed
 try:
     import psutil
+
     PSUTIL_AVAILABLE = True
 except ImportError:
     PSUTIL_AVAILABLE = False
 
 try:
     import boto3
+
     BOTO3_AVAILABLE = True
 except ImportError:
     BOTO3_AVAILABLE = False
@@ -31,14 +33,14 @@ except ImportError:
 try:
     import prometheus_client as prom
     from prometheus_client import start_http_server
+
     PROMETHEUS_AVAILABLE = True
 except ImportError:
     PROMETHEUS_AVAILABLE = False
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger("monitoring")
 
@@ -59,7 +61,7 @@ class ServerMonitor:
         cloudwatch_namespace: str = "Minecraft",
         server_name: str = "minecraft-server",
         server_id: Optional[str] = None,
-        metrics_dir: Optional[Path] = None
+        metrics_dir: Optional[Path] = None,
     ):
         """
         Initialize the server monitor
@@ -113,12 +115,10 @@ class ServerMonitor:
             return
 
         self._running = True
-        self._collector_thread = threading.Thread(
-            target=self._collect_metrics_loop)
+        self._collector_thread = threading.Thread(target=self._collect_metrics_loop)
         self._collector_thread.daemon = True
         self._collector_thread.start()
-        logger.info(
-            f"Started metrics collection every {self.collect_interval} seconds")
+        logger.info(f"Started metrics collection every {self.collect_interval} seconds")
 
     def stop(self) -> None:
         """Stop collecting metrics"""
@@ -193,9 +193,9 @@ class ServerMonitor:
             if not os.path.exists(metrics_file):
                 return {}
 
-            with open(metrics_file, 'r') as f:
+            with open(metrics_file) as f:
                 return json.load(f)
-        except (json.JSONDecodeError, IOError) as e:
+        except (OSError, json.JSONDecodeError) as e:
             logger.warning(f"Failed to read metrics file: {e}")
             return {}
 
@@ -213,43 +213,41 @@ class ServerMonitor:
             metrics["player_count"] = prom.Gauge(
                 "minecraft_player_count",
                 "Number of connected players",
-                ["server_name", "server_id"]
+                ["server_name", "server_id"],
             )
 
             metrics["heap_used"] = prom.Gauge(
                 "minecraft_heap_used_bytes",
                 "Java heap used in bytes",
-                ["server_name", "server_id"]
+                ["server_name", "server_id"],
             )
 
             metrics["heap_max"] = prom.Gauge(
                 "minecraft_heap_max_bytes",
                 "Java heap maximum in bytes",
-                ["server_name", "server_id"]
+                ["server_name", "server_id"],
             )
 
             metrics["cpu_usage"] = prom.Gauge(
                 "minecraft_cpu_usage_percent",
                 "CPU usage percentage",
-                ["server_name", "server_id"]
+                ["server_name", "server_id"],
             )
 
             metrics["memory_usage"] = prom.Gauge(
                 "minecraft_memory_usage_percent",
                 "Memory usage percentage",
-                ["server_name", "server_id"]
+                ["server_name", "server_id"],
             )
 
             metrics["uptime"] = prom.Gauge(
                 "minecraft_uptime_seconds",
                 "Server uptime in seconds",
-                ["server_name", "server_id"]
+                ["server_name", "server_id"],
             )
 
             metrics["tps"] = prom.Gauge(
-                "minecraft_tps",
-                "Ticks per second",
-                ["server_name", "server_id"]
+                "minecraft_tps", "Ticks per second", ["server_name", "server_id"]
             )
 
         return metrics
@@ -262,7 +260,8 @@ class ServerMonitor:
 
         try:
             logger.info(
-                f"Starting Prometheus metrics server on port {self.metrics_port}")
+                f"Starting Prometheus metrics server on port {self.metrics_port}"
+            )
             start_http_server(self.metrics_port)
         except Exception as e:
             logger.error(f"Failed to start Prometheus metrics server: {e}")
@@ -270,14 +269,14 @@ class ServerMonitor:
     def _initialize_cloudwatch(self) -> None:
         """Initialize CloudWatch client"""
         if not BOTO3_AVAILABLE:
-            logger.warning(
-                "boto3 library not available for CloudWatch metrics")
+            logger.warning("boto3 library not available for CloudWatch metrics")
             return
 
         try:
-            self.cloudwatch = boto3.client('cloudwatch')
+            self.cloudwatch = boto3.client("cloudwatch")
             logger.info(
-                f"Initialized CloudWatch metrics client with namespace {self.cloudwatch_namespace}")
+                f"Initialized CloudWatch metrics client with namespace {self.cloudwatch_namespace}"
+            )
         except Exception as e:
             logger.error(f"Failed to initialize CloudWatch client: {e}")
             self.enable_cloudwatch = False
@@ -302,18 +301,18 @@ class ServerMonitor:
         try:
             # Save to latest metrics file
             latest_file = self.metrics_dir / "latest_metrics.json"
-            with open(latest_file, 'w') as f:
+            with open(latest_file, "w") as f:
                 json.dump(metrics, f, indent=2)
 
             # Also save with timestamp for history
             timestamp = int(time.time())
             history_file = self.metrics_dir / f"metrics_{timestamp}.json"
-            with open(history_file, 'w') as f:
+            with open(history_file, "w") as f:
                 json.dump(metrics, f, indent=2)
 
             # Cleanup old files (keep last 100)
             self._cleanup_old_metrics_files(100)
-        except IOError as e:
+        except OSError as e:
             logger.warning(f"Failed to write metrics to file: {e}")
 
     def _cleanup_old_metrics_files(self, keep_count: int) -> None:
@@ -364,23 +363,24 @@ class ServerMonitor:
             metric_data = []
 
             for name, value in metrics.items():
-                metric_data.append({
-                    'MetricName': name,
-                    'Dimensions': [
-                        {'Name': 'ServerName', 'Value': self.server_name},
-                        {'Name': 'ServerId', 'Value': self.server_id},
-                        {'Name': 'ServerType', 'Value': self.server_type}
-                    ],
-                    'Value': value,
-                    'Unit': self._get_metric_unit(name)
-                })
+                metric_data.append(
+                    {
+                        "MetricName": name,
+                        "Dimensions": [
+                            {"Name": "ServerName", "Value": self.server_name},
+                            {"Name": "ServerId", "Value": self.server_id},
+                            {"Name": "ServerType", "Value": self.server_type},
+                        ],
+                        "Value": value,
+                        "Unit": self._get_metric_unit(name),
+                    }
+                )
 
             # Split into chunks of 20 (CloudWatch API limit)
             for i in range(0, len(metric_data), 20):
-                chunk = metric_data[i:i+20]
+                chunk = metric_data[i : i + 20]
                 self.cloudwatch.put_metric_data(
-                    Namespace=self.cloudwatch_namespace,
-                    MetricData=chunk
+                    Namespace=self.cloudwatch_namespace, MetricData=chunk
                 )
 
             logger.debug(f"Sent {len(metric_data)} metrics to CloudWatch")
@@ -423,18 +423,28 @@ class ServerMonitor:
         if self.server_type == "aws" and BOTO3_AVAILABLE:
             try:
                 # First try IMDSv2
-                token_cmd = ["curl", "-s", "-X", "PUT", "http://169.254.169.254/latest/api/token",
-                             "-H", "X-aws-ec2-metadata-token-ttl-seconds: 60"]
-                token_proc = subprocess.run(
-                    token_cmd, capture_output=True, text=True)
+                token_cmd = [
+                    "curl",
+                    "-s",
+                    "-X",
+                    "PUT",
+                    "http://169.254.169.254/latest/api/token",
+                    "-H",
+                    "X-aws-ec2-metadata-token-ttl-seconds: 60",
+                ]
+                token_proc = subprocess.run(token_cmd, capture_output=True, text=True, check=False)
                 token = token_proc.stdout.strip()
 
                 # Get instance ID using token
                 if token:
-                    id_cmd = ["curl", "-s", "-H", f"X-aws-ec2-metadata-token: {token}",
-                              "http://169.254.169.254/latest/meta-data/instance-id"]
-                    id_proc = subprocess.run(
-                        id_cmd, capture_output=True, text=True)
+                    id_cmd = [
+                        "curl",
+                        "-s",
+                        "-H",
+                        f"X-aws-ec2-metadata-token: {token}",
+                        "http://169.254.169.254/latest/meta-data/instance-id",
+                    ]
+                    id_proc = subprocess.run(id_cmd, capture_output=True, text=True, check=False)
                     instance_id = id_proc.stdout.strip()
                     if instance_id:
                         return instance_id
@@ -455,19 +465,25 @@ class ServerMonitor:
 
         try:
             # Get Docker stats
-            cmd = ["docker", "stats", "minecraft-server", "--no-stream", "--format",
-                   "{{.CPUPerc}}|{{.MemUsage}}|{{.MemPerc}}|{{.NetIO}}|{{.BlockIO}}"]
-            proc = subprocess.run(cmd, capture_output=True, text=True)
+            cmd = [
+                "docker",
+                "stats",
+                "minecraft-server",
+                "--no-stream",
+                "--format",
+                "{{.CPUPerc}}|{{.MemUsage}}|{{.MemPerc}}|{{.NetIO}}|{{.BlockIO}}",
+            ]
+            proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
 
             if proc.returncode == 0 and proc.stdout:
-                parts = proc.stdout.strip().split('|')
+                parts = proc.stdout.strip().split("|")
                 if len(parts) >= 5:
                     # CPU percentage (remove % sign)
-                    cpu_perc = parts[0].strip().rstrip('%')
+                    cpu_perc = parts[0].strip().rstrip("%")
                     metrics["container_cpu_percent"] = float(cpu_perc)
 
                     # Memory usage
-                    mem_parts = parts[1].split('/')
+                    mem_parts = parts[1].split("/")
                     if len(mem_parts) == 2:
                         mem_used = self._parse_size(mem_parts[0].strip())
                         mem_limit = self._parse_size(mem_parts[1].strip())
@@ -475,11 +491,11 @@ class ServerMonitor:
                         metrics["container_memory_limit"] = mem_limit
 
                     # Memory percentage (remove % sign)
-                    mem_perc = parts[2].strip().rstrip('%')
+                    mem_perc = parts[2].strip().rstrip("%")
                     metrics["container_memory_percent"] = float(mem_perc)
 
                     # Network IO
-                    net_parts = parts[3].split('/')
+                    net_parts = parts[3].split("/")
                     if len(net_parts) == 2:
                         net_in = self._parse_size(net_parts[0].strip())
                         net_out = self._parse_size(net_parts[1].strip())
@@ -487,7 +503,7 @@ class ServerMonitor:
                         metrics["container_network_out"] = net_out
 
                     # Block IO
-                    block_parts = parts[4].split('/')
+                    block_parts = parts[4].split("/")
                     if len(block_parts) == 2:
                         block_in = self._parse_size(block_parts[0].strip())
                         block_out = self._parse_size(block_parts[1].strip())
@@ -533,7 +549,7 @@ class ServerMonitor:
             # Remove any non-numeric/non-decimal prefix
             value = ""
             for char in size_str:
-                if char.isdigit() or char == '.':
+                if char.isdigit() or char == ".":
                     value += char
                 else:
                     break
@@ -541,16 +557,16 @@ class ServerMonitor:
             value = float(value)
 
             # Get unit
-            unit = size_str[len(str(value)):].strip().upper()
+            unit = size_str[len(str(value)) :].strip().upper()
 
             # Convert to bytes
-            if unit.startswith('K'):
+            if unit.startswith("K"):
                 return value * 1024
-            elif unit.startswith('M'):
+            elif unit.startswith("M"):
                 return value * 1024 * 1024
-            elif unit.startswith('G'):
+            elif unit.startswith("G"):
                 return value * 1024 * 1024 * 1024
-            elif unit.startswith('T'):
+            elif unit.startswith("T"):
                 return value * 1024 * 1024 * 1024 * 1024
             else:
                 return value

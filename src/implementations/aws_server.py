@@ -4,29 +4,25 @@
 AWS EC2-based Minecraft Server implementation
 """
 
+import logging
 import os
 import time
-import logging
-import json
-import base64
-from typing import Dict, List, Optional, Union, Any, Set
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Set
 
 import boto3
 from botocore.exceptions import ClientError
 
 from src.core.server_interface import MinecraftServer
-from src.utils.console import Console
-from src.utils.command_executor import CommandExecutor
-from src.utils.file_manager import FileManager
 from src.utils.auto_shutdown import AutoShutdown
+from src.utils.console import Console
+from src.utils.file_manager import FileManager
 from src.utils.mod_manager import ModManager
 from src.utils.monitoring import ServerMonitor
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger("aws_server")
 
@@ -51,7 +47,7 @@ class AWSServer(MinecraftServer):
         auto_shutdown_timeout: int = 120,  # 2 hours in minutes
         monitoring_enabled: bool = True,
         enable_prometheus: bool = True,
-        enable_cloudwatch: bool = True
+        enable_cloudwatch: bool = True,
     ):
         """
         Initialize an AWS EC2-based Minecraft server
@@ -62,7 +58,7 @@ class AWSServer(MinecraftServer):
             region: AWS region
             ssh_key_path: Path to SSH key for connecting to the instance
             ssh_user: SSH username for the instance
-            data_dir_name: Name of the data directory 
+            data_dir_name: Name of the data directory
             backup_dir_name: Name of the backups directory
             plugins_dir_name: Name of the plugins directory
             config_dir_name: Name of the config directory
@@ -75,8 +71,9 @@ class AWSServer(MinecraftServer):
             enable_cloudwatch: Whether to enable CloudWatch metrics
         """
         # Set the base directory
-        self.base_dir = base_dir or Path(
-            os.path.dirname(os.path.abspath(__file__))) / "../.."
+        self.base_dir = (
+            base_dir or Path(os.path.dirname(os.path.abspath(__file__))) / "../.."
+        )
         self.base_dir = self.base_dir.resolve()  # Convert to absolute path
 
         # Configure directories
@@ -96,12 +93,14 @@ class AWSServer(MinecraftServer):
         self.minecraft_version = minecraft_version
         self.server_type = server_type.lower()
         self.memory = "2G"  # Default memory allocation
-        self.java_flags = "-XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200"
+        self.java_flags = (
+            "-XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200"
+        )
 
         # Initialize AWS clients
-        self.ec2 = boto3.client('ec2', region_name=self.region)
-        self.ssm = boto3.client('ssm', region_name=self.region)
-        self.cloudwatch = boto3.client('cloudwatch', region_name=self.region)
+        self.ec2 = boto3.client("ec2", region_name=self.region)
+        self.ssm = boto3.client("ssm", region_name=self.region)
+        self.cloudwatch = boto3.client("cloudwatch", region_name=self.region)
 
         # Ensure directories exist
         self._ensure_directories()
@@ -112,14 +111,14 @@ class AWSServer(MinecraftServer):
             shutdown_callback=self.stop,
             inactivity_threshold=auto_shutdown_timeout,
             check_interval=5,  # Check every 5 minutes
-            enabled=auto_shutdown_enabled
+            enabled=auto_shutdown_enabled,
         )
 
         # Initialize mod manager
         self.mod_manager = ModManager(
             server_type=self.server_type,
             minecraft_version=self.minecraft_version,
-            mods_dir=self.plugins_dir
+            mods_dir=self.plugins_dir,
         )
 
         # Initialize monitoring
@@ -131,7 +130,7 @@ class AWSServer(MinecraftServer):
                 enable_prometheus=enable_prometheus,
                 enable_cloudwatch=enable_cloudwatch,
                 metrics_dir=self.base_dir / "metrics",
-                aws_region=self.region
+                aws_region=self.region,
             )
         else:
             self.monitor = None
@@ -143,14 +142,16 @@ class AWSServer(MinecraftServer):
 
     def _ensure_directories(self) -> None:
         """Ensure all required directories exist"""
-        FileManager.ensure_directories([
-            self.data_dir,
-            self.backup_dir,
-            self.plugins_dir,
-            self.config_dir,
-            self.logs_dir,
-            self.base_dir / "metrics"
-        ])
+        FileManager.ensure_directories(
+            [
+                self.data_dir,
+                self.backup_dir,
+                self.plugins_dir,
+                self.config_dir,
+                self.logs_dir,
+                self.base_dir / "metrics",
+            ]
+        )
 
     def is_running(self) -> bool:
         """Check if the Minecraft server EC2 instance is running"""
@@ -159,8 +160,7 @@ class AWSServer(MinecraftServer):
 
         try:
             response = self.ec2.describe_instance_status(
-                InstanceIds=[self.instance_id],
-                IncludeAllInstances=True
+                InstanceIds=[self.instance_id], IncludeAllInstances=True
             )
 
             if not response["InstanceStatuses"]:
@@ -182,18 +182,15 @@ class AWSServer(MinecraftServer):
             response = self.ssm.send_command(
                 InstanceIds=[self.instance_id],
                 DocumentName="AWS-RunShellScript",
-                Parameters={
-                    "commands": ["cd /opt/minecraft && rcon-cli list"]
-                }
+                Parameters={"commands": ["cd /opt/minecraft && rcon-cli list"]},
             )
 
             # Wait for command completion
-            command_id = response['Command']['CommandId']
+            command_id = response["Command"]["CommandId"]
             time.sleep(2)  # Give command time to execute
 
             output = self.ssm.get_command_invocation(
-                CommandId=command_id,
-                InstanceId=self.instance_id
+                CommandId=command_id, InstanceId=self.instance_id
             )
 
             # Parse player list from output
@@ -226,14 +223,15 @@ class AWSServer(MinecraftServer):
                 # This would be a complex operation to create and configure a new EC2 instance
                 # For simplicity, we're assuming the instance already exists
                 raise ValueError(
-                    "No instance ID provided and automatic creation not implemented")
+                    "No instance ID provided and automatic creation not implemented"
+                )
 
             # Start the instance
             self.ec2.start_instances(InstanceIds=[self.instance_id])
 
             # Wait for the instance to be running
             Console.print_info("Waiting for instance to start...")
-            waiter = self.ec2.get_waiter('instance_running')
+            waiter = self.ec2.get_waiter("instance_running")
             waiter.wait(InstanceIds=[self.instance_id])
 
             # Wait for SSH to be available
@@ -248,9 +246,9 @@ class AWSServer(MinecraftServer):
                 Parameters={
                     "commands": [
                         "cd /opt/minecraft",
-                        "sudo systemctl start minecraft.service"
+                        "sudo systemctl start minecraft.service",
                     ]
-                }
+                },
             )
 
             # Wait for the server to initialize
@@ -259,7 +257,8 @@ class AWSServer(MinecraftServer):
 
             Console.print_success("Server started successfully!")
             Console.print_colored(
-                f"Connect to server at: {self._get_instance_ip()}", Console.PURPLE)
+                f"Connect to server at: {self._get_instance_ip()}", Console.PURPLE
+            )
 
             # Start auto-shutdown monitoring
             if self.auto_shutdown_enabled:
@@ -307,9 +306,9 @@ class AWSServer(MinecraftServer):
                     Parameters={
                         "commands": [
                             "cd /opt/minecraft",
-                            "sudo systemctl stop minecraft.service"
+                            "sudo systemctl stop minecraft.service",
                         ]
-                    }
+                    },
                 )
 
                 # Wait for the server to stop
@@ -323,7 +322,7 @@ class AWSServer(MinecraftServer):
 
             # Wait for the instance to stop
             Console.print_info("Waiting for EC2 instance to stop...")
-            waiter = self.ec2.get_waiter('instance_stopped')
+            waiter = self.ec2.get_waiter("instance_stopped")
             waiter.wait(InstanceIds=[self.instance_id])
 
             Console.print_success("Server stopped successfully!")
@@ -351,9 +350,9 @@ class AWSServer(MinecraftServer):
                 Parameters={
                     "commands": [
                         "cd /opt/minecraft",
-                        "sudo systemctl restart minecraft.service"
+                        "sudo systemctl restart minecraft.service",
                     ]
-                }
+                },
             )
 
             # Wait for the server to restart
@@ -380,30 +379,26 @@ class AWSServer(MinecraftServer):
             "region": self.region,
             "data_directory": str(self.data_dir),
             "plugins_directory": str(self.plugins_dir),
-            "config_directory": str(self.config_dir)
+            "config_directory": str(self.config_dir),
         }
 
         # If the server is running, get additional information
         if is_running:
             try:
                 # Get instance details
-                response = self.ec2.describe_instances(
-                    InstanceIds=[self.instance_id])
+                response = self.ec2.describe_instances(InstanceIds=[self.instance_id])
                 instance = response["Reservations"][0]["Instances"][0]
 
                 # Add instance information
-                status["instance_type"] = instance.get(
-                    "InstanceType", "Unknown")
-                status["public_ip"] = instance.get(
-                    "PublicIpAddress", "Unknown")
-                status["private_ip"] = instance.get(
-                    "PrivateIpAddress", "Unknown")
+                status["instance_type"] = instance.get("InstanceType", "Unknown")
+                status["public_ip"] = instance.get("PublicIpAddress", "Unknown")
+                status["private_ip"] = instance.get("PrivateIpAddress", "Unknown")
 
                 # Get uptime
                 launch_time = instance.get("LaunchTime", None)
                 if launch_time:
                     # Calculate uptime
-                    uptime_seconds = (time.time() - launch_time.timestamp())
+                    uptime_seconds = time.time() - launch_time.timestamp()
                     days, remainder = divmod(uptime_seconds, 86400)
                     hours, remainder = divmod(remainder, 3600)
                     minutes, _ = divmod(remainder, 60)
@@ -420,24 +415,25 @@ class AWSServer(MinecraftServer):
                         Parameters={
                             "commands": [
                                 "cd /opt/minecraft",
-                                "grep 'Starting minecraft server version' logs/latest.log | tail -1"
+                                "grep 'Starting minecraft server version' logs/latest.log | tail -1",
                             ]
-                        }
+                        },
                     )
 
-                    command_id = response['Command']['CommandId']
+                    command_id = response["Command"]["CommandId"]
                     time.sleep(2)  # Give command time to execute
 
                     output = self.ssm.get_command_invocation(
-                        CommandId=command_id,
-                        InstanceId=self.instance_id
+                        CommandId=command_id, InstanceId=self.instance_id
                     )
 
                     # Parse server version
                     version_output = output.get("StandardOutputContent", "")
                     import re
+
                     version_match = re.search(
-                        r"Starting minecraft server version ([\d\.]+)", version_output)
+                        r"Starting minecraft server version ([\d\.]+)", version_output
+                    )
                     if version_match:
                         status["version"] = version_match.group(1)
                     else:
@@ -467,8 +463,12 @@ class AWSServer(MinecraftServer):
                     metrics = self.monitor.get_metrics()
                     for key, value in metrics.items():
                         # Add a subset of interesting metrics to status
-                        if key in ["system_cpu_percent", "system_memory_percent",
-                                   "instance_cpu_utilization", "instance_memory_utilization"]:
+                        if key in [
+                            "system_cpu_percent",
+                            "system_memory_percent",
+                            "instance_cpu_utilization",
+                            "instance_memory_utilization",
+                        ]:
                             status[key] = value
 
             except Exception as e:
@@ -489,17 +489,14 @@ class AWSServer(MinecraftServer):
             response = self.ssm.send_command(
                 InstanceIds=[self.instance_id],
                 DocumentName="AWS-RunShellScript",
-                Parameters={
-                    "commands": [f"cd /opt/minecraft && rcon-cli {command}"]
-                }
+                Parameters={"commands": [f"cd /opt/minecraft && rcon-cli {command}"]},
             )
 
-            command_id = response['Command']['CommandId']
+            command_id = response["Command"]["CommandId"]
             time.sleep(2)  # Give command time to execute
 
             output = self.ssm.get_command_invocation(
-                CommandId=command_id,
-                InstanceId=self.instance_id
+                CommandId=command_id, InstanceId=self.instance_id
             )
 
             # Record activity for auto-shutdown
@@ -510,7 +507,7 @@ class AWSServer(MinecraftServer):
 
         except Exception as e:
             Console.print_error(f"Error executing command: {e}")
-            return f"Error: {str(e)}"
+            return f"Error: {e!s}"
 
     def backup(self) -> Optional[Path]:
         """Create a backup of the server"""
@@ -524,7 +521,8 @@ class AWSServer(MinecraftServer):
             # Notify server of backup
             try:
                 self.execute_command(
-                    "say SERVER BACKUP STARTING - Possible lag incoming")
+                    "say SERVER BACKUP STARTING - Possible lag incoming"
+                )
             except Exception:
                 pass
 
@@ -536,9 +534,9 @@ class AWSServer(MinecraftServer):
                     "commands": [
                         "cd /opt/minecraft",
                         "mkdir -p backups",
-                        "tar -czf backups/backup-$(date +%Y%m%d%H%M%S).tar.gz world"
+                        "tar -czf backups/backup-$(date +%Y%m%d%H%M%S).tar.gz world",
                     ]
-                }
+                },
             )
 
             # Download the latest backup
@@ -547,12 +545,10 @@ class AWSServer(MinecraftServer):
             # For simplicity, we're just creating a placeholder
 
             backup_path, backup_size = FileManager.create_backup(
-                self.data_dir,
-                self.backup_dir
+                self.data_dir, self.backup_dir
             )
 
-            Console.print_success(
-                f"Backup created successfully: {backup_path.name}")
+            Console.print_success(f"Backup created successfully: {backup_path.name}")
             Console.print_success(f"Backup size: {backup_size}")
 
             # Clean up old backups (keep 5 latest)
@@ -589,8 +585,7 @@ class AWSServer(MinecraftServer):
     def get_logs(self, lines: int = 50) -> List[str]:
         """Get the most recent server logs"""
         if not self.is_running():
-            Console.print_warning(
-                "Server is not running, logs may be unavailable")
+            Console.print_warning("Server is not running, logs may be unavailable")
             return []
 
         try:
@@ -598,16 +593,17 @@ class AWSServer(MinecraftServer):
                 InstanceIds=[self.instance_id],
                 DocumentName="AWS-RunShellScript",
                 Parameters={
-                    "commands": [f"cd /opt/minecraft && tail -n {lines} logs/latest.log"]
-                }
+                    "commands": [
+                        f"cd /opt/minecraft && tail -n {lines} logs/latest.log"
+                    ]
+                },
             )
 
-            command_id = response['Command']['CommandId']
+            command_id = response["Command"]["CommandId"]
             time.sleep(2)  # Give command time to execute
 
             output = self.ssm.get_command_invocation(
-                CommandId=command_id,
-                InstanceId=self.instance_id
+                CommandId=command_id, InstanceId=self.instance_id
             )
 
             return output.get("StandardOutputContent", "").splitlines()
@@ -632,7 +628,8 @@ class AWSServer(MinecraftServer):
         # Check server type compatibility
         if not self.mod_manager.is_compatible(source):
             Console.print_error(
-                f"Server type '{self.server_type}' is not compatible with {source} mods")
+                f"Server type '{self.server_type}' is not compatible with {source} mods"
+            )
             return False
 
         if not self.is_running():
@@ -657,12 +654,12 @@ class AWSServer(MinecraftServer):
             mod_file = mod_files[0]
 
             # Upload the mod to the EC2 instance
-            Console.print_info(f"Uploading mod to EC2 instance...")
+            Console.print_info("Uploading mod to EC2 instance...")
             # This would require more code to actually upload the file
             # For simplicity, we'll just say it was successful
 
             # Install the mod on the server
-            Console.print_info(f"Installing mod on server...")
+            Console.print_info("Installing mod on server...")
             # This is a placeholder for the actual installation process
 
             Console.print_success(f"Successfully installed mod {mod_id}")
@@ -687,8 +684,7 @@ class AWSServer(MinecraftServer):
         Console.print_info(f"Uninstalling mod {mod_id}...")
 
         if not self.is_running():
-            Console.print_warning(
-                "Server is not running, cannot uninstall mod")
+            Console.print_warning("Server is not running, cannot uninstall mod")
             return False
 
         try:
@@ -696,12 +692,11 @@ class AWSServer(MinecraftServer):
             success = self.mod_manager.uninstall_mod(mod_id)
 
             if not success:
-                Console.print_error(
-                    f"Failed to uninstall mod {mod_id} locally")
+                Console.print_error(f"Failed to uninstall mod {mod_id} locally")
                 return False
 
             # Remove mod from EC2 instance
-            Console.print_info(f"Removing mod from EC2 instance...")
+            Console.print_info("Removing mod from EC2 instance...")
             # This would require more code to actually remove the file
             # For simplicity, we'll just say it was successful
 
@@ -728,7 +723,9 @@ class AWSServer(MinecraftServer):
         # This is a simplified implementation
         return self.mod_manager.list_installed_mods()
 
-    def configure_auto_shutdown(self, enabled: bool, timeout_minutes: int = 120) -> None:
+    def configure_auto_shutdown(
+        self, enabled: bool, timeout_minutes: int = 120
+    ) -> None:
         """
         Configure auto-shutdown behavior
 
@@ -757,7 +754,7 @@ class AWSServer(MinecraftServer):
         memory: Optional[str] = None,
         minecraft_version: Optional[str] = None,
         server_type: Optional[str] = None,
-        java_flags: Optional[str] = None
+        java_flags: Optional[str] = None,
     ) -> None:
         """
         Update server configuration
@@ -799,8 +796,7 @@ class AWSServer(MinecraftServer):
             return "Unknown"
 
         try:
-            response = self.ec2.describe_instances(
-                InstanceIds=[self.instance_id])
+            response = self.ec2.describe_instances(InstanceIds=[self.instance_id])
             instance = response["Reservations"][0]["Instances"][0]
             return instance.get("PublicIpAddress", "Unknown")
         except Exception as e:

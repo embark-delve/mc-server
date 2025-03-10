@@ -4,10 +4,9 @@
 Test for the auto-shutdown utility
 """
 
-import threading
 import time
-from unittest.mock import MagicMock, patch
 from datetime import datetime, timedelta
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -24,7 +23,7 @@ class TestAutoShutdown:
             shutdown_callback=mock_shutdown,
             inactivity_threshold=30,
             check_interval=1,
-            enabled=True
+            enabled=True,
         )
 
         assert auto_shutdown.shutdown_callback == mock_shutdown
@@ -88,8 +87,10 @@ class TestAutoShutdown:
         # Activity timestamp should not be updated for empty list
         assert auto_shutdown.last_activity == old_activity
 
-    @pytest.mark.xfail(reason="This test is timing-sensitive and may fail in CI environments")
-    @patch('time.sleep', return_value=None)  # Don't actually sleep in tests
+    @pytest.mark.xfail(
+        reason="This test is timing-sensitive and may fail in CI environments"
+    )
+    @patch("time.sleep", return_value=None)  # Don't actually sleep in tests
     def test_monitoring_thread(self, _):
         """Test monitoring thread behavior"""
         # Mock shutdown callback
@@ -101,7 +102,7 @@ class TestAutoShutdown:
             shutdown_callback=mock_shutdown,
             inactivity_threshold=0.05,  # Very short for testing
             check_interval=0.02,
-            enabled=True
+            enabled=True,
         )
 
         # Start monitoring
@@ -123,10 +124,7 @@ class TestAutoShutdown:
     def test_disabled_auto_shutdown(self):
         """Test behavior when auto-shutdown is disabled"""
         mock_shutdown = MagicMock()
-        auto_shutdown = AutoShutdown(
-            shutdown_callback=mock_shutdown,
-            enabled=False
-        )
+        auto_shutdown = AutoShutdown(shutdown_callback=mock_shutdown, enabled=False)
 
         # Start monitoring with disabled state
         auto_shutdown.start_monitoring()
@@ -140,8 +138,7 @@ class TestAutoShutdown:
         """Test stopping the monitoring thread"""
         mock_shutdown = MagicMock()
         auto_shutdown = AutoShutdown(
-            shutdown_callback=mock_shutdown,
-            check_interval=0.1
+            shutdown_callback=mock_shutdown, check_interval=0.1
         )
 
         # Start monitoring
@@ -160,9 +157,7 @@ class TestAutoShutdown:
         """Test getting status information"""
         mock_shutdown = MagicMock()
         auto_shutdown = AutoShutdown(
-            shutdown_callback=mock_shutdown,
-            inactivity_threshold=120,
-            enabled=True
+            shutdown_callback=mock_shutdown, inactivity_threshold=120, enabled=True
         )
 
         # Add some active players

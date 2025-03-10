@@ -5,20 +5,18 @@ Mod manager utility for Minecraft servers
 Handles downloading, installing, and managing server mods
 """
 
+import datetime
+import json
+import logging
 import os
 import shutil
 import tempfile
-import logging
-import json
-import requests
-import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Union, Tuple, Any
+from typing import Any, Dict, List, Optional, Tuple
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger("mod_manager")
 
@@ -27,7 +25,7 @@ DEFAULT_SOURCES = {
     "modrinth": "https://api.modrinth.com/v2",
     "curseforge": "https://api.curseforge.com/v1",
     "bukkit": "https://dev.bukkit.org/projects",
-    "spigot": "https://api.spigotmc.org/legacy/update.php"
+    "spigot": "https://api.spigotmc.org/legacy/update.php",
 }
 
 # Supported server types with compatible mod formats
@@ -36,7 +34,7 @@ SERVER_COMPATIBILITY = {
     "spigot": ["bukkit", "spigot"],
     "paper": ["bukkit", "spigot"],
     "fabric": ["fabric", "modrinth"],
-    "forge": ["forge", "curseforge"]
+    "forge": ["forge", "curseforge"],
 }
 
 
@@ -51,7 +49,7 @@ class ModManager:
         minecraft_version: str,
         mods_dir: Path,
         api_keys: Optional[Dict[str, str]] = None,
-        mod_sources: Optional[Dict[str, str]] = None
+        mod_sources: Optional[Dict[str, str]] = None,
     ):
         """
         Initialize the mod manager
@@ -94,18 +92,18 @@ class ModManager:
             return {}
 
         try:
-            with open(self.installed_mods_file, 'r') as f:
+            with open(self.installed_mods_file) as f:
                 return json.load(f)
-        except (json.JSONDecodeError, IOError) as e:
+        except (OSError, json.JSONDecodeError) as e:
             logger.warning(f"Failed to load installed mods cache: {e}")
             return {}
 
     def _save_installed_mods(self) -> None:
         """Save information about installed mods to cache"""
         try:
-            with open(self.installed_mods_file, 'w') as f:
+            with open(self.installed_mods_file, "w") as f:
                 json.dump(self.installed_mods, f, indent=2)
-        except IOError as e:
+        except OSError as e:
             logger.warning(f"Failed to save installed mods cache: {e}")
 
     def list_installed_mods(self) -> List[Dict[str, Any]]:
@@ -122,7 +120,7 @@ class ModManager:
                 "version": info.get("version", "unknown"),
                 "source": info.get("source", "unknown"),
                 "mc_version": info.get("mc_version", "unknown"),
-                "installed_at": info.get("installed_at", "unknown")
+                "installed_at": info.get("installed_at", "unknown"),
             }
             for mod_id, info in self.installed_mods.items()
         ]
@@ -144,7 +142,7 @@ class ModManager:
         self,
         mod_identifier: str,
         source: str = "modrinth",
-        version: Optional[str] = None
+        version: Optional[str] = None,
     ) -> bool:
         """
         Install a mod from the specified source
@@ -171,8 +169,7 @@ class ModManager:
             )
 
             if not download_url:
-                logger.error(
-                    f"Could not find download URL for mod {mod_identifier}")
+                logger.error(f"Could not find download URL for mod {mod_identifier}")
                 return False
 
             # Download and install the mod
@@ -242,24 +239,19 @@ class ModManager:
         source = mod_info.get("source")
 
         if not source:
-            logger.warning(
-                f"Source information missing for mod {mod_identifier}")
+            logger.warning(f"Source information missing for mod {mod_identifier}")
             return False
 
         # Uninstall the old version
         if not self.uninstall_mod(mod_identifier):
-            logger.warning(
-                f"Failed to uninstall old version of mod {mod_identifier}")
+            logger.warning(f"Failed to uninstall old version of mod {mod_identifier}")
             return False
 
         # Install the new version
         return self.install_mod(mod_identifier, source)
 
     def _get_mod_download_info(
-        self,
-        mod_identifier: str,
-        source: str,
-        version: Optional[str] = None
+        self, mod_identifier: str, source: str, version: Optional[str] = None
     ) -> Tuple[Dict[str, Any], str]:
         """
         Get mod information and download URL
@@ -280,14 +272,14 @@ class ModManager:
         elif source == "curseforge":
             return self._get_curseforge_download_info(mod_identifier, version)
         elif source in ["bukkit", "spigot"]:
-            return self._get_bukkit_spigot_download_info(mod_identifier, source, version)
+            return self._get_bukkit_spigot_download_info(
+                mod_identifier, source, version
+            )
         else:
             raise ValueError(f"Unsupported mod source: {source}")
 
     def _get_modrinth_download_info(
-        self,
-        mod_identifier: str,
-        version: Optional[str] = None
+        self, mod_identifier: str, version: Optional[str] = None
     ) -> Tuple[Dict[str, Any], str]:
         """Get mod info from Modrinth"""
         # Implementation details would go here
@@ -298,15 +290,13 @@ class ModManager:
             "version": "1.0.0",
             "mc_version": self.minecraft_version,
             "author": "Example Author",
-            "description": "An example mod"
+            "description": "An example mod",
         }
         download_url = "https://example.com/mods/example-mod.jar"
         return mod_info, download_url
 
     def _get_curseforge_download_info(
-        self,
-        mod_identifier: str,
-        version: Optional[str] = None
+        self, mod_identifier: str, version: Optional[str] = None
     ) -> Tuple[Dict[str, Any], str]:
         """Get mod info from CurseForge"""
         # Implementation details would go here
@@ -316,16 +306,13 @@ class ModManager:
             "version": "1.0.0",
             "mc_version": self.minecraft_version,
             "author": "Example Author",
-            "description": "An example mod"
+            "description": "An example mod",
         }
         download_url = "https://example.com/mods/example-mod.jar"
         return mod_info, download_url
 
     def _get_bukkit_spigot_download_info(
-        self,
-        mod_identifier: str,
-        source: str,
-        version: Optional[str] = None
+        self, mod_identifier: str, source: str, version: Optional[str] = None
     ) -> Tuple[Dict[str, Any], str]:
         """Get mod info from Bukkit/Spigot"""
         # Implementation details would go here
@@ -334,7 +321,7 @@ class ModManager:
             "version": "1.0.0",
             "mc_version": self.minecraft_version,
             "author": "Example Author",
-            "description": "An example plugin"
+            "description": "An example plugin",
         }
         download_url = "https://example.com/plugins/example-plugin.jar"
         return mod_info, download_url
@@ -344,7 +331,7 @@ class ModManager:
         mod_identifier: str,
         mod_info: Dict[str, Any],
         download_url: str,
-        source: str
+        source: str,
     ) -> bool:
         """
         Download and install a mod
@@ -392,7 +379,7 @@ class ModManager:
                 "source": source,
                 "filename": mod_filename,
                 "installed_at": datetime.datetime.now().isoformat(),
-                "info": mod_info
+                "info": mod_info,
             }
 
             self._save_installed_mods()
@@ -431,11 +418,10 @@ class ModManager:
                     updates[mod_id] = {
                         "current_version": current_version,
                         "latest_version": latest_version,
-                        "name": info.get("name", mod_id)
+                        "name": info.get("name", mod_id),
                     }
 
             except Exception as e:
-                logger.warning(
-                    f"Error checking for updates to mod {mod_id}: {e}")
+                logger.warning(f"Error checking for updates to mod {mod_id}: {e}")
 
         return updates

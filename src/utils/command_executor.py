@@ -5,8 +5,8 @@ Command executor utility for running shell commands
 """
 
 import subprocess
-from typing import List, Optional, Union
 from pathlib import Path
+from typing import List, Optional, Union
 
 from src.utils.console import Console
 
@@ -21,7 +21,7 @@ class CommandExecutor:
         capture_output: bool = False,
         check: bool = True,
         shell: bool = False,
-        verbose: bool = True
+        verbose: bool = True,
     ) -> subprocess.CompletedProcess:
         """
         Run a shell command and handle errors
@@ -56,7 +56,7 @@ class CommandExecutor:
                 check=check,
                 text=True,
                 shell=shell,
-                capture_output=capture_output
+                capture_output=capture_output,
             )
             return result
         except subprocess.CalledProcessError as e:

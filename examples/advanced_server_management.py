@@ -11,9 +11,8 @@ including:
 - Server configuration updates
 """
 
-import os
-import time
 import argparse
+import os
 from pathlib import Path
 
 from src.minecraft_server_manager import MinecraftServerManager
@@ -23,39 +22,68 @@ from src.utils.console import Console
 def main():
     """Main function to demonstrate advanced server management"""
     parser = argparse.ArgumentParser(
-        description="Advanced Minecraft Server Manager Example")
+        description="Advanced Minecraft Server Manager Example"
+    )
 
     # Basic server options
-    parser.add_argument("--server-type", choices=["docker", "aws"], default="docker",
-                        help="Server type (docker or aws)")
-    parser.add_argument("--minecraft-version", default="latest",
-                        help="Minecraft version to use")
-    parser.add_argument("--server-flavor", default="paper",
-                        help="Server flavor (paper, spigot, vanilla, etc.)")
+    parser.add_argument(
+        "--server-type",
+        choices=["docker", "aws"],
+        default="docker",
+        help="Server type (docker or aws)",
+    )
+    parser.add_argument(
+        "--minecraft-version", default="latest", help="Minecraft version to use"
+    )
+    parser.add_argument(
+        "--server-flavor",
+        default="paper",
+        help="Server flavor (paper, spigot, vanilla, etc.)",
+    )
 
     # Auto-shutdown options
-    parser.add_argument("--disable-auto-shutdown", action="store_true",
-                        help="Disable auto-shutdown")
-    parser.add_argument("--timeout", type=int, default=120,
-                        help="Auto-shutdown timeout in minutes")
+    parser.add_argument(
+        "--disable-auto-shutdown", action="store_true", help="Disable auto-shutdown"
+    )
+    parser.add_argument(
+        "--timeout", type=int, default=120, help="Auto-shutdown timeout in minutes"
+    )
 
     # Monitoring options
-    parser.add_argument("--disable-monitoring", action="store_true",
-                        help="Disable server monitoring")
-    parser.add_argument("--disable-prometheus", action="store_true",
-                        help="Disable Prometheus metrics")
+    parser.add_argument(
+        "--disable-monitoring", action="store_true", help="Disable server monitoring"
+    )
+    parser.add_argument(
+        "--disable-prometheus", action="store_true", help="Disable Prometheus metrics"
+    )
 
     # Action options
-    parser.add_argument("--action", choices=[
-        "start", "stop", "restart", "status", "backup", "restore",
-        "install-mod", "uninstall-mod", "list-mods", "configure",
-        "auto-shutdown-status", "execute-command", "logs"
-    ], default="status", help="Action to perform")
+    parser.add_argument(
+        "--action",
+        choices=[
+            "start",
+            "stop",
+            "restart",
+            "status",
+            "backup",
+            "restore",
+            "install-mod",
+            "uninstall-mod",
+            "list-mods",
+            "configure",
+            "auto-shutdown-status",
+            "execute-command",
+            "logs",
+        ],
+        default="status",
+        help="Action to perform",
+    )
 
     # Action-specific options
     parser.add_argument("--mod-id", help="Mod ID for install/uninstall")
-    parser.add_argument("--mod-source", default="modrinth",
-                        help="Source for mod installation")
+    parser.add_argument(
+        "--mod-source", default="modrinth", help="Source for mod installation"
+    )
     parser.add_argument("--command", help="Command to execute on server")
     parser.add_argument("--memory", help="Memory allocation (e.g., '2G')")
     parser.add_argument("--java-flags", help="Java JVM flags")
@@ -70,9 +98,11 @@ def main():
     Console.print_info(f"Minecraft Version: {args.minecraft_version}")
     Console.print_info(f"Server Flavor: {args.server_flavor}")
     Console.print_info(
-        f"Auto-Shutdown: {'Disabled' if args.disable_auto_shutdown else 'Enabled'}")
+        f"Auto-Shutdown: {'Disabled' if args.disable_auto_shutdown else 'Enabled'}"
+    )
     Console.print_info(
-        f"Monitoring: {'Disabled' if args.disable_monitoring else 'Enabled'}")
+        f"Monitoring: {'Disabled' if args.disable_monitoring else 'Enabled'}"
+    )
 
     try:
         # Initialize the server manager
@@ -84,7 +114,7 @@ def main():
             auto_shutdown_enabled=not args.disable_auto_shutdown,
             auto_shutdown_timeout=args.timeout,
             monitoring_enabled=not args.disable_monitoring,
-            enable_prometheus=not args.disable_prometheus
+            enable_prometheus=not args.disable_prometheus,
         )
 
         # Perform the selected action
@@ -136,11 +166,11 @@ def main():
                 return
 
             Console.print_info(
-                f"Installing mod {args.mod_id} from {args.mod_source}...")
+                f"Installing mod {args.mod_id} from {args.mod_source}..."
+            )
             success = manager.install_mod(args.mod_id, args.mod_source)
             if success:
-                Console.print_success(
-                    f"Mod {args.mod_id} installed successfully")
+                Console.print_success(f"Mod {args.mod_id} installed successfully")
             else:
                 Console.print_error(f"Failed to install mod {args.mod_id}")
 
@@ -152,8 +182,7 @@ def main():
             Console.print_info(f"Uninstalling mod {args.mod_id}...")
             success = manager.uninstall_mod(args.mod_id)
             if success:
-                Console.print_success(
-                    f"Mod {args.mod_id} uninstalled successfully")
+                Console.print_success(f"Mod {args.mod_id} uninstalled successfully")
             else:
                 Console.print_error(f"Failed to uninstall mod {args.mod_id}")
 
@@ -162,16 +191,24 @@ def main():
 
         elif args.action == "configure":
             # Update server configuration if any options provided
-            if any([args.memory, args.minecraft_version, args.server_flavor, args.java_flags]):
+            if any(
+                [
+                    args.memory,
+                    args.minecraft_version,
+                    args.server_flavor,
+                    args.java_flags,
+                ]
+            ):
                 Console.print_header("Updating Server Configuration")
                 manager.update_server_configuration(
                     memory=args.memory,
                     minecraft_version=args.minecraft_version,
                     server_flavor=args.server_flavor,
-                    java_flags=args.java_flags
+                    java_flags=args.java_flags,
                 )
                 Console.print_info(
-                    "Configuration updated. Restart the server to apply changes.")
+                    "Configuration updated. Restart the server to apply changes."
+                )
             else:
                 Console.print_warning("No configuration options provided")
 

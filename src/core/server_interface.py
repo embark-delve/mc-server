@@ -7,7 +7,7 @@ Defines the core operations that any Minecraft server implementation must suppor
 
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Dict, List, Optional, Union, Any
+from typing import Any, Dict, List, Optional
 
 
 class MinecraftServer(ABC):
@@ -154,7 +154,9 @@ class MinecraftServer(ABC):
         pass
 
     @abstractmethod
-    def configure_auto_shutdown(self, enabled: bool, timeout_minutes: int = 120) -> None:
+    def configure_auto_shutdown(
+        self, enabled: bool, timeout_minutes: int = 120
+    ) -> None:
         """
         Configure auto-shutdown behavior
 
@@ -170,7 +172,7 @@ class MinecraftServer(ABC):
         memory: Optional[str] = None,
         minecraft_version: Optional[str] = None,
         server_type: Optional[str] = None,
-        java_flags: Optional[str] = None
+        java_flags: Optional[str] = None,
     ) -> None:
         """
         Update server configuration

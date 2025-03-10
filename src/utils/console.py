@@ -4,15 +4,20 @@
 Console utilities for terminal output formatting
 """
 
-from typing import Dict, List, Optional, Union, Any
+from typing import Any, Dict
+
+from rich import box
 from rich.console import Console as RichConsole
 from rich.panel import Panel
-from rich.table import Table
-from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TimeElapsedColumn
-from rich.tree import Tree
+from rich.progress import (
+    BarColumn,
+    Progress,
+    SpinnerColumn,
+    TextColumn,
+    TimeElapsedColumn,
+)
 from rich.syntax import Syntax
-from rich.text import Text
-from rich import box
+from rich.table import Table
 
 
 class Console:
@@ -77,13 +82,13 @@ class Console:
 
         for key, value in status_data.items():
             # Format key for display (capitalize and replace underscores with spaces)
-            display_key = key.replace('_', ' ').title()
+            display_key = key.replace("_", " ").title()
 
             # Format value based on type
             if isinstance(value, bool):
                 display_value = "✓" if value else "✗"
                 style = "green" if value else "red"
-            elif isinstance(value, (int, float)) and 'memory' in key.lower():
+            elif isinstance(value, (int, float)) and "memory" in key.lower():
                 display_value = f"{value} MB"
                 style = "green"
             else:
@@ -107,7 +112,7 @@ class Console:
             TextColumn("[bold blue]{task.description}"),
             BarColumn(),
             TextColumn("[bold green]{task.percentage:>3.0f}%"),
-            TimeElapsedColumn()
+            TimeElapsedColumn(),
         )
 
     @staticmethod

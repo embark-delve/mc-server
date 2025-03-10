@@ -4,16 +4,15 @@
 Auto-shutdown utility for Minecraft servers
 """
 
-import time
 import logging
 import threading
+import time
+from datetime import datetime
 from typing import Callable, List, Optional, Set
-from datetime import datetime, timedelta
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger("auto_shutdown")
 
@@ -32,7 +31,7 @@ class AutoShutdown:
         shutdown_callback: Callable[[], bool],
         inactivity_threshold: int = 120,  # Default 2 hours in minutes
         check_interval: int = 5,  # Check every 5 minutes
-        enabled: bool = True
+        enabled: bool = True,
     ):
         """
         Initialize the auto-shutdown monitor
@@ -74,9 +73,7 @@ class AutoShutdown:
         # Start new monitoring thread
         self.stop_monitoring_flag.clear()
         self.monitor_thread = threading.Thread(
-            target=self._monitor_activity,
-            daemon=True,
-            name="auto-shutdown-monitor"
+            target=self._monitor_activity, daemon=True, name="auto-shutdown-monitor"
         )
         self.monitor_thread.start()
         logger.info(
@@ -140,7 +137,8 @@ class AutoShutdown:
                 # Log remaining time at regular intervals
                 if inactive_minutes % 15 < self.check_interval:
                     remaining_minutes = max(
-                        0, self.inactivity_threshold - inactive_minutes)
+                        0, self.inactivity_threshold - inactive_minutes
+                    )
                     logger.info(
                         f"Server inactive for {inactive_minutes:.1f} minutes. "
                         f"Will shut down in {remaining_minutes:.1f} minutes if no activity."
@@ -184,16 +182,17 @@ class AutoShutdown:
         """
         inactive_time = datetime.now() - self.last_activity
         inactive_minutes = inactive_time.total_seconds() / 60
-        remaining_minutes = max(
-            0, self.inactivity_threshold - inactive_minutes)
+        remaining_minutes = max(0, self.inactivity_threshold - inactive_minutes)
 
         return {
             "enabled": self.enabled,
-            "monitoring_active": bool(self.monitor_thread and self.monitor_thread.is_alive()),
+            "monitoring_active": bool(
+                self.monitor_thread and self.monitor_thread.is_alive()
+            ),
             "inactive_minutes": round(inactive_minutes, 1),
             "shutdown_threshold_minutes": self.inactivity_threshold,
             "minutes_until_shutdown": round(remaining_minutes, 1),
             "last_activity": self.last_activity.isoformat(),
             "active_player_count": len(self.active_players),
-            "active_players": list(self.active_players)
+            "active_players": list(self.active_players),
         }

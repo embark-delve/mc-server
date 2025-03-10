@@ -4,20 +4,18 @@
 Minecraft Server Manager main entry point
 """
 
-import os
 import logging
-from typing import Dict, List, Optional, Union, Any
+import os
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 
-from src.core.server_interface import MinecraftServer
-from src.implementations.docker_server import DockerServer
 from src.implementations.aws_server import AWSServer
+from src.implementations.docker_server import DockerServer
 from src.utils.console import Console
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger("server_manager")
 
@@ -36,7 +34,7 @@ class MinecraftServerManager:
         monitoring_enabled: bool = True,
         enable_prometheus: bool = True,
         enable_cloudwatch: bool = False,
-        **kwargs
+        **kwargs,
     ):
         """
         Initialize the Minecraft server manager
@@ -70,7 +68,7 @@ class MinecraftServerManager:
                 monitoring_enabled=monitoring_enabled,
                 enable_prometheus=enable_prometheus,
                 enable_cloudwatch=enable_cloudwatch,
-                **kwargs
+                **kwargs,
             )
         elif server_type == "aws":
             self.server = AWSServer(
@@ -82,7 +80,7 @@ class MinecraftServerManager:
                 monitoring_enabled=monitoring_enabled,
                 enable_prometheus=enable_prometheus,
                 enable_cloudwatch=True,  # Always enable CloudWatch for AWS
-                **kwargs
+                **kwargs,
             )
         else:
             raise ValueError(f"Unsupported server type: {server_type}")
@@ -105,61 +103,65 @@ class MinecraftServerManager:
         """Get the current status of the server"""
         status = self.server.get_status()
         Console.print_header("Minecraft Server Status")
+        Console.print_info(f"Server Type: {status.get('server_type', 'Unknown')}")
+        Console.print_info(f"Minecraft Type: {status.get('minecraft_type', 'Unknown')}")
         Console.print_info(
-            f"Server Type: {status.get('server_type', 'Unknown')}")
-        Console.print_info(
-            f"Minecraft Type: {status.get('minecraft_type', 'Unknown')}")
-        Console.print_info(
-            f"Running: {'Yes' if status.get('running', False) else 'No'}")
+            f"Running: {'Yes' if status.get('running', False) else 'No'}"
+        )
 
-        if status.get('running', False):
+        if status.get("running", False):
             Console.print_info(f"Version: {status.get('version', 'Unknown')}")
             Console.print_info(f"Uptime: {status.get('uptime', 'Unknown')}")
             Console.print_info(f"Players: {status.get('player_count', 0)}")
 
-            if status.get('players'):
+            if status.get("players"):
                 Console.print_info("Online players:")
-                for player in status.get('players', []):
+                for player in status.get("players", []):
                     Console.print_info(f"  - {player}")
 
             # Display connection information with rich formatting
             Console.print_header("Connection Information")
 
             # For Docker servers (local)
-            if status.get('server_type') == 'Docker':
+            if status.get("server_type") == "Docker":
                 Console.print_success(
-                    "Local Connection: [bold cyan]localhost[/bold cyan] or [bold cyan]127.0.0.1[/bold cyan]")
+                    "Local Connection: [bold cyan]localhost[/bold cyan] or [bold cyan]127.0.0.1[/bold cyan]"
+                )
                 # Try to get the local machine's IP for LAN connections
                 import socket
+
                 try:
                     hostname = socket.gethostname()
                     local_ip = socket.gethostbyname(hostname)
                     Console.print_success(
-                        f"LAN Connection: [bold cyan]{local_ip}[/bold cyan]")
+                        f"LAN Connection: [bold cyan]{local_ip}[/bold cyan]"
+                    )
                 except Exception:
                     Console.print_warning("Could not determine LAN IP address")
 
             # For AWS servers (remote)
-            elif status.get('server_type') == 'AWS EC2':
-                if 'public_ip' in status and status['public_ip'] != 'Unknown':
+            elif status.get("server_type") == "AWS EC2":
+                if "public_ip" in status and status["public_ip"] != "Unknown":
                     Console.print_success(
-                        f"Public Connection: [bold cyan]{status['public_ip']}[/bold cyan]")
-                if 'private_ip' in status and status['private_ip'] != 'Unknown':
+                        f"Public Connection: [bold cyan]{status['public_ip']}[/bold cyan]"
+                    )
+                if "private_ip" in status and status["private_ip"] != "Unknown":
                     Console.print_success(
-                        f"Private Connection: [bold cyan]{status['private_ip']}[/bold cyan]")
+                        f"Private Connection: [bold cyan]{status['private_ip']}[/bold cyan]"
+                    )
 
             # For any server type
+            Console.print_info("Default Minecraft Port: [bold cyan]25565[/bold cyan]")
             Console.print_info(
-                "Default Minecraft Port: [bold cyan]25565[/bold cyan]")
-            Console.print_info(
-                "Connection String: [bold cyan]<ip_address>:25565[/bold cyan]")
+                "Connection String: [bold cyan]<ip_address>:25565[/bold cyan]"
+            )
 
             # Display monitoring metrics if available
             metrics = [
-                ('system_cpu_percent', 'System CPU Usage', '%'),
-                ('system_memory_percent', 'System Memory Usage', '%'),
-                ('container_cpu_percent', 'Container CPU Usage', '%'),
-                ('container_memory_percent', 'Container Memory Usage', '%')
+                ("system_cpu_percent", "System CPU Usage", "%"),
+                ("system_memory_percent", "System Memory Usage", "%"),
+                ("container_cpu_percent", "Container CPU Usage", "%"),
+                ("container_memory_percent", "Container Memory Usage", "%"),
             ]
 
             Console.print_header("Resource Usage")
@@ -216,9 +218,7 @@ class MinecraftServerManager:
 
     # Auto-shutdown Configuration
     def configure_auto_shutdown(
-        self,
-        enabled: bool = True,
-        timeout_minutes: int = 120
+        self, enabled: bool = True, timeout_minutes: int = 120
     ) -> None:
         """
         Configure the auto-shutdown feature
@@ -249,12 +249,9 @@ class MinecraftServerManager:
         Console.print_header("Auto-Shutdown Status")
         Console.print_info(f"Enabled: {status['enabled']}")
         Console.print_info(f"Active: {status['monitoring_active']}")
-        Console.print_info(
-            f"Inactive for: {status['inactive_minutes']} minutes")
-        Console.print_info(
-            f"Threshold: {status['shutdown_threshold_minutes']} minutes")
-        Console.print_info(
-            f"Shutdown in: {status['minutes_until_shutdown']} minutes")
+        Console.print_info(f"Inactive for: {status['inactive_minutes']} minutes")
+        Console.print_info(f"Threshold: {status['shutdown_threshold_minutes']} minutes")
+        Console.print_info(f"Shutdown in: {status['minutes_until_shutdown']} minutes")
 
         return status
 
@@ -264,7 +261,7 @@ class MinecraftServerManager:
         memory: Optional[str] = None,
         minecraft_version: Optional[str] = None,
         server_flavor: Optional[str] = None,
-        java_flags: Optional[str] = None
+        java_flags: Optional[str] = None,
     ) -> None:
         """
         Update server configuration
@@ -279,5 +276,5 @@ class MinecraftServerManager:
             memory=memory,
             minecraft_version=minecraft_version,
             server_type=server_flavor,
-            java_flags=java_flags
+            java_flags=java_flags,
         )
