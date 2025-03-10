@@ -1,0 +1,33 @@
+# Minecraft Server Manager Configuration
+
+# Docker container settings
+container:
+  name: minecraft-server
+  docker_compose_cmd: ["docker", "compose"]
+
+# Server settings
+server:
+  port: 25565
+  rcon_port: 25575
+  rcon_password: minecraft
+  memory: 2G
+  type: PAPER
+  version: 1.20.4
+  difficulty: normal
+  mode: survival
+
+# Backup settings
+backup:
+  max_backups: 10 # Number of backups to keep
+  schedule: "0 3 * * *" # Cron schedule for auto backups (3am daily)
+
+# Plugin settings
+plugins:
+  auto_restart_on_change: true # Whether to restart server when plugins are installed/removed
+
+# Paths
+paths:
+  data_dir: data
+  plugins_dir: plugins
+  config_dir: config
+  backups_dir: backups

@@ -1,0 +1,37 @@
+# Core dependencies
+pathlib>=1.0.1
+typing-extensions>=4.0.0
+
+# AWS-specific dependencies
+boto3>=1.26.0
+botocore>=1.31.0
+python-dotenv>=1.0.0
+PyYAML>=6.0
+click>=8.1.3
+docker>=6.1.3
+
+# API and scheduling
+requests>=2.31.0
+schedule>=1.2.0
+
+# For auto-shutdown and monitoring
+psutil>=5.9.5
+prometheus-client>=0.17.0
+pyyaml>=6.0.0
+colorama>=0.4.6
+paramiko>=3.3.1
+rich>=13.9.0
+
+# Testing dependencies
+pytest>=7.3.1
+pytest-cov>=4.1.0
+
+# Development tools
+black>=23.3.0
+flake8>=6.0.0
+mypy>=1.3.0
+isort>=5.12.0
+
+# Optional dependencies for additional features
+requests>=2.28.0  # For API integrations
+schedule>=1.2.0   # For scheduling tasks 
