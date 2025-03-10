@@ -1,0 +1,86 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+env/
+.venv/
+venv/
+ENV/
+
+# Environment variables (contains secrets)
+.env
+
+# Build and distribution
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Test cache and coverage
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Minecraft server data and generated files
+data/
+backups/
+plugins/
+logs/
+metrics/
+world/
+world_nether/
+world_the_end/
+*.jar
+crash-reports/
+banned-ips.json
+banned-players.json
+ops.json
+whitelist.json
+usercache.json
+start_output.log
+
+# Large files and binary files
+*.log
+*.gz
+*.zip
+*.tar
+*.rar
+*.7z
+*.jar
+*.db
+*.sqlite
+*.sqlite3
+
+# Git
+.git/
+
+# Terraform
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.backup
+terraform/.terraform.lock.hcl
+
+# Kubernetes
+kubernetes/secrets/
+
+# Docker
+.docker/
+
+# Cursor specific
+.cursor/ 

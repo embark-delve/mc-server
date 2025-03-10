@@ -1,0 +1,80 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+env/
+.venv/
+venv/
+ENV/
+
+# Environment variables (contains secrets)
+.env
+
+# Build and distribution
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Test cache and coverage
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Minecraft server data and generated files
+data/
+backups/
+plugins/
+logs/
+metrics/
+world/
+world_nether/
+world_the_end/
+eula.txt
+server.properties
+*.jar
+crash-reports/
+banned-ips.json
+banned-players.json
+ops.json
+whitelist.json
+usercache.json
+start_output.log
+
+# Docker
+.docker/
+
+# IDE specific
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Cursor specific
+.cursor/ 
