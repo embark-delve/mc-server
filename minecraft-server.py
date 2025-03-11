@@ -8,23 +8,33 @@ This is the main entry point for the application, providing a simple
 command-line interface to the MinecraftServerManager.
 """
 
+import src.commands.server_commands
+from src.utils.console import Console
+from src.utils.config import Config
+from src.minecraft_server_manager import MinecraftServerManager
+from src.commands import get_available_commands, get_handler
 import argparse
 import logging
 import os
 import sys
 from pathlib import Path
 
-from src.minecraft_server_manager import MinecraftServerManager
-from src.utils.console import Console
-
 # Ensure that the src directory is in the Python path
 script_dir = Path(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, str(script_dir))
 
+# Import after setting up the path
 
-def main():
-    """Main entry point for the Minecraft Server Manager CLI"""
+# Import command handlers to register them
 
+
+def setup_argument_parser() -> argparse.ArgumentParser:
+    """
+    Set up the command-line argument parser
+
+    Returns:
+        Configured argument parser
+    """
     parser = argparse.ArgumentParser(
         description="Manage Minecraft servers with different deployment options"
     )
@@ -33,25 +43,23 @@ def main():
     parser.add_argument(
         "--type",
         choices=["docker", "aws"],
-        default="docker",
         help="Server deployment type (default: docker)",
     )
 
     # Server version
     parser.add_argument(
-        "--version", default="latest", help="Minecraft version to use (default: latest)"
+        "--version", help="Minecraft version to use (default: latest)"
     )
 
     # Server flavor
     parser.add_argument(
         "--flavor",
-        default="paper",
         help="Server flavor (paper, spigot, vanilla, etc.) (default: paper)",
     )
 
     # Memory allocation
     parser.add_argument(
-        "--memory", default="2G", help="Memory allocation for the server (default: 2G)"
+        "--memory", help="Memory allocation for the server (default: 2G)"
     )
 
     # Auto-shutdown options
@@ -63,133 +71,83 @@ def main():
     parser.add_argument(
         "--timeout",
         type=int,
-        default=120,
         help="Auto-shutdown timeout in minutes (default: 120)",
     )
 
     # Debug mode
-    parser.add_argument("--debug", action="store_true", help="Enable debug logging")
+    parser.add_argument("--debug", action="store_true",
+                        help="Enable debug logging")
+
+    # Config file
+    parser.add_argument(
+        "--config",
+        help="Path to configuration file (default: config.yml)",
+        default="config.yml",
+    )
 
     # Command
     parser.add_argument(
         "command",
-        choices=["start", "stop", "restart", "status", "backup", "restore", "console"],
+        choices=get_available_commands(),
         help="Server management command",
     )
 
     # Additional command arguments
-    parser.add_argument("args", nargs="*", help="Additional arguments for the command")
+    parser.add_argument("args", nargs="*",
+                        help="Additional arguments for the command")
 
+    return parser
+
+
+def main():
+    """Main entry point for the Minecraft Server Manager CLI"""
+    # Parse command-line arguments
+    parser = setup_argument_parser()
     args = parser.parse_args()
 
+    # Load configuration with proper precedence
+    config = Config()
+    config.from_file(args.config)  # Load from config file (lowest precedence)
+    config.from_env()              # Load from environment variables (medium precedence)
+    # Load from command-line arguments (highest precedence)
+    config.from_args(vars(args))
+
     # Configure logging
-    log_level = logging.DEBUG if args.debug else logging.INFO
+    log_level = logging.DEBUG if config.get("debug") else logging.INFO
     logging.basicConfig(
         level=log_level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
+    # Print header
     Console.print_header("Minecraft Server Manager")
 
-    if args.debug:
+    if config.get("debug"):
         Console.print_info("Debug mode enabled - verbose logging activated")
 
-    # Initialize the server manager with the specified options
+    # Initialize the server manager with the configuration
     manager = MinecraftServerManager(
-        server_type=args.type,
-        minecraft_version=args.version,
-        server_flavor=args.flavor,
-        auto_shutdown_enabled=not args.disable_auto_shutdown,
-        auto_shutdown_timeout=args.timeout,
+        server_type=config.get("server.type"),
+        minecraft_version=config.get("server.version"),
+        server_flavor=config.get("server.flavor"),
+        auto_shutdown_enabled=config.get("auto_shutdown.enabled"),
+        auto_shutdown_timeout=config.get("auto_shutdown.timeout"),
     )
 
-    # Process the command
-    with Console.create_progress() as progress:
-        task = progress.add_task(f"[cyan]Executing {args.command}...", total=100)
+    # Get the command handler
+    command_handler = get_handler(args.command)
+    if not command_handler:
+        Console.print_error(f"Unknown command: {args.command}")
+        sys.exit(1)
 
-        try:
-            if args.command == "start":
-                progress.update(task, advance=50)
-                success = manager.start()
-                progress.update(task, completed=100)
-
-                if success:
-                    Console.print_success("Server started successfully!")
-                    Console.print_status(manager.status())
-                else:
-                    Console.print_error("Failed to start the server!")
-
-            elif args.command == "stop":
-                progress.update(task, advance=50)
-                success = manager.stop()
-                progress.update(task, completed=100)
-
-                if success:
-                    Console.print_success("Server stopped successfully!")
-                else:
-                    Console.print_error("Failed to stop the server!")
-
-            elif args.command == "restart":
-                progress.update(task, advance=50)
-                success = manager.restart()
-                progress.update(task, completed=100)
-
-                if success:
-                    Console.print_success("Server restarted successfully!")
-                    Console.print_status(manager.status())
-                else:
-                    Console.print_error("Failed to restart the server!")
-
-            elif args.command == "status":
-                progress.update(task, completed=100)
-                Console.print_status(manager.status())
-
-            elif args.command == "backup":
-                progress.update(task, advance=25)
-                backup_path = manager.backup()
-                progress.update(task, completed=100)
-
-                if backup_path:
-                    Console.print_success(
-                        f"Backup created successfully at: {backup_path}"
-                    )
-                else:
-                    Console.print_error("Failed to create backup!")
-
-            elif args.command == "restore":
-                backup_path = args.args[0] if args.args else None
-                progress.update(task, advance=25)
-                success = manager.restore(backup_path)
-                progress.update(task, completed=100)
-
-                if success:
-                    Console.print_success("Backup restored successfully!")
-                else:
-                    Console.print_error("Failed to restore backup!")
-
-            elif args.command == "console":
-                progress.update(task, completed=100)
-
-                if not args.args:
-                    # Interactive console mode
-                    Console.print_info("Interactive console mode. Type 'exit' to quit.")
-                    while True:
-                        try:
-                            command = input("> ")
-                            if command.lower() in ("exit", "quit"):
-                                break
-                            result = manager.execute_command(command)
-                            print(result)
-                        except KeyboardInterrupt:
-                            break
-                else:
-                    # Execute a single command
-                    command = " ".join(args.args)
-                    result = manager.execute_command(command)
-                    print(result)
-
-        except Exception as e:
-            Console.print_error(f"Error: {e!s}")
-            sys.exit(1)
+    # Execute the command
+    try:
+        command_handler(manager, args.args)
+    except Exception as e:
+        Console.print_error(f"Error: {e!s}")
+        if config.get("debug"):
+            import traceback
+            traceback.print_exc()
+        sys.exit(1)
 
 
 if __name__ == "__main__":
