@@ -1,352 +1,138 @@
 # Minecraft Server Manager
 
-[![CI/CD](https://github.com/yourusername/minecraft-server/actions/workflows/ci.yml/badge.svg)](https://github.com/yourusername/minecraft-server/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+A local, command-line manager for **Minecraft Java Edition 1.20.1 / Forge 47.4.23**, targeting **Java 25**. It runs the game in Docker and keeps each server's files outside this repository.
 
-A Python-based utility for managing Minecraft servers across different deployment environments.
+The original prototype has been replaced with a smaller supported local path. AWS, Kubernetes, legacy shell management, mock mod downloads, automatic shutdown and persistent metrics are disabled. No web UI is required for a private laptop server.
 
-## Features
+**Validation status:** code-level safety tests and packaging checks are automated. The full requested modpack and real Docker gameplay still require validation; see [implementation status](docs/implementation-status.md). Do not treat a passing unit suite as proof that the modpack loads.
 
-- **Multiple Deployment Options**: Run Minecraft servers on Docker or AWS
-- **Server Management**: Start, stop, restart, and monitor your Minecraft server
-- **Backup & Restore**: Create and manage server backups
-- **Server Console**: Execute commands directly on the server
-- **Resource Monitoring**: Track CPU, memory, and network usage
-- **Auto-Shutdown**: Automatically shut down inactive servers to save resources
-- **Mod Management**: Install, update, and manage server mods/plugins
-- **Metrics Export**: Export metrics to Prometheus or AWS CloudWatch
+## Install
 
-## Installation
+Install a current Python 3.13 and [uv](https://docs.astral.sh/uv/getting-started/installation/), plus a working local Docker engine with Compose v2 (for example [Docker Desktop for Mac](https://docs.docker.com/desktop/setup/install/mac-install/)). Java is supplied by the game image; no host Java installation is needed.
 
-### Requirements
-
-- Python 3.8+
-- Docker (for local server deployment)
-- AWS CLI (configured with appropriate permissions for AWS deployment)
-
-### Setup
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/yourusername/minecraft-server-manager.git
-cd minecraft-server-manager
+```sh
+uv sync --locked
+uv run --locked minecraft-server --help
+docker version
+docker compose version
 ```
 
-2. Install dependencies:
+`pyproject.toml` defines dependencies; `uv.lock` pins the resolved set. There is no maintained requirements.txt. Python dependencies, Java, Minecraft, Forge and individual mods have separate version contracts.
 
-```bash
-pip install -r requirements.txt
+## Configure and initialize
+
+Edit `config.yml`: add your exact Minecraft username to `server.allowlist`, select a heap/container budget your laptop can support, and optionally set `paths.base_dir` to an empty dedicated directory. Default storage is `~/MinecraftServers/forge`. The initial 4G heap / 6G container values are configurable starting values, not a measured recommendation for your laptop.
+
+```sh
+uv run --locked minecraft-server config
+uv run --locked minecraft-server render
 ```
 
-3. (Optional) Install development dependencies:
+Read the [Minecraft EULA](https://aka.ms/MinecraftEULA). Only if you accept it:
 
-```bash
-pip install -r requirements-dev.txt
+```sh
+uv run --locked minecraft-server init --accept-eula
 ```
 
-## Quick Start
+Initialization creates private profile directories and a random private RCON secret. It refuses to adopt a nonempty directory. It does not download or start Minecraft. EULA agreement is recorded explicitly in that profile, not inferred from a config file.
 
-The easiest way to get started is with the included command-line script:
+## Operate
 
-```bash
-# Start a server
-python minecraft-server.py start
-
-# Check server status
-python minecraft-server.py status
-
-# Execute a command on the server console
-python minecraft-server.py console list
-
-# Stop the server
-python minecraft-server.py stop
+```sh
+uv run --locked minecraft-server start
+uv run --locked minecraft-server status
+uv run --locked minecraft-server logs --lines 100
+uv run --locked minecraft-server console list
+uv run --locked minecraft-server stop
+uv run --locked minecraft-server backup
+uv run --locked minecraft-server backups
 ```
 
-Use debug mode for detailed logs:
+Connect from the Java Edition client at `127.0.0.1:25565`. Default networking is loopback only, online authentication and allowlisting are enabled, and RCON is not published. To allow trusted LAN access, explicitly set `server.allow_lan: true` and a suitable `server.bind_address`; review the host firewall first.
 
-```bash
-python minecraft-server.py --debug start
+The first start downloads the configured image and records its immutable digest in `runtime.json`. Later starts use that digest. Game/Forge/Java/image changes are refused once a world has a runtime lock: test upgrades in a separate profile. Startup succeeds only after Minecraft's health check passes. Stop waits for a clean game exit and refuses to force-kill if saving exceeds the deadline. A failed startup can leave a container running for diagnosis; use logs/status and stop explicitly.
+
+Stop before closing the laptop, quitting Docker Desktop, backing up, restoring, or changing mods. The manager does not keep a background process alive after the CLI exits.
+
+## Mods and client content
+
+See the complete requested list and unresolved choices in [the Forge pack plan](docs/forge-modpack.md). **Exact pack exports/JAR versions are still needed.** Embeddium and Oculus are client-side; resource packs and shaders belong in the client. A NeoForge artifact is not automatically a Forge artifact. Do not install every listed item on the server indiscriminately.
+
+The current supported install path is a reviewed local Forge JAR with an expected SHA-256 from a trusted manifest/source:
+
+```sh
+uv run --locked minecraft-server mods-install /absolute/path/mod.jar --sha256 EXPECTED_64_HEX_DIGEST
+uv run --locked minecraft-server mods-list
+uv run --locked minecraft-server mods-remove exact-filename.jar
 ```
 
-## Usage
+Installation checks the hash and Forge metadata and refuses known/declared client-only files. It is not a malware scan or proof of dependency/Java compatibility. Never take an untrusted download and treat hashing it yourself as establishing trust. Back up before replacing mods; old filenames are never silently overwritten. All server mods live inside the backed-up `data/mods` directory.
 
-### Basic Usage
+## Backups and recovery
 
-```python
-from src.minecraft_server_manager import MinecraftServerManager
+Managed backups require a stopped server. They include all `data/` (worlds, mods, configs, player state), a checksum manifest and runtime/config metadata. Archives are private files and may contain plugin credentials or a generated server.properties RCON password: protect them and do not publish them. Keep an independent copy outside the laptop for valuable worlds.
 
-# Create a Docker-based server manager
-manager = MinecraftServerManager(server_type="docker")
+Restore requires an explicit archive and target-profile confirmation:
 
-# Start the server
-manager.start()
-
-# Get server status (shows connection info)
-status = manager.status()
-
-# Execute a command on the server
-result = manager.execute_command("list")  # List online players
-
-# Stop the server
-manager.stop()
+```sh
+uv run --locked minecraft-server restore /absolute/path/backup.zip --confirm-profile forge
 ```
 
-### Deployment Options
+Restoration validates and extracts into staging before touching the world. Previous data is retained as `data.rollback`. Verify the restored world before moving that rollback directory to safe storage; another restore refuses to overwrite it. The manager refuses old unmanifested ZIPs: preserve original archives and recover them manually into a new empty directory, never into the checkout or a live server.
 
-#### Docker Deployment (Default)
+For a recovery rehearsal, copy `config.yml` to a separate YAML file, change its profile name, data root and game port, initialize it after EULA acceptance, and restore the backup there. A fresh empty profile may adopt the image digest from a compatible backup. All runtime settings must match; the game port and target directory may differ.
 
-```python
-# Default setup - uses Docker with Paper server
-manager = MinecraftServerManager(
-    server_type="docker",
-    minecraft_version="latest",  # Use specific version like "1.20.1" if needed
-    server_flavor="paper"        # Options: paper, spigot, vanilla, forge, etc.
-)
+If interrupted after `data` was renamed to `data.rollback`, leave the server stopped, preserve all directories, and restore that rollback to `data` manually. Do not initialize over existing files. The retained directory is intentionally not automatically deleted.
+
+## Multiple servers
+
+Use one YAML file, distinct profile name, independent base directory and host port per server:
+
+```sh
+uv run --locked minecraft-server --config profiles/creative.yml start
+uv run --locked minecraft-server --config profiles/creative.yml stop
 ```
 
-#### AWS Deployment
-
-```python
-# AWS deployment
-manager = MinecraftServerManager(
-    server_type="aws",
-    minecraft_version="1.20.1",
-    server_flavor="paper",
-    # AWS specific settings
-    region="us-west-2",
-    instance_type="t3.medium",
-    # Optional: use an existing instance
-    instance_id="i-1234567890abcdef0"
-)
-```
-
-### Advanced Features
-
-#### Auto-Shutdown
-
-The auto-shutdown feature automatically stops the server when it's inactive for a specified period of time. This is useful for saving resources, especially on AWS deployments.
-
-```python
-# Configure auto-shutdown (enabled, timeout in minutes)
-manager.configure_auto_shutdown(enabled=True, timeout_minutes=120)
-
-# Get auto-shutdown status
-status = manager.get_auto_shutdown_status()
-```
-
-#### Mod Management
-
-Install and manage mods/plugins for your Minecraft server:
-
-```python
-# Install a mod from Modrinth
-manager.install_mod("sodium", source="modrinth")
-
-# Install a plugin from Bukkit/Spigot
-manager.install_mod("worldedit", source="bukkit")
-
-# List installed mods
-mods = manager.list_mods()
-
-# Uninstall a mod
-manager.uninstall_mod("sodium")
-```
-
-#### Server Monitoring
-
-Enable monitoring to track server performance metrics:
-
-```python
-# Create a server manager with monitoring enabled
-manager = MinecraftServerManager(
-    server_type="docker",
-    monitoring_enabled=True,
-    enable_prometheus=True,
-    enable_cloudwatch=False  # Enable for AWS deployments
-)
-
-# Metrics are automatically collected when the server is running
-# and can be viewed in the status() output
-```
-
-### Configuration
-
-The Minecraft Server Manager supports various configuration options:
-
-```python
-manager = MinecraftServerManager(
-    # Basic settings
-    server_type="docker",              # "docker" or "aws"
-    base_dir=Path("/path/to/server"),  # Server files location
-    minecraft_version="1.20.1",        # Minecraft version
-    server_flavor="paper",             # Server type (paper, spigot, vanilla, etc.)
-
-    # Performance settings
-    memory="4G",                       # Memory allocation
-
-    # Auto-shutdown settings
-    auto_shutdown_enabled=True,        # Enable auto-shutdown
-    auto_shutdown_timeout=120,         # Minutes of inactivity before shutdown
-
-    # Monitoring settings
-    monitoring_enabled=True,           # Enable performance monitoring
-    enable_prometheus=True,            # Export metrics to Prometheus
-    enable_cloudwatch=False            # Export metrics to CloudWatch
-)
-```
-
-### CLI Script Options
-
-```bash
-python minecraft-server.py --help
-```
-
-Common options:
-
-```bash
-# Use a specific Minecraft version
-python minecraft-server.py --version 1.20.1 start
-
-# Specify server flavor
-python minecraft-server.py --flavor forge start
-
-# Set memory allocation
-python minecraft-server.py --memory 4G start
-
-# Disable auto-shutdown
-python minecraft-server.py --disable-auto-shutdown start
-
-# Enable debug logging
-python minecraft-server.py --debug start
-```
-
-## Troubleshooting
-
-### Common Issues
-
-#### Server Won't Start
-
-**Problem**: The server keeps restarting or fails to initialize.
-
-**Solutions**:
-
-1. Check the Docker logs:
-
-   ```bash
-   docker logs minecraft-server
-   ```
-
-2. Verify Java compatibility:
-   If you see `UnsupportedClassVersionError`, you need to update the Java version:
-
-   ```yaml
-   # In docker-compose.yml
-   image: itzg/minecraft-server:java21 # Use java17 for older Minecraft versions
-   ```
-
-3. Ensure you have enough memory:
-   ```bash
-   # Increase memory allocation
-   python minecraft-server.py --memory 4G start
-   ```
-
-#### Connection Issues
-
-**Problem**: Can't connect to the server from Minecraft.
-
-**Solutions**:
-
-1. Check server status to verify it's running:
-
-   ```bash
-   python minecraft-server.py status
-   ```
-
-2. Ensure you're using the correct IP address (check the status output)
-
-3. Verify the port is open and not blocked by a firewall:
-
-   ```bash
-   # Test port connectivity
-   telnet localhost 25565
-   ```
-
-4. For AWS servers, check security group settings to allow port 25565
-
-#### "Address already in use" Error
-
-**Problem**: Docker complains that the port is already in use.
-
-**Solution**:
-
-1. Check for existing containers using the port:
-
-   ```bash
-   docker ps -a | grep 25565
-   ```
-
-2. Stop and remove the conflicting container:
-   ```bash
-   docker stop <container_id>
-   docker rm <container_id>
-   ```
-
-### Logs and Debugging
-
-1. Enable debug mode for verbose logging:
-
-   ```bash
-   python minecraft-server.py --debug start
-   ```
-
-2. Check Minecraft server logs:
-
-   ```bash
-   docker exec minecraft-server cat /data/logs/latest.log
-   ```
-
-3. View Docker container logs:
-   ```bash
-   docker logs minecraft-server
-   ```
-
-### Detailed Troubleshooting Guide
-
-For more detailed troubleshooting steps and solutions to common problems, refer to the [Troubleshooting Guide](docs/troubleshooting.md).
-
-## Documentation
-
-### Core Documentation
-
-- [Server Configuration Guide](docs/server-configuration.md) - Complete reference for all server settings
-- [Server Flavors Guide](docs/server-flavors.md) - Comparison of different server types (Vanilla, Paper, Forge, etc.)
-- [Mods and Plugins Guide](docs/mods-and-plugins.md) - Managing and configuring mods and plugins
-
-### Additional Guides
-
-- [Docker Deployment](docs/docker-deployment.md) - Detailed Docker deployment instructions
-- [AWS Deployment](docs/aws-deployment.md) - Deploying to AWS cloud
-- [API Reference](docs/api-reference.md) - Complete Python API documentation
+Commands derive a Compose project identity from the profile name and data root. They do not target arbitrary containers by a shared default name. Ports must be unique, and the combined heaps/containers must fit your Docker VM and laptop. Per-profile locks prevent concurrent manager operations; do not bypass them by editing live world files or starting the same directory manually.
 
 ## Development
 
-### Running Tests
-
-```bash
-pytest
+```sh
+uv sync --locked
+make bootstrap   # Local Node, locked tools, pre-commit + pre-push hooks
+make check       # Python/frontend lint, types, Bandit and tests
+make security    # Python/npm dependency audits and history secret scan
+uv build         # Source archive and complete installable wheel
 ```
 
-### Code Quality
+Run `make format` before committing. Review dependency updates through `uv lock --upgrade` and re-run all checks. The Dockerfile is an **offline CLI inspection image**; it deliberately does not receive the Docker socket and is not a server-management deployment.
 
-```bash
-ruff check src tests
+## Documentation
+
+Start with the [admin guide](docs/admin-guide.md), [development checks](docs/development.md), and [outside-network access](docs/remote-access.md).
+
+- [Implementation status and remaining validation](docs/implementation-status.md)
+- [Requested Forge modpack](docs/forge-modpack.md)
+- [Original review](docs/laptop-readiness.md), [findings](docs/review-findings.md), [validation evidence](docs/review-validation.md)
+
+The original review and older guides are historical. The review's line numbers refer to baseline `df94b16`; this README describes the replacement local implementation.
+
+## Family web dashboard
+
+```sh
+uv run --locked minecraft-server web
 ```
 
-## Contributing
+Open the owner bootstrap link printed in your terminal, or configure the single admin with `uv run --locked minecraft-server admin owner` and sign in. The dashboard is laptop-only. Anyone using the admin login can set up the world, add/ban/remove Minecraft players, start/stop, and create backups. There are no player website accounts or grown-up approval gates. Keep the owner link private.
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Minecraft still runs in Docker. The CLI/web manager runs on the laptop; the dashboard does not expose or mount a Docker socket. A working Docker engine, your explicit EULA acceptance, an approved username allowlist, and a validated modpack are needed before live play.
 
-## License
+After starting the game, inspect its actual access controls:
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+```sh
+uv run --locked minecraft-server security
+```
+
+See [UI design](docs/clubhouse-design.md), [authentication and Docker boundaries](docs/web-ui-security.md), and [verification evidence and remaining live tests](docs/web-ui-validation.md).
+
+See [accounts and invitations](docs/accounts-and-invitations.md) for single-admin setup and Minecraft player controls. Website credentials do not replace Minecraft/Microsoft authentication.

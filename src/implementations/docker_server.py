@@ -1,708 +1,692 @@
-#!/usr/bin/env python3
-
-"""
-Docker-based Minecraft server implementation
-"""
+"""Profile-scoped Docker operations. No background service or network on construction."""
 
 import contextlib
-import logging
+import fcntl
+import hashlib
+import json
 import os
-import shutil
+import re
+import secrets
+import tempfile
 import time
+import zipfile
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Union
+from typing import Any
 
-from src.core.base_server import BaseMinecraftServer
-from src.utils.auto_shutdown import AutoShutdown
+import yaml
+
+from src.utils.accounts import Accounts
 from src.utils.command_executor import CommandExecutor
-from src.utils.console import Console
-from src.utils.file_manager import FileManager
+from src.utils.config import Config
+from src.utils.file_manager import FileManager, atomic_json
 from src.utils.mod_manager import ModManager
-from src.utils.monitoring import ServerMonitor
-
-# Configure logging
-logger = logging.getLogger(__name__)
 
 
-class DockerServer(BaseMinecraftServer):
-    """Docker-based Minecraft server implementation"""
-
+class DockerServer:
     def __init__(
         self,
-        base_dir: Optional[Path] = None,
-        container_name: str = "minecraft-server",
-        data_dir_name: str = "data",
-        backup_dir_name: str = "backups",
-        plugins_dir_name: str = "plugins",
-        config_dir_name: str = "config",
-        minecraft_version: str = "latest",
-        server_type: str = "paper",
-        auto_shutdown_enabled: bool = True,
-        auto_shutdown_timeout: int = 120,  # 2 hours in minutes
-        monitoring_enabled: bool = True,
-        enable_prometheus: bool = True,
+        base_dir: Path | None = None,
+        minecraft_version: str = "1.20.1",
+        server_type: str = "forge",
+        memory: str = "4G",
+        java_version: str = "java25",
+        auto_shutdown_enabled: bool = False,
+        auto_shutdown_timeout: int = 120,
+        monitoring_enabled: bool = False,
+        enable_prometheus: bool = False,
         enable_cloudwatch: bool = False,
-        java_version: str = "java21",
-    ):
-        """
-        Initialize a Docker-based Minecraft server
-
-        Args:
-            base_dir: Base directory for server files (defaults to script directory)
-            container_name: Name of the Docker container
-            data_dir_name: Name of the data directory
-            backup_dir_name: Name of the backups directory
-            plugins_dir_name: Name of the plugins directory
-            config_dir_name: Name of the config directory
-            minecraft_version: Minecraft version to use
-            server_type: Type of server (paper, spigot, vanilla, etc.)
-            auto_shutdown_enabled: Whether to enable auto-shutdown
-            auto_shutdown_timeout: Minutes of inactivity before shutdown
-            monitoring_enabled: Whether to enable monitoring
-            enable_prometheus: Whether to enable Prometheus metrics
-            enable_cloudwatch: Whether to enable CloudWatch metrics
-            java_version: Java version to use
-        """
-        # Call parent constructor
-        super().__init__(
-            server_type=server_type,
-            base_dir=base_dir,
-            data_dir_name=data_dir_name,
-            backup_dir_name=backup_dir_name,
-            plugins_dir_name=plugins_dir_name,
-            config_dir_name=config_dir_name,
-            minecraft_version=minecraft_version,
-            auto_shutdown_enabled=auto_shutdown_enabled,
-            auto_shutdown_timeout=auto_shutdown_timeout,
-            monitoring_enabled=monitoring_enabled,
-            enable_prometheus=enable_prometheus,
-            enable_cloudwatch=enable_cloudwatch,
+        config: Config | None = None,
+    ) -> None:
+        self.config = config or Config()
+        if config is None:
+            for key, value in {
+                "paths.base_dir": str(base_dir) if base_dir else None,
+                "server.version": minecraft_version,
+                "server.flavor": server_type,
+                "server.memory": memory,
+                "server.java_version": java_version,
+                "server.image": f"itzg/minecraft-server:{java_version}",
+                "auto_shutdown.enabled": auto_shutdown_enabled,
+                "auto_shutdown.timeout": auto_shutdown_timeout,
+                "monitoring.enabled": monitoring_enabled,
+                "monitoring.prometheus": enable_prometheus,
+                "monitoring.cloudwatch": enable_cloudwatch,
+            }.items():
+                self.config.set(key, value)
+        self.config.validate()
+        self.base_dir = self.config.base_dir
+        self.accounts = Accounts(self.base_dir)
+        self.data_dir = self.base_dir / "data"
+        self.backup_dir = self.base_dir / "backups"
+        self.plugins_dir = self.data_dir / "mods"
+        self.config_dir = self.data_dir / "config"
+        self.compose_file = self.base_dir / "compose.yaml"
+        self.marker = self.base_dir / "profile.json"
+        self.runtime_file = self.base_dir / "runtime.json"
+        self.project = (
+            "mc-"
+            + self.config.get("profile")
+            + "-"
+            + hashlib.sha256(str(self.base_dir).encode()).hexdigest()[:10]
         )
-
-        # Docker-specific configuration
-        self.container_name = container_name
-        self.java_version = java_version
-        self.docker_compose_cmd = ["docker", "compose"]
-
-        # Initialize auto-shutdown
-        self.auto_shutdown = AutoShutdown(
-            shutdown_callback=self.stop,
-            inactivity_threshold=auto_shutdown_timeout,
-            check_interval=5,  # Check every 5 minutes
-            enabled=auto_shutdown_enabled,
-        )
-
-        # Initialize mod manager
         self.mod_manager = ModManager(
-            server_type=self.server_type,
-            minecraft_version=self.minecraft_version,
-            mods_dir=self.plugins_dir,
+            self.config.get("server.flavor"),
+            self.config.get("server.version"),
+            self.plugins_dir,
         )
 
-        # Initialize monitoring
-        if monitoring_enabled:
-            self.monitor = ServerMonitor(
-                server_type="docker",
-                server_name=self.container_name,
-                enable_prometheus=enable_prometheus,
-                enable_cloudwatch=enable_cloudwatch,
-                metrics_dir=self.base_dir / "metrics",
-            )
-        else:
-            self.monitor = None
+    def _run(self, args: list[str], timeout: float = 60, check: bool = True) -> Any:
+        return CommandExecutor.run(
+            args, capture_output=True, timeout=timeout, check=check
+        )
 
-        # Current player list
-        self.active_players: Set[str] = set()
+    def _compose(self, *args: str, timeout: float = 60) -> Any:
+        return self._run(
+            [
+                "docker",
+                "compose",
+                "--project-name",
+                self.project,
+                "--file",
+                str(self.compose_file),
+                *args,
+            ],
+            timeout=timeout,
+        )
 
-    def is_running(self) -> bool:
-        """Check if the server is currently running"""
+    @contextlib.contextmanager
+    def _locked(self) -> Iterator[None]:
+        if not self.base_dir.is_dir():
+            raise ValueError("Profile is not initialized. Run init first")
+        path = self.base_dir / ".operation.lock"
+        fd = os.open(path, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW, 0o600)
         try:
-            result = CommandExecutor.run(
-                ["docker", "ps", "--format", "{{.Names}}"],
-                capture_output=True,
+            try:
+                fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError as exc:
+                raise RuntimeError(
+                    "Another operation is active for this profile"
+                ) from exc
+            for p in [
+                self.data_dir,
+                self.backup_dir,
+                self.marker,
+                self.runtime_file,
+                self.compose_file,
+            ]:
+                if p.is_symlink():
+                    raise ValueError(f"Refusing profile symlink: {p}")
+            yield
+        finally:
+            os.close(fd)
+
+    def initialize(self, accept_eula: bool = False) -> None:
+        if not accept_eula:
+            raise ValueError(
+                "Read https://aka.ms/MinecraftEULA, then pass --accept-eula if you agree"
             )
-
-            if result.returncode != 0:
-                logger.error(
-                    f"Error checking if server is running: {result.stderr}")
-                return False
-
-            # For tests, handle the case where stdout is a string or a MagicMock
-            stdout = result.stdout
-            if hasattr(stdout, "__class__") and stdout.__class__.__name__ == "MagicMock":
-                # In tests, we're checking for the container name directly
-                # Special case for test_docker_server_is_running_true where stdout is "minecraft-server"
-                if str(stdout) == "minecraft-server" and self.container_name == "minecraft-server":
-                    return True
-                return self.container_name in str(stdout)
-
-            running_containers = stdout.strip().split("\n") if stdout.strip() else []
-            return self.container_name in running_containers
-        except Exception as e:
-            logger.error(f"Error checking if server is running: {e}")
-            return False
-
-    def _get_player_list(self) -> List[str]:
-        """Get list of currently active players"""
-        if not self.is_running():
-            return []
-
-        try:
-            # Execute RCON command to get player list
-            result = CommandExecutor.run(
-                ["docker", "exec", self.container_name, "rcon-cli", "list"],
-                capture_output=True,
+        if self.base_dir in (Path("/"), Path.home(), Path.cwd()):
+            raise ValueError("Choose a dedicated server profile directory")
+        self.base_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
+        with self._locked():
+            if self.marker.exists():
+                self._verify_profile()
+                return
+            if any(p.name != ".operation.lock" for p in self.base_dir.iterdir()):
+                raise ValueError(
+                    "Initialization requires an empty dedicated directory; existing worlds need a separate migration"
+                )
+            if not self.accounts.allowlist(self.config.get("server.allowlist")):
+                raise ValueError(
+                    "Add your Minecraft username to server.allowlist before initializing"
+                )
+            FileManager.ensure_directories(
+                [self.data_dir, self.plugins_dir, self.backup_dir]
             )
-
-            if result.returncode != 0:
-                logger.warning(f"Failed to get player list: {result.stderr}")
-                return []
-
-            # Parse player list from output
-            # Example output: "There are 3 of 20 players online: player1, player2, player3"
-            output = result.stdout.strip()
-            if "players online:" in output:
-                players_part = output.split("players online:")[1].strip()
-                if players_part and players_part != ".":
-                    player_list = [p.strip() for p in players_part.split(",")]
-
-                    # Update auto-shutdown with player list
-                    if self.auto_shutdown_enabled:
-                        self.auto_shutdown.update_player_list(player_list)
-
-                    return player_list
-            return []
-        except Exception as e:
-            logger.error(f"Error getting player list: {e}")
-            return []
-
-    def start(self) -> bool:
-        """Start the Minecraft server"""
-        Console.print_header("Starting Minecraft Server")
-        Console.print_info("Starting Minecraft server...")
-
-        # First check if server is already running
-        if self.is_running():
-            logger.info("Server is already running")
-            Console.print_success("Server is already running!")
-            return True
-
-        # Create Docker compose file
-        self._create_docker_compose_file()
-
-        # Add debug logging
-        logger.debug("Docker compose file created, launching container...")
-
-        # Start the server
-        try:
-            Console.print_info("Running: docker compose up -d")
-            docker_result = CommandExecutor.run(
-                [*self.docker_compose_cmd, "up", "-d"],
-                cwd=self.base_dir,
-                capture_output=True,
+            secret = self.base_dir / "rcon.secret"
+            fd = os.open(
+                secret, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600
             )
+            with os.fdopen(fd, "w") as stream:
+                stream.write(secrets.token_urlsafe(36) + "\n")
+            atomic_json(
+                self.marker,
+                {"schema": 1, "project": self.project, "eula_accepted": True},
+            )
+            self._write_compose()
 
-            if docker_result.returncode != 0:
-                logger.error(
-                    f"Failed to start Docker container: {docker_result.stderr}"
-                )
-                Console.print_error(
-                    f"Failed to start Docker container: {docker_result.stderr}"
-                )
-                return False
+    def _verify_profile(self) -> None:
+        if not self.marker.is_file() or self.marker.is_symlink():
+            raise ValueError("Profile not initialized")
+        marker = json.loads(self.marker.read_text())
+        if marker != {"schema": 1, "project": self.project, "eula_accepted": True}:
+            raise ValueError("Profile ownership/EULA marker mismatch")
+        secret = self.base_dir / "rcon.secret"
+        if not secret.is_file() or secret.is_symlink() or secret.stat().st_mode & 0o077:
+            raise ValueError("RCON secret must be a private regular file (mode 600)")
+        if len(secret.read_text().strip()) < 32:
+            raise ValueError("RCON secret is too short")
+        if not self.data_dir.is_dir() or self.data_dir.is_symlink():
+            raise ValueError("Profile data directory is missing or unsafe")
 
-            logger.debug(
-                f"Docker compose output: {docker_result.stdout}")
-
-            # Wait for server to start
-            Console.print_info("Checking server startup...")
-
-            # Try up to 10 times to see if the server is responsive
-            max_attempts = 10
-            for attempt in range(1, max_attempts + 1):
-                logger.debug(f"Startup check attempt {attempt}/{max_attempts}")
-                Console.print_info(
-                    f"Waiting for server to initialize... ({attempt}/{max_attempts})"
-                )
-
-                # Sleep to give the server time to initialize
-                time.sleep(5)
-
-                # Check if container is running (not just created)
-                container_status = CommandExecutor.run(
-                    [
-                        "docker",
-                        "inspect",
-                        "-f",
-                        "{{.State.Status}}",
-                        self.container_name,
+    def compose_config(self) -> dict[str, Any]:
+        s = self.config.get("server")
+        # This is a mounted filename, not a password value.
+        rcon_secret_path = str(Path("/run/secrets") / "rcon_password")
+        image = s["image"]
+        if self.runtime_file.exists():
+            runtime = json.loads(self.runtime_file.read_text())
+            image = runtime["image"]
+        return {
+            "services": {
+                "minecraft": {
+                    "image": image,
+                    "ports": [
+                        {
+                            "target": 25565,
+                            "published": str(s["port"]),
+                            "host_ip": s["bind_address"],
+                            "protocol": "tcp",
+                        }
                     ],
-                    capture_output=True,
-                    verbose=False,
-                )
-
-                logger.debug(
-                    f"Container status: {container_status.stdout.strip()}")
-
-                # Get container logs to help diagnose issues
-                if attempt % 3 == 0:  # Check logs every 3 attempts
-                    container_logs = CommandExecutor.run(
-                        ["docker", "logs", "--tail", "30", self.container_name],
-                        capture_output=True,
-                        verbose=False,
-                    )
-                    logger.debug(
-                        f"Recent container logs: {container_logs.stdout}")
-
-                    # Check for common error patterns
-                    if "UnsupportedClassVersionError" in container_logs.stdout:
-                        logger.error(
-                            "Java version mismatch detected. The container is using an older Java version than required."
-                        )
-                        Console.print_error(
-                            "Java version mismatch detected. The container is using an older Java version than required."
-                        )
-                        Console.print_info(
-                            "Try updating the Docker image to use a newer Java version (e.g., java21)"
-                        )
-
-                if self.is_running():
-                    logger.info("Server started successfully!")
-                    Console.print_success("Server started successfully!")
-
-                    # Start auto-shutdown if enabled
-                    if self.auto_shutdown_enabled:
-                        self.auto_shutdown.start_monitoring()
-
-                    return True
-
-                # If container is failing/restarting, don't wait for all attempts
-                if container_status.stdout.strip() in ["restarting", "exited"]:
-                    logger.error(
-                        f"Container is in '{container_status.stdout.strip()}' state, indicating startup problems"
-                    )
-
-                    # Get the logs to show error
-                    failure_logs = CommandExecutor.run(
-                        ["docker", "logs", "--tail", "50", self.container_name],
-                        capture_output=True,
-                        verbose=False,
-                    )
-                    logger.error(f"Container logs: {failure_logs.stdout}")
-
-                    # Try to provide specific feedback on common issues
-                    if "Error: A JNI error has occurred" in failure_logs.stdout:
-                        Console.print_error(
-                            "Java error detected. Check logs for more details."
-                        )
-                    elif "UnsupportedClassVersionError" in failure_logs.stdout:
-                        Console.print_error(
-                            "Java version mismatch. The Minecraft server requires a newer Java version."
-                        )
-                        Console.print_info(
-                            "Edit the docker-compose.yml file to use java21 image: itzg/minecraft-server:java21"
-                        )
-
-            Console.print_warning(
-                "Server is starting but taking longer than expected.\nCheck logs with: server.get_logs()"
-            )
-            return False
-
-        except Exception as e:
-            logger.error(f"Error starting server: {e}")
-            Console.print_error(f"Failed to start the server: {e}")
-            return False
-
-    def stop(self) -> bool:
-        """Stop the Minecraft server"""
-        Console.print_header("Stopping Minecraft Server")
-        Console.print_info("Stopping Minecraft server...")
-
-        if not self.is_running():
-            Console.print_info("Server is already stopped")
-            return True
-
-        # Stop auto-shutdown monitoring
-        if self.auto_shutdown_enabled:
-            self.auto_shutdown.stop_monitoring()
-
-        # Stop monitoring
-        if self.monitoring_enabled and self.monitor:
-            self.monitor.stop()
-
-        Console.print_success("Stopping Minecraft server...")
-
-        # Send stop command to server console first for clean shutdown
-        try:
-            self.execute_command("stop")
-            # Wait for server to stop gracefully
-            time.sleep(5)
-        except Exception as e:
-            Console.print_warning(
-                f"Could not send stop command, forcing shutdown... Error: {e}"
-            )
-
-        # Force stop if still running
-        CommandExecutor.run(
-            [*self.docker_compose_cmd, "down"], cwd=self.base_dir)
-        Console.print_success("Server stopped successfully!")
-        return True
-
-    def get_status(self) -> Dict[str, Union[str, int, bool]]:
-        """Get the current status of the server"""
-        is_running = self.is_running()
-
-        status = {
-            "running": is_running,
-            "server_type": "Docker",
-            "minecraft_type": self.server_type,
-            "minecraft_version": self.minecraft_version,
-            "container_name": self.container_name,
-            "data_directory": str(self.data_dir),
-            "plugins_directory": str(self.plugins_dir),
-            "config_directory": str(self.config_dir),
+                    "environment": {
+                        "EULA": "TRUE",
+                        "TYPE": s["flavor"].upper(),
+                        "VERSION": s["version"],
+                        "FORGE_VERSION": s["forge_version"],
+                        "MEMORY": s["memory"],
+                        "ENABLE_RCON": "true",
+                        "RCON_PASSWORD_FILE": rcon_secret_path,
+                        "ONLINE_MODE": "true",
+                        "ENFORCE_SECURE_PROFILE": "true",
+                        "ENABLE_WHITELIST": "true",
+                        "ENFORCE_WHITELIST": "true",
+                        "WHITELIST": ",".join(self.accounts.allowlist(s["allowlist"])),
+                        "EXISTING_WHITELIST_FILE": "SYNCHRONIZE",
+                        "OPS": ",".join(self._operators()),
+                        "EXISTING_OPS_FILE": "SYNCHRONIZE",
+                        "USER_API_PROVIDER": "mojang",
+                        "MAX_PLAYERS": str(s["max_players"]),
+                        "VIEW_DISTANCE": str(s["view_distance"]),
+                        "SIMULATION_DISTANCE": str(s["simulation_distance"]),
+                        "ENABLE_AUTOPAUSE": "false",
+                        "ENABLE_AUTOSTOP": "false",
+                        "UID": str(os.getuid()),
+                        "GID": str(os.getgid()),
+                    },
+                    "volumes": [
+                        {
+                            "type": "bind",
+                            "source": str(self.data_dir),
+                            "target": "/data",
+                        }
+                    ],
+                    "secrets": ["rcon_password"],
+                    "restart": "no",
+                    "mem_limit": s["container_memory"],
+                    "cpus": s["cpus"],
+                    "stop_grace_period": f"{s['stop_timeout']}s",
+                    "logging": {
+                        "driver": "json-file",
+                        "options": {"max-size": "10m", "max-file": "3"},
+                    },
+                    "security_opt": ["no-new-privileges:true"],
+                    "healthcheck": {
+                        "test": ["CMD", "mc-health"],
+                        "interval": "10s",
+                        "timeout": "5s",
+                        "retries": 6,
+                        "start_period": "120s",
+                    },
+                }
+            },
+            "secrets": {"rcon_password": {"file": str(self.base_dir / "rcon.secret")}},
         }
 
-        # If the server is running, get additional information
-        if is_running:
-            # Get player list
-            players = self._get_player_list()
-            status["player_count"] = len(players)
-            status["players"] = players
+    def _write_compose(self) -> None:
+        if self.compose_file.is_symlink():
+            raise ValueError("Compose file cannot be a symlink")
+        fd, temp = tempfile.mkstemp(prefix=".compose-", dir=self.base_dir)
+        try:
+            with os.fdopen(fd, "w") as stream:
+                yaml.safe_dump(self.compose_config(), stream, sort_keys=False)
+            os.replace(temp, self.compose_file)
+        finally:
+            Path(temp).unlink(missing_ok=True)
 
-            # Get auto-shutdown status
-            auto_shutdown_status = self.auto_shutdown.get_status()
-            status.update(auto_shutdown_status)
-
-            # Get server uptime
-            uptime_result = CommandExecutor.run(
-                ["docker", "inspect", "-f",
-                    "{{.State.StartedAt}}", self.container_name],
-                capture_output=True,
-                verbose=False,
+    def _container(self) -> dict[str, Any] | None:
+        result = self._run(
+            [
+                "docker",
+                "ps",
+                "-aq",
+                "--filter",
+                f"label=com.docker.compose.project={self.project}",
+                "--filter",
+                "label=com.docker.compose.service=minecraft",
+            ]
+        )
+        ids = result.stdout.split()
+        if len(ids) > 1:
+            raise RuntimeError(
+                "Multiple containers found for this profile; refusing ambiguous operation"
             )
-            if uptime_result.returncode == 0:
-                status["started_at"] = uptime_result.stdout.strip()
+        if not ids:
+            return None
+        info = json.loads(self._run(["docker", "inspect", ids[0]]).stdout)[0]
+        labels = info.get("Config", {}).get("Labels", {})
+        if (
+            labels.get("com.docker.compose.project") != self.project
+            or labels.get("com.docker.compose.service") != "minecraft"
+        ):
+            raise RuntimeError("Container ownership mismatch")
+        return info
 
-            # Get server version
-            version_result = CommandExecutor.run(
-                ["docker", "exec", self.container_name,
-                    "cat", "/data/logs/latest.log"],
-                capture_output=True,
-                verbose=False,
+    def is_running(self) -> bool:
+        info = self._container()
+        return bool(info and info["State"]["Running"])
+
+    def _runtime(self) -> dict[str, Any]:
+        s = self.config.get("server")
+        desired = {
+            "minecraft": s["version"],
+            "flavor": s["flavor"],
+            "forge": s["forge_version"],
+            "java": s["java_version"],
+            "requested_image": s["image"],
+        }
+        if self.runtime_file.exists():
+            saved = json.loads(self.runtime_file.read_text())
+            if any(saved.get(k) != v for k, v in desired.items()):
+                raise ValueError(
+                    "Runtime differs from locked world; test upgrades in a new profile"
+                )
+            return saved
+        return desired
+
+    def _pin_image(self) -> None:
+        runtime = self._runtime()
+        if "image" not in runtime:
+            image = runtime["requested_image"]
+            self._run(
+                ["docker", "pull", image],
+                timeout=self.config.get("server.startup_timeout"),
             )
-            if version_result.returncode == 0:
-                for line in version_result.stdout.splitlines():
-                    if "Starting minecraft server version" in line:
-                        version_part = line.split("version")[1].strip()
-                        status["full_version"] = version_part
-                        break
+            found = json.loads(self._run(["docker", "image", "inspect", image]).stdout)[
+                0
+            ]
+            digests = found.get("RepoDigests", [])
+            candidates = [
+                x for x in digests if x.startswith("itzg/minecraft-server@sha256:")
+            ]
+            if not candidates:
+                raise RuntimeError("Could not lock the downloaded image digest")
+            runtime["image"] = candidates[0]
+            atomic_json(self.runtime_file, runtime)
 
-            # Get memory usage
-            memory_result = CommandExecutor.run(
-                ["docker", "stats", "--no-stream", "--format",
-                    "{{.MemUsage}}", self.container_name],
-                capture_output=True,
-                verbose=False,
+    def start(self) -> bool:
+        with self._locked():
+            self._verify_profile()
+            self._runtime()
+            if not self.accounts.allowlist(self.config.get("server.allowlist")):
+                raise ValueError("Set an allowlist before starting")
+            info = self._container()
+            if not (info and info["State"]["Running"]):
+                self._prepare_access()
+                self._pin_image()
+                self._write_compose()
+                self._compose("config", "--quiet")
+                self._compose(
+                    "up", "-d", timeout=self.config.get("server.startup_timeout")
+                )
+            deadline = time.monotonic() + self.config.get("server.startup_timeout")
+            while time.monotonic() < deadline:
+                info = self._container()
+                if info:
+                    state = info["State"]
+                    if state.get("Health", {}).get("Status") == "healthy" and state.get(
+                        "Running"
+                    ):
+                        self._sync_access(info)
+                        return True
+                    if state.get("Status") in ("exited", "dead"):
+                        raise RuntimeError(
+                            "Minecraft exited during startup; inspect logs"
+                        )
+                time.sleep(2)
+            raise RuntimeError(
+                "Minecraft did not become healthy before the deadline; inspect logs and stop if needed"
             )
-            if memory_result.returncode == 0:
-                status["memory_usage"] = memory_result.stdout.strip()
 
-        return status
+    def _stop(self) -> bool:
+        info = self._container()
+        if info is None or not info["State"]["Running"]:
+            return True
+        timeout = self.config.get("server.stop_timeout")
+        # RCON stops the game itself; unlike Docker stop this never force-kills after a deadline.
+        self._run(["docker", "exec", info["Id"], "rcon-cli", "stop"])
+        deadline = time.monotonic() + timeout
+        while time.monotonic() < deadline:
+            info = self._container()
+            if info is None:
+                raise RuntimeError(
+                    "Container disappeared during stop; save state cannot be verified"
+                )
+            if not info["State"]["Running"]:
+                if (
+                    info["State"].get("OOMKilled")
+                    or info["State"].get("ExitCode", 0) != 0
+                ):
+                    raise RuntimeError(
+                        "Server exited uncleanly; inspect logs before backup/restore"
+                    )
+                return True
+            time.sleep(1)
+        raise RuntimeError(
+            "Graceful stop timed out; server was not force-killed. Backup/restore refused"
+        )
+
+    def stop(self) -> bool:
+        with self._locked():
+            self._verify_profile()
+            return self._stop()
+
+    def restart(self) -> bool:
+        self.stop()
+        return self.start()
 
     def execute_command(self, command: str) -> str:
-        """Execute a command on the server console"""
-        if not self.is_running():
-            raise RuntimeError("Server is not running")
+        if not command.strip() or any(c in command for c in ("\n", "\r", "\x00")):
+            raise ValueError("Send one nonempty console command")
+        with self._locked():
+            self._verify_profile()
+            info = self._container()
+            if not info or not info["State"]["Running"]:
+                raise RuntimeError("Server is stopped")
+            return str(
+                self._run(["docker", "exec", info["Id"], "rcon-cli", command]).stdout
+            ).strip()
 
-        result = CommandExecutor.run(
-            ["docker", "exec", self.container_name, "rcon-cli", command],
-            capture_output=True,
-        )
+    def get_status(self) -> dict[str, Any]:
+        info = self._container()
+        state = info["State"] if info else {}
+        return {
+            "profile": self.config.get("profile"),
+            "state": state.get("Status", "absent"),
+            "running": state.get("Running", False),
+            "health": state.get("Health", {}).get("Status", "unknown"),
+            "minecraft_version": self.config.get("server.version"),
+            "forge_version": self.config.get("server.forge_version"),
+            "java": self.config.get("server.java_version"),
+            "data_directory": str(self.data_dir),
+            "connection": f"{self.config.get('server.bind_address')}:{self.config.get('server.port')}",
+        }
 
-        # For tests, we need to handle the case where result attributes are MagicMocks
-        if hasattr(result, "__class__") and result.__class__.__name__ == "MagicMock":
-            # In tests, we're mocking the result, so just return the stdout
-            return result.stdout
+    def _operators(self) -> list[str]:
+        allowed = {
+            x.lower()
+            for x in self.accounts.allowlist(self.config.get("server.allowlist"))
+        }
+        return [x for x in self.config.get("server.operators") if x.lower() in allowed]
 
-        # For tests, we need to handle the case where stderr is a MagicMock
-        stderr = result.stderr
-        if hasattr(stderr, "__class__") and stderr.__class__.__name__ == "MagicMock":
-            stderr = ""
-
-        if result.returncode != 0:
-            raise RuntimeError(f"Command execution failed: {stderr}")
-
-        return result.stdout.strip()
-
-    def backup(self) -> Optional[Path]:
-        """Create a backup of the server"""
-        Console.print_header("Backing Up Minecraft Server")
-
-        if self.is_running():
-            Console.print_warning(
-                "Creating backup while server is running. This might cause data corruption."
+    def _prepare_access(self) -> None:
+        # Operators bypass the whitelist: revoke stale operators BEFORE starting Java.
+        path = self.data_dir / "ops.json"
+        if path.is_symlink():
+            raise ValueError("Operator inventory cannot be a symlink")
+        if path.exists():
+            operators = json.loads(path.read_text())
+            if not isinstance(operators, list) or any(
+                not isinstance(x, dict) for x in operators
+            ):
+                raise ValueError("Invalid operator inventory")
+            allowed = {
+                name.lower()
+                for name in self.accounts.allowlist(self.config.get("server.allowlist"))
+            }
+            atomic_json(
+                path,
+                [
+                    entry
+                    for entry in operators
+                    if str(entry.get("name", "")).lower() in allowed
+                ],
             )
-            Console.print_warning(
-                "It's recommended to stop the server before backing up."
+
+    def _sync_access(self, info: dict[str, Any]) -> None:
+        data = self.accounts.read()
+        if not (
+            data["allowed"] or data["removed"] or data["banned"] or self._operators()
+        ):
+            return
+
+        def command(text: str) -> None:
+            self._run(["docker", "exec", info["Id"], "rcon-cli", text])
+
+        command("whitelist on")
+        for name in sorted(set(data["removed"]) | set(data["banned"])):
+            command(f"deop {name}")
+            command(f"whitelist remove {name}")
+            command(f"kick {name} Invitation revoked")
+        for name in data["banned"]:
+            command(f"ban {name} Access revoked by server owner")
+        for name in self.accounts.allowlist(self.config.get("server.allowlist")):
+            command(f"pardon {name}")
+            command(f"whitelist add {name}")
+        for name in self._operators():
+            command(f"op {name}")
+        self.verify_security()
+
+    def change_player(self, minecraft: str, action: str) -> None:
+        if not self.marker.exists():
+            self.accounts.change_player(minecraft, action)
+            return
+        with self._locked():
+            self._verify_profile()
+            self.accounts.change_player(minecraft, action)
+            info = self._container()
+            if info and info["State"]["Running"]:
+                if action == "unban":
+                    self._run(
+                        [
+                            "docker",
+                            "exec",
+                            info["Id"],
+                            "rcon-cli",
+                            f"pardon {minecraft}",
+                        ]
+                    )
+                self._sync_access(info)
+
+    def verify_security(self) -> dict[str, Any]:
+        """Inspect effective container settings, without returning RCON secrets."""
+        info = self._container()
+        if not info or not info["State"]["Running"]:
+            raise RuntimeError("Start the server before checking live security")
+        ports = info.get("NetworkSettings", {}).get("Ports", {})
+        bindings = ports.get("25565/tcp") or []
+        expected_ip = self.config.get("server.bind_address")
+        if not bindings or any(
+            binding.get("HostIp") != expected_ip
+            or str(binding.get("HostPort")) != str(self.config.get("server.port"))
+            for binding in bindings
+        ):
+            raise RuntimeError(
+                "Game port binding differs from the approved configuration"
+            )
+        if any(bindings for port, bindings in ports.items() if port != "25565/tcp"):
+            raise RuntimeError("An unexpected container port is published")
+
+        def read(name: str) -> str:
+            return str(
+                self._run(["docker", "exec", info["Id"], "cat", f"/data/{name}"]).stdout
             )
 
-            # Notify server of backup
-            with contextlib.suppress(Exception):
-                self.execute_command(
-                    "say SERVER BACKUP STARTING - Possible lag incoming"
-                )
+        properties = {}
+        for line in read("server.properties").splitlines():
+            if "=" in line and not line.lstrip().startswith(("#", "!")):
+                key, value = line.split("=", 1)
+                properties[key.strip()] = value.strip()
+        for key in (
+            "online-mode",
+            "white-list",
+            "enforce-whitelist",
+            "enforce-secure-profile",
+        ):
+            if properties.get(key) != "true":
+                raise RuntimeError(f"Live security check failed: {key} must be true")
+        expected = {
+            name.lower()
+            for name in self.accounts.allowlist(self.config.get("server.allowlist"))
+        }
+        allowed = json.loads(read("whitelist.json"))
+        operators = json.loads(read("ops.json"))
+        if not isinstance(allowed, list) or not isinstance(operators, list):
+            raise RuntimeError("Invalid live access-control inventory")
 
-        try:
-            # Create backup
-            backup_path, backup_size = FileManager.create_backup(
-                self.data_dir, self.backup_dir
-            )
+        def names(entries: list[Any]) -> set[str]:
+            if any(
+                not isinstance(x, dict)
+                or not isinstance(x.get("name"), str)
+                or not isinstance(x.get("uuid"), str)
+                or not x["uuid"]
+                for x in entries
+            ):
+                raise RuntimeError("Invalid live player identity")
+            return {entry["name"].lower() for entry in entries}
 
-            Console.print_success(
-                f"Backup created successfully: {backup_path.name}")
-            Console.print_success(f"Backup size: {backup_size}")
+        if names(allowed) != expected:
+            raise RuntimeError("Live allowlist differs from the approved player list")
+        if not names(operators).issubset(expected):
+            raise RuntimeError("An unapproved operator can bypass the allowlist")
+        if not {x.lower() for x in self._operators()}.issubset(names(operators)):
+            raise RuntimeError("A configured administrator is missing operator access")
+        return {
+            "verified": True,
+            "online_mode": True,
+            "allowlist_enforced": True,
+            "approved_players": len(expected),
+            "game_bind_address": expected_ip,
+            "management_ports_published": False,
+        }
 
-            # Notify server if running
-            if self.is_running():
-                with contextlib.suppress(Exception):
-                    self.execute_command("say SERVER BACKUP COMPLETED")
-
-            return backup_path
-
-        except Exception as e:
-            Console.print_error(f"Backup failed: {e}")
-            return None
-
-    def restore(self, backup_path: Optional[Path] = None) -> bool:
-        """Restore the server from a backup"""
-        Console.print_header("Restoring Minecraft Server")
-
-        # Find the most recent backup if none specified
-        if not backup_path:
-            backups = FileManager.list_backups(self.backup_dir)
-            if not backups:
-                Console.print_error("No backups found")
-                return False
-            backup_path = backups[0]  # Most recent backup
-
-        # Confirm the server is not running
-        if self.is_running():
-            Console.print_warning(
-                "Server must be stopped before restoring a backup")
-            Console.print_warning("Stopping server...")
-            self.stop()
-
-        # Extract and restore
-        Console.print_info(f"Restoring from backup: {backup_path}")
-        success = FileManager.extract_backup(
-            backup_path, self.base_dir, self.data_dir)
-
-        if success:
-            Console.print_success("Backup restored successfully")
-            Console.print_info("Start the server to apply the restored backup")
-        else:
-            Console.print_error("Failed to restore backup")
-
-        return success
-
-    def get_logs(self, lines: int = 50) -> List[str]:
-        """Get the most recent server logs"""
-        if not self.is_running():
-            Console.print_warning(
-                "Server is not running, logs may be incomplete")
-
-        result = CommandExecutor.run(
-            ["docker", "logs", "--tail", str(lines), self.container_name],
-            capture_output=True,
-        )
-
-        if result.returncode != 0:
-            Console.print_error(f"Failed to get logs: {result.stderr}")
+    def get_logs(self, lines: int = 50) -> list[str]:
+        if not 1 <= lines <= 10000:
+            raise ValueError("Log line count must be between 1 and 10000")
+        info = self._container()
+        if info is None:
             return []
+        result = self._run(["docker", "logs", "--tail", str(lines), info["Id"]])
+        return (result.stdout + result.stderr).splitlines()
 
-        return result.stdout.splitlines()
+    def _require_stopped(self) -> None:
+        info = self._container()
+        if info and info["State"]["Running"]:
+            raise RuntimeError(
+                "Stop the server before modifying or backing up its files"
+            )
+        if info and (
+            info["State"].get("OOMKilled") or info["State"].get("ExitCode", 0) != 0
+        ):
+            raise RuntimeError(
+                "Last exit was unclean; recover/inspect the world before using managed backups"
+            )
+
+    def backup(self) -> Path:
+        with self._locked():
+            self._verify_profile()
+            self._require_stopped()
+            runtime = self._runtime()
+            if "image" not in runtime:
+                raise ValueError(
+                    "Start this profile once to establish its runtime lock before a managed backup"
+                )
+            path, _ = FileManager.create_backup(
+                self.data_dir,
+                self.backup_dir,
+                metadata={"runtime": runtime, "config": self.config.get_all()},
+            )
+            FileManager.cleanup_old_backups(
+                self.backup_dir, self.config.get("backup.max_backups")
+            )
+            return path
+
+    def restore(self, backup_path: Path | None = None) -> bool:
+        with self._locked():
+            self._verify_profile()
+            self._require_stopped()
+            if backup_path is None:
+                raise ValueError(
+                    "Specify an explicit backup path; restore never selects implicitly"
+                )
+            runtime = self._runtime()
+            adopting_runtime = not self.runtime_file.exists()
+            if adopting_runtime:
+                # Only a fresh profile may adopt the exact image recorded in a backup.
+                if any(p.is_file() or p.is_symlink() for p in self.data_dir.rglob("*")):
+                    raise ValueError(
+                        "Restore into an empty profile or one with an existing runtime lock"
+                    )
+                with zipfile.ZipFile(backup_path) as archive:
+                    if archive.getinfo("manifest.json").file_size > 8 * 1024**2:
+                        raise ValueError("Oversized manifest")
+                    saved = (
+                        json.loads(archive.read("manifest.json"))
+                        .get("metadata", {})
+                        .get("runtime", {})
+                    )
+                if not isinstance(saved, dict) or any(
+                    saved.get(k) != v for k, v in runtime.items()
+                ):
+                    raise ValueError("Backup runtime does not match target settings")
+                if not isinstance(saved.get("image"), str) or not re.fullmatch(
+                    r"itzg/minecraft-server@sha256:[a-f0-9]{64}", saved["image"]
+                ):
+                    raise ValueError("Backup must record a pinned Minecraft image")
+                runtime = saved
+            result = FileManager.extract_backup(
+                backup_path,
+                self.base_dir,
+                self.data_dir,
+                max_bytes=self.config.get("backup.max_restore_bytes"),
+                expected_runtime=runtime,
+            )
+            if adopting_runtime:
+                atomic_json(self.runtime_file, runtime)
+            return result
 
     def install_mod(self, mod_id: str, source: str = "modrinth") -> bool:
-        """
-        Install a mod to the server
+        return self.mod_manager.install_mod(mod_id, source)
 
-        Args:
-            mod_id: ID or slug of the mod
-            source: Source repository for the mod
-
-        Returns:
-            bool: True if installation was successful
-        """
-        Console.print_header("Installing Mod")
-
-        # Check server type compatibility
-        if not self.mod_manager.is_compatible(source):
-            Console.print_error(
-                f"Server type '{self.server_type}' is not compatible with {source} mods"
-            )
-            return False
-
-        Console.print_info(f"Installing mod {mod_id} from {source}...")
-        success = self.mod_manager.install_mod(mod_id, source)
-
-        if success:
-            Console.print_success(f"Successfully installed mod {mod_id}")
-            Console.print_info("Restart the server to apply changes")
-        else:
-            Console.print_error(f"Failed to install mod {mod_id}")
-
-        return success
+    def install_local_mod(self, path: Path, sha256: str) -> bool:
+        with self._locked():
+            self._verify_profile()
+            self._require_stopped()
+            return self.mod_manager.install_local(path, sha256)
 
     def uninstall_mod(self, mod_id: str) -> bool:
-        """
-        Uninstall a mod from the server
+        with self._locked():
+            self._verify_profile()
+            self._require_stopped()
+            return self.mod_manager.uninstall_mod(mod_id)
 
-        Args:
-            mod_id: ID of the mod to uninstall
+    def set_mod_enabled(self, filename: str, enabled: bool) -> bool:
+        with self._locked():
+            self._verify_profile()
+            self._require_stopped()
+            return self.mod_manager.set_enabled(filename, enabled)
 
-        Returns:
-            bool: True if uninstallation was successful
-        """
-        Console.print_header("Uninstalling Mod")
-        Console.print_info(f"Uninstalling mod {mod_id}...")
-
-        success = self.mod_manager.uninstall_mod(mod_id)
-
-        if success:
-            Console.print_success(f"Successfully uninstalled mod {mod_id}")
-            Console.print_info("Restart the server to apply changes")
-        else:
-            Console.print_error(f"Failed to uninstall mod {mod_id}")
-
-        return success
-
-    def list_mods(self) -> List[Dict[str, str]]:
-        """
-        List installed mods
-
-        Returns:
-            List of dictionaries containing mod information
-        """
+    def list_mods(self) -> list[dict[str, Any]]:
         return self.mod_manager.list_installed_mods()
 
     def configure_auto_shutdown(
         self, enabled: bool, timeout_minutes: int = 120
     ) -> None:
-        """
-        Configure auto-shutdown behavior
+        if enabled:
+            raise ValueError("Auto-shutdown is disabled; explicitly stop the server")
 
-        Args:
-            enabled: Whether auto-shutdown should be enabled
-            timeout_minutes: Inactivity minutes before shutdown
-        """
-        # Update configuration
-        self.auto_shutdown_enabled = enabled
-        self.auto_shutdown.inactivity_threshold = timeout_minutes
-        self.auto_shutdown.enabled = enabled
-
-        # Update monitoring state
-        if enabled and self.is_running():
-            self.auto_shutdown.start_monitoring()
-            Console.print_info(
-                f"Auto-shutdown enabled. Server will shut down after "
-                f"{timeout_minutes} minutes of inactivity."
-            )
-        else:
-            self.auto_shutdown.stop_monitoring()
-            Console.print_info("Auto-shutdown disabled.")
-
-    def _create_docker_compose_file(self) -> None:
-        """Create the docker-compose.yml file"""
-        docker_compose_content = f"""
-version: '3'
-
-services:
-  minecraft:
-    image: itzg/minecraft-server:{self.java_version}
-    container_name: {self.container_name}
-    ports:
-      - "25565:25565"
-    environment:
-      # EULA Agreement
-      EULA: "TRUE"
-
-      # Server type and version
-      TYPE: "{self.server_type.upper()}"
-      VERSION: "{self.minecraft_version}"
-
-      # Performance settings
-      MEMORY: "{self.memory}"
-      JVM_XX_OPTS: "{self.java_flags}"
-      USE_AIKAR_FLAGS: "true"
-
-      # Game settings
-      DIFFICULTY: "normal"
-      MODE: "survival"
-      MOTD: "Minecraft Server"
-
-      # Security settings
-      ENABLE_RCON: "true"
-      RCON_PASSWORD: "minecraft"
-      RCON_PORT: 25575
-      ENFORCE_SECURE_PROFILE: "false"
-
-      # Auto-shutdown
-      ENABLE_AUTOPAUSE: "{str(self.auto_shutdown_enabled).lower()}"
-      AUTOPAUSE_TIMEOUT_EST: "{self.auto_shutdown.inactivity_threshold * 60}"
-
-    volumes:
-      - ./data:/data
-      - ./plugins:/plugins
-      - ./config:/config
-
-    restart: unless-stopped
-    """
-
-        # Write the file
-        with open(self.base_dir / "docker-compose.yml", "w") as f:
-            f.write(docker_compose_content)
-
-        Console.print_info(
-            f"Created Docker Compose file: {self.base_dir / 'docker-compose.yml'}")
-
-    def update_server_configuration(
-        self,
-        memory: Optional[str] = None,
-        minecraft_version: Optional[str] = None,
-        server_type: Optional[str] = None,
-        java_flags: Optional[str] = None,
-    ) -> None:
-        """
-        Update server configuration
-
-        Args:
-            memory: Memory allocation (e.g., "2G")
-            minecraft_version: Minecraft version to use
-            server_type: Type of server (paper, spigot, etc.)
-            java_flags: Java JVM flags
-        """
-        configuration_changed = False
-
-        if memory and memory != self.memory:
-            self.memory = memory
-            configuration_changed = True
-
-        if minecraft_version and minecraft_version != self.minecraft_version:
-            self.minecraft_version = minecraft_version
-            configuration_changed = True
-
-        if server_type and server_type.lower() != self.server_type:
-            self.server_type = server_type.lower()
-            configuration_changed = True
-
-        if java_flags and java_flags != self.java_flags:
-            self.java_flags = java_flags
-            configuration_changed = True
-
-        if configuration_changed:
-            Console.print_info("Server configuration updated")
-            self._create_docker_compose_file()
-            Console.print_warning("Restart the server to apply changes")
-        else:
-            Console.print_info("No configuration changes made")
+    def update_server_configuration(self, **kwargs: Any) -> None:
+        raise ValueError(
+            "Edit the profile YAML configuration, then restart. Runtime upgrades require a separate profile"
+        )

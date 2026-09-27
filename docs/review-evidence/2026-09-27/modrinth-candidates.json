@@ -1,0 +1,2854 @@
+{
+  "date": "2026-09-27",
+  "status": "UNREVIEWED CANDIDATES, NOT A PACK LOCK",
+  "minecraft": "1.20.1",
+  "loader": "forge",
+  "results": [
+    {
+      "requested": "Lets Do API",
+      "candidates": [
+        {
+          "title": "[Let's Do] API",
+          "project_id": "4XJZeZbM",
+          "slug": "do-api",
+          "url": "https://modrinth.com/mod/do-api",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "uEaTMht9",
+            "version_number": "1.2.15",
+            "date_published": "2024-06-24T15:23:37.248167Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "lhGA9TYQ",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "1AbaSOdK",
+                "hashes": {
+                  "sha512": "36bb6b923d7f4c774372eb90e81bbdf43c6629cbb4e38d4439575175b4ac197bf218c4d64b3595ff92735ed8943269a7891cf24c8c10f4e3d55269d8d7cf5c2c",
+                  "sha1": "a261043a45097d861a13a63ebdbb0ca350e06a63"
+                },
+                "url": "https://cdn.modrinth.com/data/4XJZeZbM/versions/uEaTMht9/letsdo-API-forge-1.2.15-forge.jar",
+                "filename": "letsdo-API-forge-1.2.15-forge.jar",
+                "primary": true,
+                "size": 1440591,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Lets Do Farm Charm",
+      "candidates": [
+        {
+          "title": "[Let's Do] Farm & Charm",
+          "project_id": "HJetCzWo",
+          "slug": "lets-do-farm-charm",
+          "url": "https://modrinth.com/mod/lets-do-farm-charm",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "9fzY3YV6",
+            "version_number": "1.0.14",
+            "date_published": "2025-10-09T19:59:11.179167Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "lhGA9TYQ",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "cswufg6E",
+                "hashes": {
+                  "sha1": "4db017c18fff8356e1aa5f0e9c683f1af30bec2b",
+                  "sha512": "a01b6c71a916ccce10014e07c0bd12023ea3628f23a7cb062a6d9ef0c232e895d24acb6a0786e130c79b9c35bdef06fe824c5f93741074ab1d850e904d318ca8"
+                },
+                "url": "https://cdn.modrinth.com/data/HJetCzWo/versions/9fzY3YV6/letsdo-farm_and_charm-forge-1.0.14.jar",
+                "filename": "letsdo-farm_and_charm-forge-1.0.14.jar",
+                "primary": true,
+                "size": 2328624,
+                "file_type": null
+              },
+              {
+                "id": "Y3zHIfOi",
+                "hashes": {
+                  "sha512": "1563d637f793ca9502149405d997298ff944432e5273249c9e92649c7cde7b48459ace3b68af615e5fcd67317d7a76fa15b90a41b1245f989afbedd92ce0cc7a",
+                  "sha1": "609ab5c5a533606fd2dc0fc1e05f41f38398e7d3"
+                },
+                "url": "https://cdn.modrinth.com/data/HJetCzWo/versions/9fzY3YV6/letsdo-farm_and_charm-forge-1.0.14-sources.jar",
+                "filename": "letsdo-farm_and_charm-forge-1.0.14-sources.jar",
+                "primary": false,
+                "size": 1968433,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "[Let's Do] Candlelight - Farm&Charm compat",
+          "project_id": "qwbArkQk",
+          "slug": "lets-do-candlelight-farmcharm-compat",
+          "url": "https://modrinth.com/mod/lets-do-candlelight-farmcharm-compat",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "MAbMsxdU",
+            "version_number": "2.0.5",
+            "date_published": "2025-08-05T10:54:29.594923Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "lhGA9TYQ",
+                "file_name": null,
+                "dependency_type": "required"
+              },
+              {
+                "version_id": null,
+                "project_id": "HJetCzWo",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "2XUeCEcw",
+                "hashes": {
+                  "sha1": "67b5560125db588cb1d87c042cc9dce9833861d7",
+                  "sha512": "c695cf17abf05362e7703b36a6579363abe00027be38f0ed310b65d17fef031a17edd9197fb999f1ddf918633bd05531b890c40ccd728317ea78a3604e32b967"
+                },
+                "url": "https://cdn.modrinth.com/data/qwbArkQk/versions/MAbMsxdU/letsdo-candlelight-forge-2.0.5.jar",
+                "filename": "letsdo-candlelight-forge-2.0.5.jar",
+                "primary": true,
+                "size": 2507744,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "[Let's Do] Bakery - Farm&Charm Compat",
+          "project_id": "oNB5jhlA",
+          "slug": "lets-do-bakery-farmcharm-compat",
+          "url": "https://modrinth.com/mod/lets-do-bakery-farmcharm-compat",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "Bz6DYFDT",
+            "version_number": "2.0.6",
+            "date_published": "2025-08-04T18:53:41.143795Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "lhGA9TYQ",
+                "file_name": null,
+                "dependency_type": "required"
+              },
+              {
+                "version_id": null,
+                "project_id": "HJetCzWo",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "AgbNo1ec",
+                "hashes": {
+                  "sha1": "75f35ba47c07d4af5b8b4e05fcffb74fc1583685",
+                  "sha512": "85922a4f0035a6d8eacfbbb109c0a7ffd79a8b227163588f39d42007fe33466f9a067ec88990bce8ff09e515d86839a8f3feb1566586028cd3e6c7ceec6ea7cf"
+                },
+                "url": "https://cdn.modrinth.com/data/oNB5jhlA/versions/Bz6DYFDT/letsdo-bakery-forge-2.0.6.jar",
+                "filename": "letsdo-bakery-forge-2.0.6.jar",
+                "primary": true,
+                "size": 1222186,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Lets Do Meadow",
+      "candidates": [
+        {
+          "title": "[Let's Do] Meadow",
+          "project_id": "ra7o6Sl7",
+          "slug": "lets-do-meadow",
+          "url": "https://modrinth.com/mod/lets-do-meadow",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "phZQOZzG",
+            "version_number": "1.3.25",
+            "date_published": "2025-04-26T17:23:07.945955Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "lhGA9TYQ",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "nQQ98PwI",
+                "hashes": {
+                  "sha512": "0d5a91be33599f51b04815fc795d5132612656812ee8a4fef9f5526754c1f3e7fd259dbbcbb15949e2e07664638fd6627d56bce2acaec0d0c4daae733ae6602a",
+                  "sha1": "da7d934ff35f03279bee6597362f30d2aea7462f"
+                },
+                "url": "https://cdn.modrinth.com/data/ra7o6Sl7/versions/phZQOZzG/letsdo-meadow-forge-1.3.25.jar",
+                "filename": "letsdo-meadow-forge-1.3.25.jar",
+                "primary": true,
+                "size": 2676511,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "[Let's Do Meadow] - Sawmill Compat",
+          "project_id": "VCLcF6ou",
+          "slug": "lets-do-meadow-sawmill-compat",
+          "url": "https://modrinth.com/mod/lets-do-meadow-sawmill-compat",
+          "client_side": "optional",
+          "server_side": "required",
+          "version": {
+            "id": "TgmqWbxv",
+            "version_number": "1.0+mod",
+            "date_published": "2025-12-24T05:34:18.346817Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "ra7o6Sl7",
+                "file_name": null,
+                "dependency_type": "required"
+              },
+              {
+                "version_id": null,
+                "project_id": "WRaRZdTd",
+                "file_name": null,
+                "dependency_type": "required"
+              },
+              {
+                "version_id": null,
+                "project_id": "pLxsKvNt",
+                "file_name": null,
+                "dependency_type": "optional"
+              }
+            ],
+            "files": [
+              {
+                "id": "UvCE1ktZ",
+                "hashes": {
+                  "sha1": "c3034950bcb7e4d8cffe637650cb367595f6a8fd",
+                  "sha512": "47a3cc956064cc9ee95b13d23d4ecfaebc04eb2d7827853713a464a7c75d63733a11f53b7e6a7b2ed17c9d44dcdf8b2f3a5b86c4533e604536b66a738213004e"
+                },
+                "url": "https://cdn.modrinth.com/data/VCLcF6ou/versions/TgmqWbxv/lets-do-meadow-sawmill-compat-1.0.jar",
+                "filename": "lets-do-meadow-sawmill-compat-1.0.jar",
+                "primary": true,
+                "size": 105676,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "AllTheLeaks",
+      "candidates": []
+    },
+    {
+      "requested": "Architectury API",
+      "candidates": [
+        {
+          "title": "Architectury API",
+          "project_id": "lhGA9TYQ",
+          "slug": "architectury-api",
+          "url": "https://modrinth.com/mod/architectury-api",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "1MKTLiiG",
+            "version_number": "9.2.14+forge",
+            "date_published": "2024-02-26T13:19:00.816154Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "8klw0xxP",
+                "hashes": {
+                  "sha512": "cf67f2050cafa00f0bee42e6d7bef77fdb808ac4f71742f7b4d6d5c1e6ffb49561a5a252f332d2b78a9767bdb5faa284611790dba303fbdc736ae36d794f61c7",
+                  "sha1": "a52918a500ff421180a1cbd1a0cabee712134ec4"
+                },
+                "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/1MKTLiiG/architectury-9.2.14-forge.jar",
+                "filename": "architectury-9.2.14-forge.jar",
+                "primary": true,
+                "size": 580602,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "Platform",
+          "project_id": "i6fiqm5y",
+          "slug": "platform",
+          "url": "https://modrinth.com/mod/platform",
+          "client_side": "optional",
+          "server_side": "optional",
+          "version": {
+            "id": "aWxR0Ksa",
+            "version_number": "1.3.4",
+            "date_published": "2026-06-08T06:02:21.011118Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "vgf667Gv",
+                "hashes": {
+                  "sha1": "066cc06802107183d6a1028a5e358a2bfd505402",
+                  "sha512": "ee1b435217e6f8b936b2e0280f7a6283b6dfff86df6c6d6c67282739ce8e25eb2884f0b96cf2873274ccd713f6c71eae34b3f3a63bcbe512a1f686df42b3e692"
+                },
+                "url": "https://cdn.modrinth.com/data/i6fiqm5y/versions/aWxR0Ksa/Platform-forge-1.20.1-1.3.4.jar",
+                "filename": "Platform-forge-1.20.1-1.3.4.jar",
+                "primary": true,
+                "size": 512461,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Athena",
+      "candidates": [
+        {
+          "title": "Athena",
+          "project_id": "b1ZV3DIJ",
+          "slug": "athena-ctm",
+          "url": "https://modrinth.com/mod/athena-ctm",
+          "client_side": "required",
+          "server_side": "unsupported",
+          "version": {
+            "id": "DULOQFj7",
+            "version_number": "3.1.2",
+            "date_published": "2024-03-12T15:17:55.531944Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "B1Y8ipdC",
+                "hashes": {
+                  "sha1": "2acee24454af859988a691f0506271a465f68f7b",
+                  "sha512": "5a71a1c220eafbfbdb570fa204454352b48d55f238db1a5b398a8c40f6b0fbd8c09a2f6c10def330abdf3daadaa24dfa52471f8de931a93fd99dc7d85b60960b"
+                },
+                "url": "https://cdn.modrinth.com/data/b1ZV3DIJ/versions/DULOQFj7/athena-forge-1.20.1-3.1.2.jar",
+                "filename": "athena-forge-1.20.1-3.1.2.jar",
+                "primary": true,
+                "size": 91808,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Balm",
+      "candidates": [
+        {
+          "title": "Balm",
+          "project_id": "MBAkmtvl",
+          "slug": "balm",
+          "url": "https://modrinth.com/mod/balm",
+          "client_side": "optional",
+          "server_side": "optional",
+          "version": {
+            "id": "dDN38ae7",
+            "version_number": "7.3.44+forge-1.20.1",
+            "date_published": "2026-09-25T05:55:37.282932Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "6xq1cB3N",
+                "hashes": {
+                  "sha512": "bdabc656c7f60d6476a7d8c3d1f7a3d174854c9c4a466a9ff9b220737b717bc8069229471f7cf7eac574ba15e1263b76da8fef2ed1a5273d53e1c9cbf041ad9b",
+                  "sha1": "dae7e647fc54609e66e4f910931be65776352b72"
+                },
+                "url": "https://cdn.modrinth.com/data/MBAkmtvl/versions/dDN38ae7/balm-forge-1.20.1-7.3.44.jar",
+                "filename": "balm-forge-1.20.1-7.3.44.jar",
+                "primary": true,
+                "size": 561741,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "Balmy food",
+          "project_id": "nNhvSbCf",
+          "slug": "balmy-food",
+          "url": "https://modrinth.com/mod/balmy-food",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "zM9XBNVd",
+            "version_number": "3.2.5",
+            "date_published": "2024-08-04T18:44:15.528453Z",
+            "version_type": "beta",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "ovCYhETr",
+                "hashes": {
+                  "sha512": "73a97b637563522946a1ed8af43b1cc75477c92cc22c1e21a89bf5205485c10fd11632f75e7fdf2e565afdd03484772dd707e5ecffdf0c4beb4c2aa8daba5784",
+                  "sha1": "a0e3388d729b1602516f9b9d672ea6c5cb714477"
+                },
+                "url": "https://cdn.modrinth.com/data/nNhvSbCf/versions/zM9XBNVd/Balmy%20Food%203.2.5%20FORGE%201.20.1.jar",
+                "filename": "Balmy Food 3.2.5 FORGE 1.20.1.jar",
+                "primary": true,
+                "size": 8166184,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "Central Heater",
+          "project_id": "ysrTgLl2",
+          "slug": "central-heater",
+          "url": "https://modrinth.com/mod/central-heater",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "1QS6bseQ",
+            "version_number": "1.2.3",
+            "date_published": "2026-02-23T14:31:19.838168Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "ybMW0EKj",
+                "hashes": {
+                  "sha512": "e3c04a211d6d0a996bc2f92a86ae2c0a88abbf376f5e5681033aa563342a3b07bed824fa890c23235e3fc38952e24233536ad0b392b755869c06709f87871e3b",
+                  "sha1": "fc6c1e25589d93406e6bb0a708a1b4892c4dd92b"
+                },
+                "url": "https://cdn.modrinth.com/data/ysrTgLl2/versions/1QS6bseQ/central_heater-1.2.3-all.jar",
+                "filename": "central_heater-1.2.3-all.jar",
+                "primary": true,
+                "size": 1441572,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Beautify",
+      "candidates": [
+        {
+          "title": "CTOV - Beautify Compat",
+          "project_id": "iunZDj0l",
+          "slug": "ctov-beautify-compat",
+          "url": "https://modrinth.com/mod/ctov-beautify-compat",
+          "client_side": "optional",
+          "server_side": "required",
+          "version": {
+            "id": "elBmQR7P",
+            "version_number": "2.0+mod",
+            "date_published": "2023-06-22T03:15:50.381661Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": "Dwqjxrdn",
+                "project_id": "DhSSvaxs",
+                "file_name": null,
+                "dependency_type": "required"
+              },
+              {
+                "version_id": "f51MDpat",
+                "project_id": "fgmhI8kH",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "roOARf61",
+                "hashes": {
+                  "sha1": "b8201794c97213644177b3eaa2cc4a4275c5d50c",
+                  "sha512": "327891ba03becb4c2e70a40f09ff86ba8fb28ff0467f6d66901c7a86727464adced54841e32bcf2d96e90745b452bd7159e9f01d5af70d019c1faf101aaa7fc2"
+                },
+                "url": "https://cdn.modrinth.com/data/iunZDj0l/versions/elBmQR7P/ctov-beautify-compat-2.0.jar",
+                "filename": "ctov-beautify-compat-2.0.jar",
+                "primary": true,
+                "size": 105598,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "Beautify!",
+          "project_id": "9BPuv4vL",
+          "slug": "beautify",
+          "url": "https://modrinth.com/mod/beautify",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "v9NnLuyB",
+            "version_number": "2.0.2",
+            "date_published": "2023-10-04T10:48:18.531094Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "96ilnxCg",
+                "hashes": {
+                  "sha1": "497ab2ebccbf89f15845428cf0e26ca5d9c4ce76",
+                  "sha512": "e1484165b14dd71473c6934647a71e62db3a281cbaaa66ef7eaf4f5325e9807820954156354fc92626c65f1dc17b7e9be4649c1ef6191b83b27bf749af0f302f"
+                },
+                "url": "https://cdn.modrinth.com/data/9BPuv4vL/versions/v9NnLuyB/beautify-2.0.2.jar",
+                "filename": "beautify-2.0.2.jar",
+                "primary": true,
+                "size": 838292,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "Better Snowy Leaves",
+          "project_id": "WmTustZr",
+          "slug": "better-snowy-leaves",
+          "url": "https://modrinth.com/mod/better-snowy-leaves",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "YcxcqwoP",
+            "version_number": "1.4.3+1.20.1",
+            "date_published": "2026-09-07T20:01:11.597662Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "QlPS7B41",
+                "hashes": {
+                  "sha512": "5252b9d1251ee40a545e55dd59d69ab72ae994c20a9f7e846daf7ffae7e8c2780380685007508bac9928a770d78507116041b32e970971a91cf56a7ce083a0df",
+                  "sha1": "55136e80abb6202acdeacdcb6f0e87f92db4a110"
+                },
+                "url": "https://cdn.modrinth.com/data/WmTustZr/versions/YcxcqwoP/snowyleaves-1.4.3-forge%2B1.20.1.jar",
+                "filename": "snowyleaves-1.4.3-forge+1.20.1.jar",
+                "primary": true,
+                "size": 763913,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Carry On",
+      "candidates": [
+        {
+          "title": "Carry On",
+          "project_id": "joEfVgkn",
+          "slug": "carry-on",
+          "url": "https://modrinth.com/mod/carry-on",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "edGQD16r",
+            "version_number": "2.1.2.7",
+            "date_published": "2023-11-19T22:29:28.090790Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "QCjOYbcy",
+                "hashes": {
+                  "sha1": "9999714ca3dd2f2401f0396ca44f3b27c3784c4f",
+                  "sha512": "4f75afb703dd71c322d4e2e27d28d7ab4afeb0c242bcee6d1eb5fef59ee4347352f1ca55f1826743957d2e95a951ed13884356485b0a979b14010915079e2c29"
+                },
+                "url": "https://cdn.modrinth.com/data/joEfVgkn/versions/edGQD16r/carryon-forge-1.20.1-2.1.2.7.jar",
+                "filename": "carryon-forge-1.20.1-2.1.2.7.jar",
+                "primary": true,
+                "size": 439457,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "Carry On Extend",
+          "project_id": "JbqjOoQj",
+          "slug": "carry-on-extend",
+          "url": "https://modrinth.com/mod/carry-on-extend",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "AZyMJCRF",
+            "version_number": "1.4.2",
+            "date_published": "2025-08-09T15:21:03.595254Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "joEfVgkn",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "60hphnBV",
+                "hashes": {
+                  "sha512": "ba50bcfc06e73dba9d6cf52487893ab7232c4fb0d5ab0f9e3a8cca4394c2872294a893924296e299e1380350b69dbdbcac4c20c6537e13bc7fb73ce77d433fc7",
+                  "sha1": "e8fd96c65e36a781949e7fd94e6422a0104346b9"
+                },
+                "url": "https://cdn.modrinth.com/data/JbqjOoQj/versions/AZyMJCRF/CarryOnExtend-1.4.2-1.20.1-Forge.jar",
+                "filename": "CarryOnExtend-1.4.2-1.20.1-Forge.jar",
+                "primary": true,
+                "size": 59528,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "Carry On + Valkyrien Skies Compat",
+          "project_id": "VdZ1CoT5",
+          "slug": "carryon-vs-compat",
+          "url": "https://modrinth.com/mod/carryon-vs-compat",
+          "client_side": "unsupported",
+          "server_side": "required",
+          "version": {
+            "id": "AnFgA2UR",
+            "version_number": "1.0.1",
+            "date_published": "2026-04-19T09:39:11.445034Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "joEfVgkn",
+                "file_name": null,
+                "dependency_type": "required"
+              },
+              {
+                "version_id": null,
+                "project_id": "V5ujR2yw",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "BxwH4cNT",
+                "hashes": {
+                  "sha512": "81dd52761afbb0d03ff7b97d2e00af3b55e609286ee8a86dfe509b95a5de0cb80c5999e309393de5a42bb8b9b44d7a07fe1c5256b78887438084f256d6f8aa5e",
+                  "sha1": "eec572eeb07948c262766adcff4aeff386c954de"
+                },
+                "url": "https://cdn.modrinth.com/data/VdZ1CoT5/versions/AnFgA2UR/CarryOnVSCompat-Forge-1.20.1-1.0.1.jar",
+                "filename": "CarryOnVSCompat-Forge-1.20.1-1.0.1.jar",
+                "primary": true,
+                "size": 76840,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Chipped",
+      "candidates": [
+        {
+          "title": "Chipped",
+          "project_id": "BAscRYKm",
+          "slug": "chipped",
+          "url": "https://modrinth.com/mod/chipped",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "pi3f4er3",
+            "version_number": "3.0.7",
+            "date_published": "2024-10-15T01:04:21.377236Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "b1ZV3DIJ",
+                "file_name": null,
+                "dependency_type": "required"
+              },
+              {
+                "version_id": null,
+                "project_id": "G1hIVOrD",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "jylRPbIh",
+                "hashes": {
+                  "sha1": "25ee2a0846059d8f21d28b94b7e0229b60cb5499",
+                  "sha512": "be1871655e213cf488d5049058200e03655f63b5922b6031af142d79d8958dca6653e7fa501f1aa2fda5544ad44a4f593521a7927a516e99579406a23a187045"
+                },
+                "url": "https://cdn.modrinth.com/data/BAscRYKm/versions/pi3f4er3/chipped-forge-1.20.1-3.0.7.jar",
+                "filename": "chipped-forge-1.20.1-3.0.7.jar",
+                "primary": true,
+                "size": 15060263,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "Reintegrated: Chipped",
+          "project_id": "5Rel2hNl",
+          "slug": "reintegrated-chipped",
+          "url": "https://modrinth.com/mod/reintegrated-chipped",
+          "client_side": "unsupported",
+          "server_side": "required",
+          "version": {
+            "id": "L60LNn5J",
+            "version_number": "1.0.0",
+            "date_published": "2025-02-22T08:11:27.151433Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "XaDC71GB",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "VzF7LS5j",
+                "hashes": {
+                  "sha512": "842fab7544199accebde2e33872439e4f1858d590edd651f90a7147914763f59dc1c25c179809c80161ebc78cd12bef3b847ac385780e5edc950c1503fb2fe78",
+                  "sha1": "2bda4896aa4d1479fdf137e84e49b01699d6fc9e"
+                },
+                "url": "https://cdn.modrinth.com/data/5Rel2hNl/versions/L60LNn5J/reintegrated_chipped-1.0.0.jar",
+                "filename": "reintegrated_chipped-1.0.0.jar",
+                "primary": true,
+                "size": 70847,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "Chipped Express",
+          "project_id": "dQIcJONI",
+          "slug": "chipped-express",
+          "url": "https://modrinth.com/mod/chipped-express",
+          "client_side": "unsupported",
+          "server_side": "required",
+          "version": {
+            "id": "afYSWdXF",
+            "version_number": "1.3.2-20",
+            "date_published": "2025-03-29T13:21:47.831852Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "70aVQP2n",
+                "hashes": {
+                  "sha512": "38ff7853a9380119e0c8657726cd74cd97335db2178e86a9d540c2dcd04f03b4e3bebffbee988818d1f20d8338c47c52c28dfde7da8efad883a3c6cc98bb8e92",
+                  "sha1": "47fd0dc3aff5b5069e657629646541c688383bc0"
+                },
+                "url": "https://cdn.modrinth.com/data/dQIcJONI/versions/afYSWdXF/ChippedExpress-universal-20x.jar",
+                "filename": "ChippedExpress-universal-20x.jar",
+                "primary": true,
+                "size": 2847056,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Easy NPC",
+      "candidates": [
+        {
+          "title": "Easy NPC",
+          "project_id": "CgGEe1h3",
+          "slug": "easy-npc",
+          "url": "https://modrinth.com/mod/easy-npc",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "KWOV0VKY",
+            "version_number": "7.12.1",
+            "date_published": "2026-09-08T23:43:17.584568Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "Epm6R3P2",
+                "file_name": null,
+                "dependency_type": "required"
+              },
+              {
+                "version_id": null,
+                "project_id": "ngLoLP1P",
+                "file_name": null,
+                "dependency_type": "optional"
+              },
+              {
+                "version_id": null,
+                "project_id": "uTGjf7vA",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "sfGaOagt",
+                "hashes": {
+                  "sha1": "e61796be64007f7d3831ac7ad2a43abf58b158fc",
+                  "sha512": "e360ddc158ed3c6db6c27ec6439cd6aa0b1bd5afd64ce7de988c19631d4411f0d76b8e5a9ff19d495231d89e8c616c7c568cd8f5e8ddcf39e86323315ddf1fb3"
+                },
+                "url": "https://cdn.modrinth.com/data/CgGEe1h3/versions/KWOV0VKY/easy_npc_bundle-forge-1.20.1-7.12.1.jar",
+                "filename": "easy_npc_bundle-forge-1.20.1-7.12.1.jar",
+                "primary": true,
+                "size": 25441,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "Easy NPC: Core",
+          "project_id": "Epm6R3P2",
+          "slug": "easy-npc-core",
+          "url": "https://modrinth.com/mod/easy-npc-core",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "b2koOKsW",
+            "version_number": "7.12.1",
+            "date_published": "2026-09-08T23:42:14.027813Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "ngLoLP1P",
+                "file_name": null,
+                "dependency_type": "optional"
+              }
+            ],
+            "files": [
+              {
+                "id": "yd7Dtgcr",
+                "hashes": {
+                  "sha1": "91f9131a1e83eee97071986de6c2c3c803f113cd",
+                  "sha512": "ca9c9de4192018580bf466be6d31aaf226587c5c6d0883dc447cd5e3dacfc7818a43091ea96ed167a453057fed8ad6840433f8f1d332eb7166921a66212b9692"
+                },
+                "url": "https://cdn.modrinth.com/data/Epm6R3P2/versions/b2koOKsW/easy_npc-forge-1.20.1-7.12.1.jar",
+                "filename": "easy_npc-forge-1.20.1-7.12.1.jar",
+                "primary": true,
+                "size": 2962197,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "Easy NPC: Config UI",
+          "project_id": "uTGjf7vA",
+          "slug": "easy-npc-config-ui",
+          "url": "https://modrinth.com/mod/easy-npc-config-ui",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "swcRILIX",
+            "version_number": "7.12.1",
+            "date_published": "2026-09-08T23:42:45.124673Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "Epm6R3P2",
+                "file_name": null,
+                "dependency_type": "required"
+              },
+              {
+                "version_id": null,
+                "project_id": "ngLoLP1P",
+                "file_name": null,
+                "dependency_type": "optional"
+              }
+            ],
+            "files": [
+              {
+                "id": "i76VOSHk",
+                "hashes": {
+                  "sha1": "e9cd504114a48303e6520ed643f20c62976274a8",
+                  "sha512": "a162bfbdeb4e47f6a7e0f75a3cead0b1f5477fccb6c30d045df9345ff4ea402ba4016a67c820e07c4f9d0c7c5bd116c6468b673308a748bd3951e11d7b37f935"
+                },
+                "url": "https://cdn.modrinth.com/data/uTGjf7vA/versions/swcRILIX/easy_npc_config_ui-forge-1.20.1-7.12.1.jar",
+                "filename": "easy_npc_config_ui-forge-1.20.1-7.12.1.jar",
+                "primary": true,
+                "size": 1092567,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Easy NPC Config UI",
+      "candidates": [
+        {
+          "title": "Easy NPC: Config UI",
+          "project_id": "uTGjf7vA",
+          "slug": "easy-npc-config-ui",
+          "url": "https://modrinth.com/mod/easy-npc-config-ui",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "swcRILIX",
+            "version_number": "7.12.1",
+            "date_published": "2026-09-08T23:42:45.124673Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "Epm6R3P2",
+                "file_name": null,
+                "dependency_type": "required"
+              },
+              {
+                "version_id": null,
+                "project_id": "ngLoLP1P",
+                "file_name": null,
+                "dependency_type": "optional"
+              }
+            ],
+            "files": [
+              {
+                "id": "i76VOSHk",
+                "hashes": {
+                  "sha1": "e9cd504114a48303e6520ed643f20c62976274a8",
+                  "sha512": "a162bfbdeb4e47f6a7e0f75a3cead0b1f5477fccb6c30d045df9345ff4ea402ba4016a67c820e07c4f9d0c7c5bd116c6468b673308a748bd3951e11d7b37f935"
+                },
+                "url": "https://cdn.modrinth.com/data/uTGjf7vA/versions/swcRILIX/easy_npc_config_ui-forge-1.20.1-7.12.1.jar",
+                "filename": "easy_npc_config_ui-forge-1.20.1-7.12.1.jar",
+                "primary": true,
+                "size": 1092567,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Easy NPC Core",
+      "candidates": [
+        {
+          "title": "Easy NPC: Core",
+          "project_id": "Epm6R3P2",
+          "slug": "easy-npc-core",
+          "url": "https://modrinth.com/mod/easy-npc-core",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "b2koOKsW",
+            "version_number": "7.12.1",
+            "date_published": "2026-09-08T23:42:14.027813Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "ngLoLP1P",
+                "file_name": null,
+                "dependency_type": "optional"
+              }
+            ],
+            "files": [
+              {
+                "id": "yd7Dtgcr",
+                "hashes": {
+                  "sha1": "91f9131a1e83eee97071986de6c2c3c803f113cd",
+                  "sha512": "ca9c9de4192018580bf466be6d31aaf226587c5c6d0883dc447cd5e3dacfc7818a43091ea96ed167a453057fed8ad6840433f8f1d332eb7166921a66212b9692"
+                },
+                "url": "https://cdn.modrinth.com/data/Epm6R3P2/versions/b2koOKsW/easy_npc-forge-1.20.1-7.12.1.jar",
+                "filename": "easy_npc-forge-1.20.1-7.12.1.jar",
+                "primary": true,
+                "size": 2962197,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Embeddium",
+      "candidates": [
+        {
+          "title": "Embeddium",
+          "project_id": "sk9rgfiA",
+          "slug": "embeddium",
+          "url": "https://modrinth.com/mod/embeddium",
+          "client_side": "required",
+          "server_side": "unsupported",
+          "version": {
+            "id": "UTbfe5d1",
+            "version_number": "0.3.31+mc1.20.1",
+            "date_published": "2024-08-31T23:11:49.184634Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "S1tndFDa",
+                "file_name": null,
+                "dependency_type": "incompatible"
+              },
+              {
+                "version_id": null,
+                "project_id": "4ZqxOvjD",
+                "file_name": null,
+                "dependency_type": "incompatible"
+              }
+            ],
+            "files": [
+              {
+                "id": "ap13BApr",
+                "hashes": {
+                  "sha512": "ffbf2da4685260a4d5c14c621708bd20722563f084f042d3dfb0a7b87f048e39299648c854a93939129da0d23a15a91ec628560d601e76074b08e275f6e132e9",
+                  "sha1": "bb2fa8f3e493af16af9160d049f96c614a1faf2f"
+                },
+                "url": "https://cdn.modrinth.com/data/sk9rgfiA/versions/UTbfe5d1/embeddium-0.3.31%2Bmc1.20.1.jar",
+                "filename": "embeddium-0.3.31+mc1.20.1.jar",
+                "primary": true,
+                "size": 1320675,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "Embeddium (Rubidium) Extra",
+          "project_id": "oY2B1pjg",
+          "slug": "rubidium-extra",
+          "url": "https://modrinth.com/mod/rubidium-extra",
+          "client_side": "required",
+          "server_side": "unsupported",
+          "version": {
+            "id": "F06DXCMX",
+            "version_number": "0.5.4.4+mc1.20.1-build.131",
+            "date_published": "2025-01-19T03:16:19.991940Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "GchcoXML",
+                "file_name": null,
+                "dependency_type": "optional"
+              },
+              {
+                "version_id": null,
+                "project_id": "sk9rgfiA",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "tIwOGT1u",
+                "hashes": {
+                  "sha1": "bb422d5626bf69841e444a3e545c8e71b6928cf8",
+                  "sha512": "4067ef8d94fd4022a5f4feb02250d86c96ab10867f526c64e7e02a409ac6d46fbc32e87ffd735b1203f328d147c291e4a8dda1288c1deb3e232a1e5cb13701fb"
+                },
+                "url": "https://cdn.modrinth.com/data/oY2B1pjg/versions/F06DXCMX/rubidium-extra-0.5.4.4%2Bmc1.20.1-build.131.jar",
+                "filename": "rubidium-extra-0.5.4.4+mc1.20.1-build.131.jar",
+                "primary": true,
+                "size": 568608,
+                "file_type": null
+              },
+              {
+                "id": "WVs2I7Kd",
+                "hashes": {
+                  "sha1": "dc615c561d3a655e447515964e24cb0adb758800",
+                  "sha512": "f2f83434244aa26ff0e0e06f75685d4d337582bde878b484530fa783193fcba0ba5816247ebdcc6b3901c48b1bd0204dd92f570cd3dc309119607a01ddc19795"
+                },
+                "url": "https://cdn.modrinth.com/data/oY2B1pjg/versions/F06DXCMX/rubidium-extra-0.5.4.4%2Bmc1.20.1-build.131-sources.jar",
+                "filename": "rubidium-extra-0.5.4.4+mc1.20.1-build.131-sources.jar",
+                "primary": false,
+                "size": 298182,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "TexTrue's Embeddium Options",
+          "project_id": "S1tndFDa",
+          "slug": "textrues-embeddium-options",
+          "url": "https://modrinth.com/mod/textrues-embeddium-options",
+          "client_side": "required",
+          "server_side": "unsupported",
+          "version": {
+            "id": "r66v9j9a",
+            "version_number": "0.1.5+mc1.20.1",
+            "date_published": "2024-02-06T03:26:10.930111Z",
+            "version_type": "beta",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "sk9rgfiA",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "VDvv5BCr",
+                "hashes": {
+                  "sha1": "f35d0566e43cde0c4ffba9ecf893209b2b96b0c8",
+                  "sha512": "8ab09307f7bf1b61e1486839fddfeef821f50a4c225d41fe500ce60d116ef30d7aaed512286eef7a4609142d7d57968ae441863f1498ffd32f1c7de112a7febe"
+                },
+                "url": "https://cdn.modrinth.com/data/S1tndFDa/versions/r66v9j9a/textrues_embeddium_options-0.1.5%2Bmc1.20.1.jar",
+                "filename": "textrues_embeddium_options-0.1.5+mc1.20.1.jar",
+                "primary": true,
+                "size": 163631,
+                "file_type": null
+              },
+              {
+                "id": "tM6c1abi",
+                "hashes": {
+                  "sha1": "ffbc80a5aa176a94d69644f7971eaf4cf585955b",
+                  "sha512": "67185b4539493b67b5a256520241e33cc11b5cd49a4919ae6008fcfb3ff40096fbb6890e12bda1360737c9da497b3f2c1618c70b54d206fcabcf4c17a87eb2aa"
+                },
+                "url": "https://cdn.modrinth.com/data/S1tndFDa/versions/r66v9j9a/textrues_embeddium_options-0.1.5%2Bmc1.20.1-sources.jar",
+                "filename": "textrues_embeddium_options-0.1.5+mc1.20.1-sources.jar",
+                "primary": false,
+                "size": 124201,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Farmers Delight",
+      "candidates": [
+        {
+          "title": "Christmas Delight (Farmers Delight Addon)",
+          "project_id": "MzcGXq2y",
+          "slug": "christmas-delight-(farmers-delight-addon)",
+          "url": "https://modrinth.com/mod/christmas-delight-(farmers-delight-addon)",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "R24JN3LP",
+            "version_number": "1.0.1",
+            "date_published": "2025-06-24T23:35:03.485144Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "R2OftAxM",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "jwiAFZxk",
+                "hashes": {
+                  "sha512": "4d849306ee8d1d194bbf86de6d9b2e17c6bcc9b9c516bf2d06fc067157152bd9192bb8fc339c443d2d3bc3046b73d97e71b35581bcc267c3a75cdd8cc66ebea9",
+                  "sha1": "38a1cf47ff9624e30222a4afcef26226229e9781"
+                },
+                "url": "https://cdn.modrinth.com/data/MzcGXq2y/versions/R24JN3LP/farmers_delight_christmas_edition-V1.0.1-forge-1.20.1.jar",
+                "filename": "farmers_delight_christmas_edition-V1.0.1-forge-1.20.1.jar",
+                "primary": true,
+                "size": 424038,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "No More Naturalist Cooked Egg (Farmers Delight Compat)",
+          "project_id": "Y0sQ2EA8",
+          "slug": "no-more-naturalist-cooked-egg-(farmers-delight-compat)",
+          "url": "https://modrinth.com/mod/no-more-naturalist-cooked-egg-(farmers-delight-compat)",
+          "client_side": "optional",
+          "server_side": "required",
+          "version": {
+            "id": "GTSUkAAb",
+            "version_number": "1.1+mod",
+            "date_published": "2025-08-30T09:55:17.319263Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "7pCNymxz",
+                "file_name": null,
+                "dependency_type": "required"
+              },
+              {
+                "version_id": null,
+                "project_id": "2cMuAZAp",
+                "file_name": null,
+                "dependency_type": "optional"
+              },
+              {
+                "version_id": null,
+                "project_id": "F8BQNPWX",
+                "file_name": null,
+                "dependency_type": "required"
+              },
+              {
+                "version_id": null,
+                "project_id": "R2OftAxM",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "AvNOksZP",
+                "hashes": {
+                  "sha1": "2443e936e438a3e2ef0238941c30d9a132b89b56",
+                  "sha512": "e287786ad74dc17ef6fa616f14e7819cd427ec43fb536cb519b64b2ba7bf8a4b51f14878f01b775ac1441160dc21f7673162deffe346ab63d697b9d129ae2a36"
+                },
+                "url": "https://cdn.modrinth.com/data/Y0sQ2EA8/versions/GTSUkAAb/no-more-naturalist-cooked-egg-%28farmers-delight-compat%29-1.1.jar",
+                "filename": "no-more-naturalist-cooked-egg-(farmers-delight-compat)-1.1.jar",
+                "primary": true,
+                "size": 7601,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "Farmers Delight Kacchi",
+          "project_id": "3OjjyiQc",
+          "slug": "farmers-delight-kacchi",
+          "url": "https://modrinth.com/mod/farmers-delight-kacchi",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "fTnISns1",
+            "version_number": "2.0.0-1.20.1",
+            "date_published": "2025-05-24T04:34:55.681676Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "R2OftAxM",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "tgiv8iHr",
+                "hashes": {
+                  "sha1": "4cf8f3788a447064e9ff386c527cb78def8d05a7",
+                  "sha512": "6297f4c5814c4d152536e0fb11a9354d59e7aec8c1d63e8f7f296661bf684559136ddbd6789455f8bed689c27e85316995bedd76cbf97e7a65e40fb702852478"
+                },
+                "url": "https://cdn.modrinth.com/data/3OjjyiQc/versions/fTnISns1/kacchi-2.0.0-1.20.1.jar",
+                "filename": "kacchi-2.0.0-1.20.1.jar",
+                "primary": true,
+                "size": 879665,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "FerriteCore",
+      "candidates": [
+        {
+          "title": "FerriteCore",
+          "project_id": "uXXizFIs",
+          "slug": "ferrite-core",
+          "url": "https://modrinth.com/mod/ferrite-core",
+          "client_side": "optional",
+          "server_side": "optional",
+          "version": {
+            "id": "DG5Fn9Sz",
+            "version_number": "6.0.1",
+            "date_published": "2023-10-22T13:40:26.306516Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "5DAl5AST",
+                "hashes": {
+                  "sha1": "417fb6ce8f52abf40bd9d0390371790f9576f8ba",
+                  "sha512": "a1960a7c03dc32d4ccaccaf28afdd9b078758bbd62d15a91d4039a83fa9397a098e89b69591f6bd5190254d9ee97e502504154b9aec764adb8c65f000b75ba2c"
+                },
+                "url": "https://cdn.modrinth.com/data/uXXizFIs/versions/DG5Fn9Sz/ferritecore-6.0.1-forge.jar",
+                "filename": "ferritecore-6.0.1-forge.jar",
+                "primary": true,
+                "size": 123034,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Fullbright",
+      "candidates": [
+        {
+          "title": "Fullbright",
+          "project_id": "L5dyCzCT",
+          "slug": "fullbright-forge",
+          "url": "https://modrinth.com/mod/fullbright-forge",
+          "client_side": "required",
+          "server_side": "unsupported",
+          "version": {
+            "id": "BtCu6IpN",
+            "version_number": "1.0",
+            "date_published": "2024-11-07T16:48:28.163511Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "2ddXk8Sy",
+                "hashes": {
+                  "sha1": "5eb1c66d903987c21fb2302e2a2cc473f7d189b3",
+                  "sha512": "12ef98fcb272f3af76cd7941d58718652fdcda3e1a6a610af4000454bb9387db008df362014c570a7c5a580d765b5237d506000939a683244d4894e99c097f18"
+                },
+                "url": "https://cdn.modrinth.com/data/L5dyCzCT/versions/BtCu6IpN/fullbright-1.0.jar",
+                "filename": "fullbright-1.0.jar",
+                "primary": true,
+                "size": 5085,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "Fullbright",
+          "project_id": "7GWY7CUH",
+          "slug": "fullb",
+          "url": "https://modrinth.com/mod/fullb",
+          "client_side": "required",
+          "server_side": "unsupported",
+          "version": {
+            "id": "VGJ7HRpi",
+            "version_number": "N2",
+            "date_published": "2026-01-16T11:25:27.660890Z",
+            "version_type": "alpha",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "EfHkNTry",
+                "hashes": {
+                  "sha512": "4e076be142e03d4fd8f76954ca84d2afd85ebc62ae72e73b17d664020b9643a0f8eeda6fb14b3f3b048042eba23f309c0340f8675ccc40ab1c1770f2f376c310",
+                  "sha1": "a2727f83d0317267f0648d49672488fb3b96a8b9"
+                },
+                "url": "https://cdn.modrinth.com/data/7GWY7CUH/versions/VGJ7HRpi/forgefullbright.jar",
+                "filename": "forgefullbright.jar",
+                "primary": true,
+                "size": 4512,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "Fullbright [Permanent Night Vision]",
+          "project_id": "fmEdAGPf",
+          "slug": "fullbright-multiplayer",
+          "url": "https://modrinth.com/mod/fullbright-multiplayer",
+          "client_side": "optional",
+          "server_side": "required",
+          "version": {
+            "id": "L4JF904I",
+            "version_number": "1.4+mod",
+            "date_published": "2025-01-01T14:09:31.579262Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "OHynmZgH",
+                "hashes": {
+                  "sha1": "0d0a1a81cd881e29b61a74c6dd4669a463b4d108",
+                  "sha512": "6d7dd218d58f1f1471997094e2ce7ee8c5b1045afcb4561b89a79a46caced384da6cea6d009166794ec763cea4fcd4e9611ec53d1743882854f2d1b103443dbd"
+                },
+                "url": "https://cdn.modrinth.com/data/fmEdAGPf/versions/L4JF904I/fullbright-multiplayer-1.4.jar",
+                "filename": "fullbright-multiplayer-1.4.jar",
+                "primary": true,
+                "size": 14677,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "GeckoLib",
+      "candidates": [
+        {
+          "title": "Geckolib",
+          "project_id": "8BmcQJ2H",
+          "slug": "geckolib",
+          "url": "https://modrinth.com/mod/geckolib",
+          "client_side": "required",
+          "server_side": "optional",
+          "version": {
+            "id": "aC5KMoNg",
+            "version_number": "4.8.4",
+            "date_published": "2026-06-20T11:07:31.386330Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "dqsu6n3D",
+                "hashes": {
+                  "sha512": "443a321a293e3cb92fbbc3c97a38b179a45d1db703cd7bdb123270a9e04e7b7d67d5b06cd8e77a6d4d9139e033e901b9660cccf53ad5f9beaae6d06eae68febf",
+                  "sha1": "50e1407869ef0e909e3bdda9328b8bd7db03fdc0"
+                },
+                "url": "https://cdn.modrinth.com/data/8BmcQJ2H/versions/aC5KMoNg/geckolib-forge-1.20.1-4.8.4.jar",
+                "filename": "geckolib-forge-1.20.1-4.8.4.jar",
+                "primary": true,
+                "size": 1038209,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "Iris/Oculus & GeckoLib Compat",
+          "project_id": "TbriQCWD",
+          "slug": "geckoanimfix",
+          "url": "https://modrinth.com/mod/geckoanimfix",
+          "client_side": "required",
+          "server_side": "unsupported",
+          "version": {
+            "id": "uWXuMaW4",
+            "version_number": "1.0.1",
+            "date_published": "2024-03-16T05:05:39.509736Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "R1S8hVBU",
+                "hashes": {
+                  "sha1": "d5c91ae0cfade2672bf00628721da661a59930c5",
+                  "sha512": "12c17477ad82bad2d80348732ee1e0d19cf1b68ca64527a251af46e664a8a5473bfba4262441d5bb0b5ff2b5f515df4387d4fce327d5906e3c3d073eb9bd9652"
+                },
+                "url": "https://cdn.modrinth.com/data/TbriQCWD/versions/uWXuMaW4/GeckoLibOculusCompat-Forge-1.0.1.jar",
+                "filename": "GeckoLibOculusCompat-Forge-1.0.1.jar",
+                "primary": true,
+                "size": 6239,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "CNPC-Geckolib-Addon",
+          "project_id": "hBV8SdT4",
+          "slug": "cnpc-geckolib-addon",
+          "url": "https://modrinth.com/mod/cnpc-geckolib-addon",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "Imyt0Dtl",
+            "version_number": "1.20.1-1.0.6",
+            "date_published": "2026-03-02T15:59:47.677989Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "o2WcLWmt",
+                "hashes": {
+                  "sha512": "1f03a393a11e35ecbffc821cb27fc65c5b7c4cea0a4d1c5ef2cc93b8436a0ca15b1780a128dfc590af86ed1bc881e323f63a0601f35387553f841009ad1bfc1c",
+                  "sha1": "fbd1e779d70a176e4c4138fecdeefd83cbf8e7e5"
+                },
+                "url": "https://cdn.modrinth.com/data/hBV8SdT4/versions/Imyt0Dtl/CNPC-Gecko-Addon-1.20.1-1.0.6.jar",
+                "filename": "CNPC-Gecko-Addon-1.20.1-1.0.6.jar",
+                "primary": true,
+                "size": 158788,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Handcrafted",
+      "candidates": [
+        {
+          "title": "Handcrafted",
+          "project_id": "pJmCFF0p",
+          "slug": "handcrafted",
+          "url": "https://modrinth.com/mod/handcrafted",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "N7wZwOFy",
+            "version_number": "3.0.6",
+            "date_published": "2024-02-18T20:34:17.603423Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "G1hIVOrD",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "yWrbIMec",
+                "hashes": {
+                  "sha512": "d3c2eb6fad0c274d4ce9e121749252bcbc19a1b0ff5b619255a08f22e3aade51d3f3fd454712de5b1cb8242e78c2f320ab99d2c94f96f372b4089dbc66a8d78e",
+                  "sha1": "f1b9a009529134c736c59d6d192d53a4a25e5e5f"
+                },
+                "url": "https://cdn.modrinth.com/data/pJmCFF0p/versions/N7wZwOFy/handcrafted-forge-1.20.1-3.0.6.jar",
+                "filename": "handcrafted-forge-1.20.1-3.0.6.jar",
+                "primary": true,
+                "size": 7111059,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "Create: Handcrafted",
+          "project_id": "wT60nf59",
+          "slug": "create-handcrafted",
+          "url": "https://modrinth.com/mod/create-handcrafted",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "qil7SYFz",
+            "version_number": "1.0.0",
+            "date_published": "2025-12-08T06:46:02.459667Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "LNytGWDc",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "pOCPblmT",
+                "hashes": {
+                  "sha512": "b32f33138385f530ee71fe6839dab78b1d3d112183f94190471c906fb82f5209aaf1dbb4b945dc2eb32a31f6ef3e6d7dac1d26354cdd36b1c91020de26e2cd3e",
+                  "sha1": "13763512660abf1fab8fddb2118eaeb9a598522b"
+                },
+                "url": "https://cdn.modrinth.com/data/wT60nf59/versions/qil7SYFz/create_handcrafted-1.0.0.jar",
+                "filename": "create_handcrafted-1.0.0.jar",
+                "primary": true,
+                "size": 55669,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "[Let's Do] BloomingNature",
+          "project_id": "4Vno77MY",
+          "slug": "lets-do-bloomingnature",
+          "url": "https://modrinth.com/mod/lets-do-bloomingnature",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "FEPCy4JB",
+            "version_number": "1.0.12",
+            "date_published": "2025-02-08T21:13:56.928294Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "lhGA9TYQ",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "6rk3enET",
+                "hashes": {
+                  "sha1": "360727042ae8579f5cdc95650953b39ea30fabfa",
+                  "sha512": "f2dd7e305a914f7cbac07462a87a03b28d037bb1599fa3a5f371ce91c943e0565c98ece7eda4f19a85059d73afd356617680cc9008a70356f72a5a0a52b509b0"
+                },
+                "url": "https://cdn.modrinth.com/data/4Vno77MY/versions/FEPCy4JB/letsdo-bloomingnature-forge-1.0.12.jar",
+                "filename": "letsdo-bloomingnature-forge-1.0.12.jar",
+                "primary": true,
+                "size": 3094193,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Journeyman",
+      "candidates": []
+    },
+    {
+      "requested": "Just Enough Items",
+      "candidates": [
+        {
+          "title": "Just Enough Items (JEI)",
+          "project_id": "u6dRKJwZ",
+          "slug": "jei",
+          "url": "https://modrinth.com/mod/jei",
+          "client_side": "optional",
+          "server_side": "optional",
+          "version": {
+            "id": "9jqubC9n",
+            "version_number": "15.56.0.205",
+            "date_published": "2026-08-31T13:57:20.356805Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "V6Nv4XOX",
+                "hashes": {
+                  "sha1": "7f64b7f8fde7f001ef054dabe3618a8780ba2650",
+                  "sha512": "1306fe15c81d54aa9ff8f3d9f04812c0d61ffaaae433c29621f926db8f8e2c898669ccdd99e025849859d38b7a2eac170c466390b467f4dfa77542b5dbdd1678"
+                },
+                "url": "https://cdn.modrinth.com/data/u6dRKJwZ/versions/9jqubC9n/jei-1.20.1-forge-15.56.0.205.jar",
+                "filename": "jei-1.20.1-forge-15.56.0.205.jar",
+                "primary": true,
+                "size": 1778129,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "Roughly Enough Items (REI)",
+          "project_id": "nfn13YXA",
+          "slug": "rei",
+          "url": "https://modrinth.com/mod/rei",
+          "client_side": "optional",
+          "server_side": "optional",
+          "version": {
+            "id": "IoS2AjPk",
+            "version_number": "12.1.785+forge",
+            "date_published": "2024-10-26T09:09:18.608500Z",
+            "version_type": "beta",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "9s6osm5g",
+                "file_name": null,
+                "dependency_type": "required"
+              },
+              {
+                "version_id": null,
+                "project_id": "lhGA9TYQ",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "t0YTA2rf",
+                "hashes": {
+                  "sha512": "c229232ce96368e16631ac0557caa2b14f3ee2c5d587241da7889b142aecb61eb68dd400f60f368951ffc741f2d375732daf2bf5a46ced239a6e4bb692066110",
+                  "sha1": "9289cb01c920c1e539034f53ba3736095a2d4410"
+                },
+                "url": "https://cdn.modrinth.com/data/nfn13YXA/versions/IoS2AjPk/RoughlyEnoughItems-12.1.785-forge.jar",
+                "filename": "RoughlyEnoughItems-12.1.785-forge.jar",
+                "primary": true,
+                "size": 2384003,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "JEITweaker",
+          "project_id": "EiEOyeoL",
+          "slug": "jeitweaker",
+          "url": "https://modrinth.com/mod/jeitweaker",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "BTMxPqmn",
+            "version_number": "8.0.6",
+            "date_published": "2023-10-04T09:40:38.182468Z",
+            "version_type": "beta",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "Xg35A4rS",
+                "file_name": null,
+                "dependency_type": "required"
+              },
+              {
+                "version_id": null,
+                "project_id": "u6dRKJwZ",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "dR9vPkUa",
+                "hashes": {
+                  "sha512": "955e8b8a30bffc25dd78537e6330010fffc43815614caa5f8d33d5dd8a61343be9aaab5b364cc1ff28dd6015ebe79150e630e8db24a52b2f308b4c9d540283be",
+                  "sha1": "99fc261537284abb20c7db4e4cfab76a1812b6bf"
+                },
+                "url": "https://cdn.modrinth.com/data/EiEOyeoL/versions/BTMxPqmn/JeiTweaker-forge-1.20.1-8.0.6.jar",
+                "filename": "JeiTweaker-forge-1.20.1-8.0.6.jar",
+                "primary": true,
+                "size": 122689,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Legacy Lets Do Bakery",
+      "candidates": [
+        {
+          "title": "Legacy: [Let's Do] Bakery",
+          "project_id": "WFwYiVoG",
+          "slug": "lets-do-bakery",
+          "url": "https://modrinth.com/mod/lets-do-bakery",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "Jo8EwiDR",
+            "version_number": "1.1.15",
+            "date_published": "2024-07-26T07:05:46.530859Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "lhGA9TYQ",
+                "file_name": null,
+                "dependency_type": "required"
+              },
+              {
+                "version_id": null,
+                "project_id": "4XJZeZbM",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "N5Lkm0QJ",
+                "hashes": {
+                  "sha512": "2981b77f946fbc68638a77a16c0cecab82cab3b0f71d956dc22d7c9880ee3109103b6486d4531ecbc1069d9e7681100f6f83414c09a49922d0c993b09eaf2dbb",
+                  "sha1": "c5cd44088089fca03f3291b851dcb0d00018fecb"
+                },
+                "url": "https://cdn.modrinth.com/data/WFwYiVoG/versions/Jo8EwiDR/letsdo-bakery-forge-1.1.15.jar",
+                "filename": "letsdo-bakery-forge-1.1.15.jar",
+                "primary": true,
+                "size": 1539376,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Macaws Doors",
+      "candidates": [
+        {
+          "title": "Macaw's Doors",
+          "project_id": "kNxa8z3e",
+          "slug": "macaws-doors",
+          "url": "https://modrinth.com/mod/macaws-doors",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "n8BlIUm3",
+            "version_number": "1.1.5",
+            "date_published": "2026-02-13T14:07:06.416874Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "JXIIK6zq",
+                "hashes": {
+                  "sha1": "fe6a9eb2fbc78300a6286fd25854c9f087e689a6",
+                  "sha512": "dc9180f0cfb049907be62a3d6429b7c469b4d7a44c1c5a8b9617aa673843f880c354febf22a22d4a995ea2ec9e5a75bb4628dc499bfb4a199b2b9e6a9ba39e26"
+                },
+                "url": "https://cdn.modrinth.com/data/kNxa8z3e/versions/n8BlIUm3/mcw-doors-1.1.5-mc1.20.1forge.jar",
+                "filename": "mcw-doors-1.1.5-mc1.20.1forge.jar",
+                "primary": true,
+                "size": 1246753,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Macaws Fences Walls",
+      "candidates": [
+        {
+          "title": "Macaw's Fences and Walls",
+          "project_id": "GmwLse2I",
+          "slug": "macaws-fences-and-walls",
+          "url": "https://modrinth.com/mod/macaws-fences-and-walls",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "HnyfcyJ9",
+            "version_number": "1.2.1",
+            "date_published": "2025-12-08T16:18:28.642946Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "zERqhM2p",
+                "hashes": {
+                  "sha1": "d24bc6e1ba7f04e058db019ae5ca3d10edd9510a",
+                  "sha512": "092afb73ed251fb4261c537bebe1a01bb3e6a96775f4a2244ec21927486955fe240e053ec23b6b575a994ef80e70a27130beb92f3de6ddf71b1d06ddeeba53ef"
+                },
+                "url": "https://cdn.modrinth.com/data/GmwLse2I/versions/HnyfcyJ9/mcw-mcwfences-1.2.1-mc1.20.1forge.jar",
+                "filename": "mcw-mcwfences-1.2.1-mc1.20.1forge.jar",
+                "primary": true,
+                "size": 708634,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Macaws Furniture",
+      "candidates": [
+        {
+          "title": "Macaw's Furniture",
+          "project_id": "dtWC90iB",
+          "slug": "macaws-furniture",
+          "url": "https://modrinth.com/mod/macaws-furniture",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "mvGf4LNK",
+            "version_number": "3.4.1",
+            "date_published": "2025-11-24T00:15:39.603459Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "YIHwzFM0",
+                "hashes": {
+                  "sha512": "8f15825b2a7dbee68f9fde4f6c6d56b0064365832459ac526e8bdf5d00bf5a5348cc19540dc89f2e78b1746941357cc4382ffa409dacca47fe1877a486af60db",
+                  "sha1": "c05189646bbde5c0d4486b93de0d707115f8445c"
+                },
+                "url": "https://cdn.modrinth.com/data/dtWC90iB/versions/mvGf4LNK/mcw-furniture-3.4.1-mc1.20.1forge.jar",
+                "filename": "mcw-furniture-3.4.1-mc1.20.1forge.jar",
+                "primary": true,
+                "size": 2174615,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Macaws Roofs",
+      "candidates": [
+        {
+          "title": "Macaw's Roofs",
+          "project_id": "B8jaH3P1",
+          "slug": "macaws-roofs",
+          "url": "https://modrinth.com/mod/macaws-roofs",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "31e80GhE",
+            "version_number": "2.3.2",
+            "date_published": "2025-05-04T09:52:43.036408Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "aNBNr7oB",
+                "hashes": {
+                  "sha512": "ff7d8be7efb2c427dba8898ed181804b93d2d7523227a190a4c100370f485e5e734c83930b6888652c9469bf01b89a3c7fd2cd00e37c5b6021ec9bd3aa6ea3e3",
+                  "sha1": "2b02beb2bd177aa695dc6fc030fc3bb230ca96b1"
+                },
+                "url": "https://cdn.modrinth.com/data/B8jaH3P1/versions/31e80GhE/mcw-roofs-2.3.2-mc1.20.1forge.jar",
+                "filename": "mcw-roofs-2.3.2-mc1.20.1forge.jar",
+                "primary": true,
+                "size": 1864023,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "[DISCONTINUED] Macaw's Roofs - Oh The Biomes You'll Go",
+          "project_id": "smN4zlYE",
+          "slug": "macaws-roofs-oh-the-biomes-youll-go",
+          "url": "https://modrinth.com/mod/macaws-roofs-oh-the-biomes-youll-go",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "jG9BpJQD",
+            "version_number": "1.20.1-1.0",
+            "date_published": "2024-07-30T07:52:19.456847Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "kkmrDlKT",
+                "file_name": null,
+                "dependency_type": "required"
+              },
+              {
+                "version_id": null,
+                "project_id": "NTi7d3Xc",
+                "file_name": null,
+                "dependency_type": "required"
+              },
+              {
+                "version_id": null,
+                "project_id": "8BmcQJ2H",
+                "file_name": null,
+                "dependency_type": "required"
+              },
+              {
+                "version_id": null,
+                "project_id": "g8NOG5OR",
+                "file_name": null,
+                "dependency_type": "required"
+              },
+              {
+                "version_id": null,
+                "project_id": "B8jaH3P1",
+                "file_name": null,
+                "dependency_type": "required"
+              },
+              {
+                "version_id": null,
+                "project_id": "ziOp6EO8",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "P6bejOrv",
+                "hashes": {
+                  "sha512": "64a755c68fea1e3946a57717c320a8a7c9bf020a3ade5220f95ab4230acad9fee9f4056d6bb654c657ca7137d3f8b4d0efbcd86b65c1244986daf4f16923854b",
+                  "sha1": "25215dc4fe96be05ac7b80efe8b150386c5de182"
+                },
+                "url": "https://cdn.modrinth.com/data/smN4zlYE/versions/jG9BpJQD/macawsroofsbyg-1.20.1-1.0.jar",
+                "filename": "macawsroofsbyg-1.20.1-1.0.jar",
+                "primary": true,
+                "size": 1979904,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Macaws Trapdoors",
+      "candidates": [
+        {
+          "title": "Macaw's Trapdoors",
+          "project_id": "n2fvCDlM",
+          "slug": "macaws-trapdoors",
+          "url": "https://modrinth.com/mod/macaws-trapdoors",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "5B4awHaA",
+            "version_number": "1.1.5",
+            "date_published": "2025-11-24T03:53:20.635055Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "dBGYkBbu",
+                "hashes": {
+                  "sha512": "bbe9751bd9302968a5984a01d8836c1b3f2c862cbbb9a1de13268a15dd2da35d305a4a5585ec481e473bd6e06e2a9275ef5f4197368aa9f0db6275520ac100c4",
+                  "sha1": "1b3b4b40041346b19bc9ab280b288a9f6b77b513"
+                },
+                "url": "https://cdn.modrinth.com/data/n2fvCDlM/versions/5B4awHaA/mcw-trapdoors-1.1.5-mc1.20.1forge.jar",
+                "filename": "mcw-trapdoors-1.1.5-mc1.20.1forge.jar",
+                "primary": true,
+                "size": 604510,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Macaws Windows",
+      "candidates": [
+        {
+          "title": "Macaw's Windows",
+          "project_id": "C7I0BCni",
+          "slug": "macaws-windows",
+          "url": "https://modrinth.com/mod/macaws-windows",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "SSIlzrPf",
+            "version_number": "2.4.2",
+            "date_published": "2025-12-10T21:43:27.750096Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "qoC8o4An",
+                "hashes": {
+                  "sha512": "904a1aba082944f14dd012704b5867e1da2ba51e0139c209c7dcd0303bb170f05d78626027dceec2a2d6cf607f6f1324646637d32d12bc085617d9e60fd9072c",
+                  "sha1": "214da89b2153d496343bde8626283975e358edbd"
+                },
+                "url": "https://cdn.modrinth.com/data/C7I0BCni/versions/SSIlzrPf/mcw-mcwwindows-2.4.2-mc1.20.1forge.jar",
+                "filename": "mcw-mcwwindows-2.4.2-mc1.20.1forge.jar",
+                "primary": true,
+                "size": 1320692,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "MiguelEconomy",
+      "candidates": [
+        {
+          "title": "MiguelEconomy",
+          "project_id": "u4zmZo7I",
+          "slug": "migueleconomy",
+          "url": "https://modrinth.com/mod/migueleconomy",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "YWgCwGim",
+            "version_number": "1.1.4",
+            "date_published": "2026-03-08T04:28:13.493995Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "RO8kNcQW",
+                "hashes": {
+                  "sha1": "a7a3e08b804ce91819500784143cc959d01b4e24",
+                  "sha512": "c39cd37ada26fd0e00c6bbc4155309f962fee65118d209f7caeeaec0b6b598f1a14c3db66b2e05097e833750bd145c086107c90353809d7ca9e6f14aa6209ac8"
+                },
+                "url": "https://cdn.modrinth.com/data/u4zmZo7I/versions/YWgCwGim/migueleconomy-1.1.4.jar",
+                "filename": "migueleconomy-1.1.4.jar",
+                "primary": true,
+                "size": 1378991,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "MiguelEconomy X EasyNPC",
+          "project_id": "1nSZMgso",
+          "slug": "migueleconomy-x-easynpc",
+          "url": "https://modrinth.com/mod/migueleconomy-x-easynpc",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "4IUPLF0v",
+            "version_number": "0.1.0-1.20.1",
+            "date_published": "2026-04-26T05:07:48.439540Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "WbIysxag",
+                "hashes": {
+                  "sha1": "972eb5bba890e8fce0e5100118872862a66c9852",
+                  "sha512": "9a8f3eb3b01b257fa4fc405e96ff1db9edee6b4996188d8e8639f3232c561c8e4b1690787b9a537a37f869ed79a0dac35e63a4e79694a4b0f4623d147efa872e"
+                },
+                "url": "https://cdn.modrinth.com/data/1nSZMgso/versions/4IUPLF0v/migueleconomy_easynpc-0.1.0-1.20.1.jar",
+                "filename": "migueleconomy_easynpc-0.1.0-1.20.1.jar",
+                "primary": true,
+                "size": 141109,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "MiguelCrates",
+          "project_id": "SwuBKi3b",
+          "slug": "miguelcrates",
+          "url": "https://modrinth.com/mod/miguelcrates",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "agtIYs6d",
+            "version_number": "1.0.4",
+            "date_published": "2026-05-13T20:58:05.987721Z",
+            "version_type": "beta",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "kgR1cqn1",
+                "hashes": {
+                  "sha512": "2590fbe526306b43b79682d6f1fc5fce1d4a9ecd8e8fe6d74728b9c79defd1e218ed2ba57763265336fb06803d6b35d10be2a4b4a324f803d765f82ae367df99",
+                  "sha1": "d196d6ff582cb08bb631d7516545d8f72d237596"
+                },
+                "url": "https://cdn.modrinth.com/data/SwuBKi3b/versions/agtIYs6d/miguelcrates-1.20.1-1.0.0.jar",
+                "filename": "miguelcrates-1.20.1-1.0.0.jar",
+                "primary": true,
+                "size": 399864,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "MiguelEconomy EasyNPC",
+      "candidates": [
+        {
+          "title": "MiguelEconomy X EasyNPC",
+          "project_id": "1nSZMgso",
+          "slug": "migueleconomy-x-easynpc",
+          "url": "https://modrinth.com/mod/migueleconomy-x-easynpc",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "4IUPLF0v",
+            "version_number": "0.1.0-1.20.1",
+            "date_published": "2026-04-26T05:07:48.439540Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "WbIysxag",
+                "hashes": {
+                  "sha1": "972eb5bba890e8fce0e5100118872862a66c9852",
+                  "sha512": "9a8f3eb3b01b257fa4fc405e96ff1db9edee6b4996188d8e8639f3232c561c8e4b1690787b9a537a37f869ed79a0dac35e63a4e79694a4b0f4623d147efa872e"
+                },
+                "url": "https://cdn.modrinth.com/data/1nSZMgso/versions/4IUPLF0v/migueleconomy_easynpc-0.1.0-1.20.1.jar",
+                "filename": "migueleconomy_easynpc-0.1.0-1.20.1.jar",
+                "primary": true,
+                "size": 141109,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "ModernFix",
+      "candidates": [
+        {
+          "title": "ModernFix",
+          "project_id": "nmDcB62a",
+          "slug": "modernfix",
+          "url": "https://modrinth.com/mod/modernfix",
+          "client_side": "optional",
+          "server_side": "optional",
+          "version": {
+            "id": "jAZ7Ge3d",
+            "version_number": "5.27.83+mc1.20.1",
+            "date_published": "2026-08-31T02:28:56.728812Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "22VuCZyg",
+                "hashes": {
+                  "sha512": "2987d43ab991c31c94e53d16fe0694dd29a405fc7cdf6be69f5bf5b3d6a06a5d1b82ba8f5d8ecb4df45e592c649e39bc69787caa62b3417b5548392793be6e55",
+                  "sha1": "24109106b51846d387aa00c06d1445c35410c31c"
+                },
+                "url": "https://cdn.modrinth.com/data/nmDcB62a/versions/jAZ7Ge3d/modernfix-forge-5.27.83%2Bmc1.20.1.jar",
+                "filename": "modernfix-forge-5.27.83+mc1.20.1.jar",
+                "primary": true,
+                "size": 1003230,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Oculus",
+      "candidates": [
+        {
+          "title": "Oculus",
+          "project_id": "GchcoXML",
+          "slug": "oculus",
+          "url": "https://modrinth.com/mod/oculus",
+          "client_side": "required",
+          "server_side": "unsupported",
+          "version": {
+            "id": "iQ1SwGc3",
+            "version_number": "1.20.1-1.8.0",
+            "date_published": "2024-12-24T23:33:42.216148Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "sk9rgfiA",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "7aacZyV2",
+                "hashes": {
+                  "sha1": "984f774e71790deaec674c7587bd24e0711871b2",
+                  "sha512": "1bb4ac77400d6684347988ed298a692c2cb15cf7923693607eb8739b171a20fef7412259e9e157111d9ce21779badab386029956f7d2283a9e611722a373e9d5"
+                },
+                "url": "https://cdn.modrinth.com/data/GchcoXML/versions/iQ1SwGc3/oculus-mc1.20.1-1.8.0.jar",
+                "filename": "oculus-mc1.20.1-1.8.0.jar",
+                "primary": true,
+                "size": 2851119,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "Iris/Oculus & GeckoLib Compat",
+          "project_id": "TbriQCWD",
+          "slug": "geckoanimfix",
+          "url": "https://modrinth.com/mod/geckoanimfix",
+          "client_side": "required",
+          "server_side": "unsupported",
+          "version": {
+            "id": "uWXuMaW4",
+            "version_number": "1.0.1",
+            "date_published": "2024-03-16T05:05:39.509736Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "R1S8hVBU",
+                "hashes": {
+                  "sha1": "d5c91ae0cfade2672bf00628721da661a59930c5",
+                  "sha512": "12c17477ad82bad2d80348732ee1e0d19cf1b68ca64527a251af46e664a8a5473bfba4262441d5bb0b5ff2b5f515df4387d4fce327d5906e3c3d073eb9bd9652"
+                },
+                "url": "https://cdn.modrinth.com/data/TbriQCWD/versions/uWXuMaW4/GeckoLibOculusCompat-Forge-1.0.1.jar",
+                "filename": "GeckoLibOculusCompat-Forge-1.0.1.jar",
+                "primary": true,
+                "size": 6239,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "Iris & Oculus Flywheel Compat",
+          "project_id": "ndHYMY2K",
+          "slug": "iris-flw-compat",
+          "url": "https://modrinth.com/mod/iris-flw-compat",
+          "client_side": "required",
+          "server_side": "unsupported",
+          "version": {
+            "id": "9fvGbqdA",
+            "version_number": "1.1.2",
+            "date_published": "2024-08-07T01:57:00.243275Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "LNytGWDc",
+                "file_name": null,
+                "dependency_type": "optional"
+              },
+              {
+                "version_id": null,
+                "project_id": "GchcoXML",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "YcQRqiEw",
+                "hashes": {
+                  "sha512": "940bf4b2387289a882f800b2b256f002f8a658b23d9edf10900a0cb636f680f986065aa7cc09d2b963364cc680dfb489bdca4d480ad20a3cc9b5e531b8f5ae64",
+                  "sha1": "0f64671bdd1d460e5f864abe0ae46639e3207a06"
+                },
+                "url": "https://cdn.modrinth.com/data/ndHYMY2K/versions/9fvGbqdA/oculus-flywheel-compat-forge1.20.1%2B1.1.2.jar",
+                "filename": "oculus-flywheel-compat-forge1.20.1+1.1.2.jar",
+                "primary": true,
+                "size": 69275,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Resourceful Lib",
+      "candidates": [
+        {
+          "title": "Resourceful Lib",
+          "project_id": "G1hIVOrD",
+          "slug": "resourceful-lib",
+          "url": "https://modrinth.com/mod/resourceful-lib",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "OhsHaCcW",
+            "version_number": "2.1.29",
+            "date_published": "2024-08-24T19:45:23.325509Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "qk2F9Pnn",
+                "hashes": {
+                  "sha512": "8dbe951d431545a7d18081a8b11a52a248e6d8ff9862ae6462b0f5a6f57ff523af12704c3adb071ae99a7c5c1dd895bd7875dea59f9c4956c1597a668b6e8820",
+                  "sha1": "6fc590a7c56a720fec57e290cbb0a106efbb3ffa"
+                },
+                "url": "https://cdn.modrinth.com/data/G1hIVOrD/versions/OhsHaCcW/resourcefullib-forge-1.20.1-2.1.29.jar",
+                "filename": "resourcefullib-forge-1.20.1-2.1.29.jar",
+                "primary": true,
+                "size": 432753,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Sophisticated Backpacks",
+      "candidates": [
+        {
+          "title": "Sophisticated Backpacks",
+          "project_id": "TyCTlI4b",
+          "slug": "sophisticated-backpacks",
+          "url": "https://modrinth.com/mod/sophisticated-backpacks",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "u2NNJgIW",
+            "version_number": "1.20.1-3.26.4.2172",
+            "date_published": "2026-09-27T18:23:16.444753Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "vRYk0bv7",
+                "file_name": null,
+                "dependency_type": "optional"
+              },
+              {
+                "version_id": null,
+                "project_id": "BAscRYKm",
+                "file_name": null,
+                "dependency_type": "optional"
+              },
+              {
+                "version_id": null,
+                "project_id": "DMu0oBKf",
+                "file_name": null,
+                "dependency_type": "optional"
+              },
+              {
+                "version_id": null,
+                "project_id": "u6dRKJwZ",
+                "file_name": null,
+                "dependency_type": "optional"
+              },
+              {
+                "version_id": null,
+                "project_id": "nmoqTijg",
+                "file_name": null,
+                "dependency_type": "required"
+              },
+              {
+                "version_id": null,
+                "project_id": "vvuO3ImH",
+                "file_name": null,
+                "dependency_type": "optional"
+              },
+              {
+                "version_id": null,
+                "project_id": "b1fMg6sH",
+                "file_name": null,
+                "dependency_type": "optional"
+              }
+            ],
+            "files": [
+              {
+                "id": "bjZnyBOp",
+                "hashes": {
+                  "sha512": "88dc2088114f62eda46429300e5e035efe9e4a1208fbe4131224951ff16f42083c9c883cb10f8011941cbb4017fcc098c762ec51921cd840d1c87bce49598d89",
+                  "sha1": "86c582f04c221ad564b14ddf7c6df15e2804838b"
+                },
+                "url": "https://cdn.modrinth.com/data/TyCTlI4b/versions/u2NNJgIW/sophisticatedbackpacks-1.20.1-3.26.4.2172.jar",
+                "filename": "sophisticatedbackpacks-1.20.1-3.26.4.2172.jar",
+                "primary": true,
+                "size": 1214552,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "Sophisticated Backpacks Create Integration",
+          "project_id": "s85zLEDe",
+          "slug": "sophisticated-backpacks-create-integration",
+          "url": "https://modrinth.com/mod/sophisticated-backpacks-create-integration",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "DzJLMA1c",
+            "version_number": "1.20.1-0.1.11.173",
+            "date_published": "2026-09-27T00:32:21.597172Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "LNytGWDc",
+                "file_name": null,
+                "dependency_type": "required"
+              },
+              {
+                "version_id": null,
+                "project_id": "u6dRKJwZ",
+                "file_name": null,
+                "dependency_type": "optional"
+              },
+              {
+                "version_id": null,
+                "project_id": "TyCTlI4b",
+                "file_name": null,
+                "dependency_type": "required"
+              },
+              {
+                "version_id": null,
+                "project_id": "nmoqTijg",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "IDWcLs8i",
+                "hashes": {
+                  "sha1": "b0bdb550f2b4d2acbbdf0d6782475a7faed4d370",
+                  "sha512": "df2f71ea496d99bd218a1248a50d0517f77d0d43c0b07e817dad6c2a7ef7b8a8661ff81e37199bd2566839758527e9455cb99d458b6d65bd8d875e8a433822f7"
+                },
+                "url": "https://cdn.modrinth.com/data/s85zLEDe/versions/DzJLMA1c/sophisticatedbackpackscreateintegration-1.20.1-0.1.11.173.jar",
+                "filename": "sophisticatedbackpackscreateintegration-1.20.1-0.1.11.173.jar",
+                "primary": true,
+                "size": 98050,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "Sophisticated Backpacks easier upgrade",
+          "project_id": "8RICmZfy",
+          "slug": "sophisticated-backpacks-easier-upgrade",
+          "url": "https://modrinth.com/mod/sophisticated-backpacks-easier-upgrade",
+          "client_side": "required",
+          "server_side": "unsupported",
+          "version": {
+            "id": "PtrEgA9Q",
+            "version_number": "2.1.0+mc1.20.1",
+            "date_published": "2026-04-12T16:34:56.491391Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "TyCTlI4b",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "URzOShKx",
+                "hashes": {
+                  "sha1": "01078c976ecb051bc0dd1d621f34f476d43d1d87",
+                  "sha512": "78ab90faf21903ae15db9b8465b4f84591905648ba30545d822a786bb07ce88a715a38b805bb5fb8858eeca0465b98a278d2111ee12d0807d23870097931f15a"
+                },
+                "url": "https://cdn.modrinth.com/data/8RICmZfy/versions/PtrEgA9Q/sbue-2.1.0%2Bmc1.20.1-unknown.jar",
+                "filename": "sbue-2.1.0+mc1.20.1-unknown.jar",
+                "primary": true,
+                "size": 39760,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Sophisticated Core",
+      "candidates": [
+        {
+          "title": "Sophisticated Core",
+          "project_id": "nmoqTijg",
+          "slug": "sophisticated-core",
+          "url": "https://modrinth.com/mod/sophisticated-core",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "7LbBi96J",
+            "version_number": "1.20.1-1.5.2.2346",
+            "date_published": "2026-09-27T00:20:01.825199Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "P9xmNUeT",
+                "hashes": {
+                  "sha1": "e9e7b34bb68ec2aca0f42232919b2cee41a9d251",
+                  "sha512": "a085957df06965b5b00f5b0e44012fb231838dd403c9b1f4b50ec6f72b350961395821757074ca7b405715d4741fe1d243ad0e23b85b4f1c5008bf36cb57e2e1"
+                },
+                "url": "https://cdn.modrinth.com/data/nmoqTijg/versions/7LbBi96J/sophisticatedcore-1.20.1-1.5.2.2346.jar",
+                "filename": "sophisticatedcore-1.20.1-1.5.2.2346.jar",
+                "primary": true,
+                "size": 1756100,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Waystones",
+      "candidates": [
+        {
+          "title": "Waystones",
+          "project_id": "LOpKHB2A",
+          "slug": "waystones",
+          "url": "https://modrinth.com/mod/waystones",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "Y0IgdaoP",
+            "version_number": "14.1.21+forge-1.20.1",
+            "date_published": "2026-09-08T12:21:29.593014Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "MBAkmtvl",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "jv5qPLqn",
+                "hashes": {
+                  "sha1": "61952fb248a9689fe46d5ffb223fcc41e31fef1a",
+                  "sha512": "3798eef2f81c2f6066d9dc2dc22bbe9d1c4b62d5aa494c592ffe67ee7f4fb8021361505b3c0b1358d4f9af27e50b1f12d29afb3b4b0b362b5ab227e8be171047"
+                },
+                "url": "https://cdn.modrinth.com/data/LOpKHB2A/versions/Y0IgdaoP/waystones-forge-1.20.1-14.1.21.jar",
+                "filename": "waystones-forge-1.20.1-14.1.21.jar",
+                "primary": true,
+                "size": 536782,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "Xaero's Minimap & World Map - Waystones Compatibility",
+          "project_id": "7mLhyqIY",
+          "slug": "xaeros-minimap-world-map-waystones-compatibility-forge",
+          "url": "https://modrinth.com/mod/xaeros-minimap-world-map-waystones-compatibility-forge",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "NujdXicM",
+            "version_number": "1.1",
+            "date_published": "2026-03-21T21:44:32.042534Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "yY7Lr8Bt",
+                "hashes": {
+                  "sha512": "b9df76f1b55cfc5b3f8b1526007366e9165db93529dd3e79404941d31c133c7955594651a00d8ca1220a3731e1feda875badd5de5fe1916de84094de9d39c72b",
+                  "sha1": "d88355bcf6d731c067ed49146a090758356bd028"
+                },
+                "url": "https://cdn.modrinth.com/data/7mLhyqIY/versions/NujdXicM/xaeros_waystones_compatibility-1.1%20-%201.20.1.jar",
+                "filename": "xaeros_waystones_compatibility-1.1 - 1.20.1.jar",
+                "primary": true,
+                "size": 325969,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "Waystones Teleport Pets",
+          "project_id": "VaCl9OtG",
+          "slug": "waystones-teleport-pets",
+          "url": "https://modrinth.com/mod/waystones-teleport-pets",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "Yh4b40rs",
+            "version_number": "1.2",
+            "date_published": "2023-12-14T16:26:35.367137Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "LOpKHB2A",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "xhN7BTTC",
+                "hashes": {
+                  "sha1": "d64055c58edcdbedfd6ebc40dba0b678a6818e57",
+                  "sha512": "c4e13812dbd77a07f585b056f830412f6ebb27e47b567b7c82ac3a5e9a9c20e999972cc52638a18a4f7f0670ad16dfa5a770f86e3c13f888ca65cbbd2f8113c4"
+                },
+                "url": "https://cdn.modrinth.com/data/VaCl9OtG/versions/Yh4b40rs/WaystonesTeleportPets-1.20-1.20.1--1.2.jar",
+                "filename": "WaystonesTeleportPets-1.20-1.20.1--1.2.jar",
+                "primary": true,
+                "size": 119264,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "Waystones Teleport Pets",
+      "candidates": [
+        {
+          "title": "Waystones Teleport Pets",
+          "project_id": "VaCl9OtG",
+          "slug": "waystones-teleport-pets",
+          "url": "https://modrinth.com/mod/waystones-teleport-pets",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "Yh4b40rs",
+            "version_number": "1.2",
+            "date_published": "2023-12-14T16:26:35.367137Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "LOpKHB2A",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "xhN7BTTC",
+                "hashes": {
+                  "sha1": "d64055c58edcdbedfd6ebc40dba0b678a6818e57",
+                  "sha512": "c4e13812dbd77a07f585b056f830412f6ebb27e47b567b7c82ac3a5e9a9c20e999972cc52638a18a4f7f0670ad16dfa5a770f86e3c13f888ca65cbbd2f8113c4"
+                },
+                "url": "https://cdn.modrinth.com/data/VaCl9OtG/versions/Yh4b40rs/WaystonesTeleportPets-1.20-1.20.1--1.2.jar",
+                "filename": "WaystonesTeleportPets-1.20-1.20.1--1.2.jar",
+                "primary": true,
+                "size": 119264,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "Waystones pets addon",
+          "project_id": "BflseuG2",
+          "slug": "waystones-pets-addon",
+          "url": "https://modrinth.com/mod/waystones-pets-addon",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "8KK2uFzS",
+            "version_number": "0.0.7",
+            "date_published": "2025-09-29T21:42:35.655904Z",
+            "version_type": "release",
+            "dependencies": [
+              {
+                "version_id": null,
+                "project_id": "MBAkmtvl",
+                "file_name": null,
+                "dependency_type": "required"
+              },
+              {
+                "version_id": null,
+                "project_id": "LOpKHB2A",
+                "file_name": null,
+                "dependency_type": "required"
+              }
+            ],
+            "files": [
+              {
+                "id": "gqT9aCto",
+                "hashes": {
+                  "sha1": "e94c9d6c3a66d997e8fd77b43688377156b44b9e",
+                  "sha512": "a935e09c50d0a1be7f15ec972a9efcfcc573e17082e67c37ff3cdf418c316f06c2d3b7081fc3c77c4c020e089f97e3d04d68cbbb92e9558661951718bb0eb47f"
+                },
+                "url": "https://cdn.modrinth.com/data/BflseuG2/versions/8KK2uFzS/waystonespetsaddon-forge-0.0.7-1.20.1.jar",
+                "filename": "waystonespetsaddon-forge-0.0.7-1.20.1.jar",
+                "primary": true,
+                "size": 74225,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requested": "WorldEdit",
+      "candidates": [
+        {
+          "title": "WorldEdit",
+          "project_id": "1u6JkXh5",
+          "slug": "worldedit",
+          "url": "https://modrinth.com/mod/worldedit",
+          "client_side": "unsupported",
+          "server_side": "required",
+          "version": {
+            "id": "Wrlqaul6",
+            "version_number": "7.2.15",
+            "date_published": "2023-10-19T01:22:00Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "GlTPUUhn",
+                "hashes": {
+                  "sha1": "9c52765ca56f917ef8cbafc20e9a4f45c346508f",
+                  "sha512": "2c41dcd9a622f948ed5409eecc485018fbf274945bdd1a9c0fdf4c4954f9a47dc311e6e0f9e445180d8b771e4a40947533d67bd66feb4ab8c8f87c2880dba7ef"
+                },
+                "url": "https://cdn.modrinth.com/data/1u6JkXh5/versions/Wrlqaul6/worldedit-mod-7.2.15.jar",
+                "filename": "worldedit-mod-7.2.15.jar",
+                "primary": true,
+                "size": 5825402,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "WorldEdit CUI (Unofficial Forge Port)",
+          "project_id": "lOELapP1",
+          "slug": "worldeditcui-forge",
+          "url": "https://modrinth.com/mod/worldeditcui-forge",
+          "client_side": "required",
+          "server_side": "unsupported",
+          "version": {
+            "id": "SRJCpmta",
+            "version_number": "1.20+01",
+            "date_published": "2023-09-05T14:37:13.322877Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "SZd18782",
+                "hashes": {
+                  "sha1": "5f0676a7369999e7414e7b2ab4f90da1f51471d4",
+                  "sha512": "72d5eb0bdb2fdb21b5a19a65208fc07f8e92c32976b614e5b293677e0801fdc42a01d10e82345f63fec5a89f21b016c077dd98ef94d7c56c7a83a9114cdf3630"
+                },
+                "url": "https://cdn.modrinth.com/data/lOELapP1/versions/SRJCpmta/WorldEditCUI-1.20%2B01.jar",
+                "filename": "WorldEditCUI-1.20+01.jar",
+                "primary": true,
+                "size": 168681,
+                "file_type": null
+              }
+            ]
+          }
+        },
+        {
+          "title": "WorldEdit Items",
+          "project_id": "xBMX8ICO",
+          "slug": "worldedit-items",
+          "url": "https://modrinth.com/mod/worldedit-items",
+          "client_side": "required",
+          "server_side": "required",
+          "version": {
+            "id": "l9xtZ6cO",
+            "version_number": "2.0",
+            "date_published": "2025-03-11T20:48:37.990817Z",
+            "version_type": "release",
+            "dependencies": [],
+            "files": [
+              {
+                "id": "vPLkwLzc",
+                "hashes": {
+                  "sha1": "842e725cfd2d846995562f68ba5f87effae3e107",
+                  "sha512": "69b7020f3d54b0a5aeb012bfa00ad9c127bf9348ae20306f1dd02af713577e2e2f94fad9083338f4cac449d11d187f01b5aab4e0dff0036342da04dbf52c9264"
+                },
+                "url": "https://cdn.modrinth.com/data/xBMX8ICO/versions/l9xtZ6cO/worldedit_items-2.0-forge-1.20.1.jar",
+                "filename": "worldedit_items-2.0-forge-1.20.1.jar",
+                "primary": true,
+                "size": 13417,
+                "file_type": null
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

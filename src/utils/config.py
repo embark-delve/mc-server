@@ -1,240 +1,265 @@
-#!/usr/bin/env python3
+"""Validated configuration; defaults < YAML < environment < explicit CLI flags."""
 
-"""
-Configuration management for Minecraft Server Manager
-Handles loading configuration from different sources with proper precedence:
-1. Command-line arguments (highest precedence)
-2. Environment variables (.env file)
-3. Configuration file (config.yml)
-4. Default values (lowest precedence)
-"""
-
-import os
-import logging
 import copy
+import ipaddress
+import os
+import re
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
-import yaml
-from dotenv import load_dotenv
+from typing import Any
 
-logger = logging.getLogger(__name__)
+import yaml
+
+DEFAULTS: dict[str, Any] = {
+    "server": {
+        "type": "docker",
+        "flavor": "forge",
+        "version": "1.20.1",
+        "forge_version": "47.4.23",
+        "java_version": "java25",
+        "memory": "4G",
+        "image": "itzg/minecraft-server:java25",
+        "port": 25565,
+        "bind_address": "127.0.0.1",
+        "allow_lan": False,
+        "eula": False,
+        "allowlist": [],
+        "operators": [],
+        "max_players": 8,
+        "view_distance": 8,
+        "simulation_distance": 6,
+        "container_memory": "6G",
+        "cpus": 2.0,
+        "startup_timeout": 600,
+        "stop_timeout": 120,
+    },
+    "profile": "forge",
+    "paths": {"base_dir": None},
+    "backup": {"max_backups": 10, "max_restore_bytes": 20 * 1024**3},
+    "auto_shutdown": {"enabled": False, "timeout": 120},
+    "monitoring": {"enabled": False, "prometheus": False, "cloudwatch": False},
+    "debug": False,
+}
+
+
+def memory_bytes(value: str) -> int:
+    if not isinstance(value, str) or not re.fullmatch(r"[1-9][0-9]*[MG]", value):
+        raise ValueError("Memory must be a positive integer followed by M or G")
+    return int(value[:-1]) * 1024 ** (2 if value[-1] == "M" else 3)
+
+
+def boolean(value: str) -> bool:
+    if value.lower() not in ("true", "false", "1", "0", "yes", "no"):
+        raise ValueError("Expected true or false")
+    return value.lower() in ("true", "1", "yes")
 
 
 class Config:
-    """Configuration manager for Minecraft Server Manager"""
+    def __init__(self) -> None:
+        self._config = copy.deepcopy(DEFAULTS)
 
-    def __init__(self):
-        """Initialize with default values"""
-        self._config = {
-            "server": {
-                "type": "docker",
-                "version": "latest",
-                "flavor": "paper",
-                "memory": "2G",
-            },
-            "auto_shutdown": {
-                "enabled": True,
-                "timeout": 120,
-            },
-            "monitoring": {
-                "enabled": True,
-                "prometheus": True,
-                "cloudwatch": False,
-            },
-            "paths": {
-                "base_dir": None,
-            },
-            "debug": False,
-        }
-
-    def from_file(self, config_path: Union[str, Path]) -> "Config":
-        """
-        Load configuration from a YAML file
-
-        Args:
-            config_path: Path to the configuration file
-
-        Returns:
-            Self for method chaining
-        """
-        config_path = Path(config_path)
-        if not config_path.exists():
-            logger.warning(f"Configuration file not found: {config_path}")
-            return self
-
-        try:
-            with open(config_path, "r") as f:
-                file_config = yaml.safe_load(f)
-
-            # Update configuration with values from file
-            if file_config:
-                # Server settings
-                if "server" in file_config:
-                    server_config = file_config["server"]
-                    if "type" in server_config:
-                        self._config["server"]["type"] = server_config["type"]
-                    if "version" in server_config:
-                        self._config["server"]["version"] = server_config["version"]
-                    if "flavor" in server_config or "type" in server_config:
-                        # Support both "flavor" and "type" for backwards compatibility
-                        self._config["server"]["flavor"] = server_config.get(
-                            "flavor", server_config.get("type", "paper")
-                        )
-                    if "memory" in server_config:
-                        self._config["server"]["memory"] = server_config["memory"]
-
-                # Auto-shutdown settings
-                if "backup" in file_config:
-                    backup_config = file_config["backup"]
-                    # Process backup settings...
-
-                # Auto-shutdown settings
-                if "auto_shutdown" in file_config:
-                    shutdown_config = file_config["auto_shutdown"]
-                    if "enabled" in shutdown_config:
-                        self._config["auto_shutdown"]["enabled"] = shutdown_config["enabled"]
-                    if "timeout" in shutdown_config:
-                        self._config["auto_shutdown"]["timeout"] = shutdown_config["timeout"]
-
-                # Monitoring settings
-                if "monitoring" in file_config:
-                    monitoring_config = file_config["monitoring"]
-                    if "enabled" in monitoring_config:
-                        self._config["monitoring"]["enabled"] = monitoring_config["enabled"]
-                    if "prometheus" in monitoring_config:
-                        self._config["monitoring"]["prometheus"] = monitoring_config["prometheus"]
-                    if "cloudwatch" in monitoring_config:
-                        self._config["monitoring"]["cloudwatch"] = monitoring_config["cloudwatch"]
-
-                # Paths
-                if "paths" in file_config:
-                    paths_config = file_config["paths"]
-                    if "base_dir" in paths_config:
-                        self._config["paths"]["base_dir"] = Path(
-                            paths_config["base_dir"])
-
-            logger.info(f"Loaded configuration from {config_path}")
-        except Exception as e:
-            logger.error(
-                f"Error loading configuration from {config_path}: {e}")
-
+    def from_file(self, config_path: str | Path) -> "Config":
+        path = Path(config_path)
+        with path.open() as stream:
+            data = yaml.safe_load(stream)
+        if not isinstance(data, dict):
+            raise ValueError("Configuration must be a YAML mapping")
+        self._merge(self._config, data)
+        base = self.get("paths.base_dir")
+        if base is not None:
+            if not isinstance(base, str):
+                raise ValueError("base_dir must be a path string")
+            expanded = Path(base).expanduser()
+            self._config["paths"]["base_dir"] = str(
+                (path.resolve().parent / expanded).resolve()
+            )
         return self
+
+    @staticmethod
+    def _merge(target: dict[str, Any], data: dict[str, Any]) -> None:
+        for key, value in data.items():
+            if key not in target:
+                raise ValueError(f"Unknown configuration key: {key}")
+            if isinstance(target[key], dict):
+                if not isinstance(value, dict):
+                    raise ValueError(f"{key} must be a mapping")
+                Config._merge(target[key], value)
+            else:
+                target[key] = value
 
     def from_env(self) -> "Config":
-        """
-        Load configuration from environment variables
-
-        Returns:
-            Self for method chaining
-        """
-        # Load .env file if it exists
-        load_dotenv()
-
-        # Server settings
-        if "SERVER_TYPE" in os.environ:
-            self._config["server"]["type"] = os.environ["SERVER_TYPE"]
-        if "MINECRAFT_VERSION" in os.environ:
-            self._config["server"]["version"] = os.environ["MINECRAFT_VERSION"]
-        if "SERVER_FLAVOR" in os.environ:
-            self._config["server"]["flavor"] = os.environ["SERVER_FLAVOR"]
-        if "SERVER_MEMORY" in os.environ:
-            self._config["server"]["memory"] = os.environ["SERVER_MEMORY"]
-
-        # Auto-shutdown settings
-        if "AUTO_SHUTDOWN_ENABLED" in os.environ:
-            self._config["auto_shutdown"]["enabled"] = os.environ["AUTO_SHUTDOWN_ENABLED"].lower(
-            ) in ("true", "1", "yes")
-        if "AUTO_SHUTDOWN_TIMEOUT" in os.environ:
-            try:
-                self._config["auto_shutdown"]["timeout"] = int(
-                    os.environ["AUTO_SHUTDOWN_TIMEOUT"])
-            except ValueError:
-                logger.warning(
-                    f"Invalid auto-shutdown timeout: {os.environ['AUTO_SHUTDOWN_TIMEOUT']}")
-
-        # Monitoring settings
-        if "MONITORING_ENABLED" in os.environ:
-            self._config["monitoring"]["enabled"] = os.environ["MONITORING_ENABLED"].lower(
-            ) in ("true", "1", "yes")
-        if "PROMETHEUS_ENABLED" in os.environ:
-            self._config["monitoring"]["prometheus"] = os.environ["PROMETHEUS_ENABLED"].lower(
-            ) in ("true", "1", "yes")
-        if "CLOUDWATCH_ENABLED" in os.environ:
-            self._config["monitoring"]["cloudwatch"] = os.environ["CLOUDWATCH_ENABLED"].lower(
-            ) in ("true", "1", "yes")
-
-        # Paths
-        if "BASE_DIR" in os.environ:
-            self._config["paths"]["base_dir"] = Path(os.environ["BASE_DIR"])
-
-        # Debug mode
-        if "DEBUG" in os.environ:
-            self._config["debug"] = os.environ["DEBUG"].lower() in (
-                "true", "1", "yes")
-
-        logger.info("Loaded configuration from environment variables")
+        fields: dict[str, tuple[str, Callable[[str], Any]]] = {
+            "SERVER_TYPE": ("server.type", str),
+            "SERVER_FLAVOR": ("server.flavor", str),
+            "MINECRAFT_VERSION": ("server.version", str),
+            "FORGE_VERSION": ("server.forge_version", str),
+            "SERVER_MEMORY": ("server.memory", str),
+            "BASE_DIR": ("paths.base_dir", str),
+            "MC_PROFILE": ("profile", str),
+            "DEBUG": ("debug", boolean),
+            "AUTO_SHUTDOWN_ENABLED": ("auto_shutdown.enabled", boolean),
+            "AUTO_SHUTDOWN_TIMEOUT": ("auto_shutdown.timeout", int),
+            "MONITORING_ENABLED": ("monitoring.enabled", boolean),
+        }
+        for name, (key, convert) in fields.items():
+            if name in os.environ:
+                self.set(key, convert(os.environ[name]))
         return self
 
-    def from_args(self, args: Dict[str, Any]) -> "Config":
-        """
-        Load configuration from command-line arguments
-
-        Args:
-            args: Dictionary of command-line arguments
-
-        Returns:
-            Self for method chaining
-        """
-        # Server settings
-        if "type" in args and args["type"] is not None:
-            self._config["server"]["type"] = args["type"]
-        if "version" in args and args["version"] is not None:
-            self._config["server"]["version"] = args["version"]
-        if "flavor" in args and args["flavor"] is not None:
-            self._config["server"]["flavor"] = args["flavor"]
-        if "memory" in args and args["memory"] is not None:
-            self._config["server"]["memory"] = args["memory"]
-
-        # Auto-shutdown settings
-        if "disable_auto_shutdown" in args:
-            self._config["auto_shutdown"]["enabled"] = not args["disable_auto_shutdown"]
-        if "timeout" in args and args["timeout"] is not None:
-            self._config["auto_shutdown"]["timeout"] = args["timeout"]
-
-        # Debug mode
-        if "debug" in args:
-            self._config["debug"] = args["debug"]
-
-        logger.info("Loaded configuration from command-line arguments")
+    def from_args(self, args: dict[str, Any]) -> "Config":
+        mapping = {
+            "type": "server.type",
+            "version": "server.version",
+            "flavor": "server.flavor",
+            "memory": "server.memory",
+            "timeout": "auto_shutdown.timeout",
+            "debug": "debug",
+            "profile": "profile",
+            "base_dir": "paths.base_dir",
+            "port": "server.port",
+        }
+        for key, dest in mapping.items():
+            if args.get(key) is not None:
+                self.set(dest, args[key])
+        if args.get("disable_auto_shutdown") is True:
+            self.set("auto_shutdown.enabled", False)
         return self
+
+    def set(self, key: str, value: Any) -> None:
+        keys = key.split(".")
+        target = self._config
+        for part in keys[:-1]:
+            target = target[part]
+        if keys[-1] not in target:
+            raise ValueError(f"Unknown setting: {key}")
+        target[keys[-1]] = value
 
     def get(self, key: str, default: Any = None) -> Any:
-        """
-        Get a configuration value
-
-        Args:
-            key: Dot-separated path to the configuration value
-            default: Default value to return if the key is not found
-
-        Returns:
-            The configuration value or the default
-        """
-        keys = key.split(".")
-        value = self._config
-
-        for k in keys:
-            if isinstance(value, dict) and k in value:
-                value = value[k]
-            else:
+        value: Any = self._config
+        for part in key.split("."):
+            if not isinstance(value, dict) or part not in value:
                 return default
-
+            value = value[part]
         return value
 
-    def get_all(self) -> Dict[str, Any]:
-        """
-        Get the entire configuration
-
-        Returns:
-            A deep copy of the entire configuration as a dictionary
-        """
+    def get_all(self) -> dict[str, Any]:
         return copy.deepcopy(self._config)
+
+    def validate(self) -> "Config":
+        s = self._config["server"]
+        if s["type"] != "docker":
+            raise ValueError(
+                "Only the local Docker backend is supported; AWS/Kubernetes are disabled"
+            )
+        if s["flavor"] not in {"forge", "paper", "vanilla"}:
+            raise ValueError("Supported flavors: forge, paper, vanilla")
+        if not isinstance(s["version"], str) or not re.fullmatch(
+            r"\d+(?:\.\d+){1,2}", s["version"]
+        ):
+            raise ValueError("Set an exact Minecraft version, not latest")
+        if s["flavor"] == "forge" and (
+            s["version"] != "1.20.1" or s["forge_version"] != "47.4.23"
+        ):
+            raise ValueError("This release supports Forge 47.4.23 on Minecraft 1.20.1")
+        if s["java_version"] not in {"java17", "java21", "java25"}:
+            raise ValueError("Java must be java17, java21, or java25")
+        if not isinstance(s["image"], str) or not re.fullmatch(
+            r"itzg/minecraft-server:(?:[0-9]+\.[0-9]+\.[0-9]+-)?java(?:17|21|25)(?:@sha256:[a-f0-9]{64})?",
+            s["image"],
+        ):
+            raise ValueError(
+                "Use a supported itzg/minecraft-server Java image tag or digest"
+            )
+        if s["java_version"] not in s["image"]:
+            raise ValueError("Image tag and java_version disagree")
+        if memory_bytes(s["container_memory"]) < memory_bytes(s["memory"]) + 1024**3:
+            raise ValueError(
+                "Container memory must leave at least 1 GiB beyond the Java heap"
+            )
+        for key, low, high in [
+            ("port", 1024, 65535),
+            ("max_players", 1, 100),
+            ("view_distance", 2, 32),
+            ("simulation_distance", 2, 32),
+            ("startup_timeout", 30, 3600),
+            ("stop_timeout", 30, 600),
+        ]:
+            if type(s[key]) is not int or not low <= s[key] <= high:
+                raise ValueError(f"{key} must be an integer between {low} and {high}")
+        if type(s["cpus"]) not in (int, float) or not 0.5 <= s["cpus"] <= 64:
+            raise ValueError("cpus must be between 0.5 and 64")
+        for key in ("eula", "allow_lan"):
+            if type(s[key]) is not bool:
+                raise ValueError(f"{key} must be a boolean")
+        address = ipaddress.ip_address(s["bind_address"])
+        if address.version != 4:
+            raise ValueError("Use an IPv4 host bind address")
+        if not address.is_loopback and not s["allow_lan"]:
+            raise ValueError("Non-loopback networking requires allow_lan: true")
+        if not isinstance(s["allowlist"], list) or any(
+            not isinstance(x, str) or not re.fullmatch(r"[A-Za-z0-9_]{1,16}", x)
+            for x in s["allowlist"]
+        ):
+            raise ValueError("allowlist must contain Minecraft usernames")
+        if not isinstance(s["operators"], list) or any(
+            not isinstance(x, str) or not re.fullmatch(r"[A-Za-z0-9_]{1,16}", x)
+            for x in s["operators"]
+        ):
+            raise ValueError("operators must contain Minecraft usernames")
+        if not {x.lower() for x in s["operators"]}.issubset(
+            {x.lower() for x in s["allowlist"]}
+        ):
+            raise ValueError("Every configured operator must also be allowlisted")
+        if not isinstance(self.get("profile"), str) or not re.fullmatch(
+            r"[a-z][a-z0-9-]{0,39}", self.get("profile")
+        ):
+            raise ValueError(
+                "Profile must be a short lowercase name with optional digits/hyphens"
+            )
+        for key in (
+            "backup.max_backups",
+            "backup.max_restore_bytes",
+            "auto_shutdown.timeout",
+        ):
+            if type(self.get(key)) is not int or self.get(key) <= 0:
+                raise ValueError(f"{key} must be a positive integer")
+        for key in (
+            "monitoring.enabled",
+            "monitoring.prometheus",
+            "monitoring.cloudwatch",
+            "auto_shutdown.enabled",
+            "debug",
+        ):
+            if type(self.get(key)) is not bool:
+                raise ValueError(f"{key} must be a boolean")
+        if any(
+            self.get(k)
+            for k in (
+                "monitoring.enabled",
+                "monitoring.prometheus",
+                "monitoring.cloudwatch",
+                "auto_shutdown.enabled",
+            )
+        ):
+            raise ValueError(
+                "Background monitoring and auto-shutdown are disabled; use explicit stop"
+            )
+        base = self.get("paths.base_dir")
+        if base is not None and (
+            not isinstance(base, (str, Path)) or not str(base).strip()
+        ):
+            raise ValueError("base_dir must be a nonempty path")
+        if base is not None and any(c in str(base) for c in ("$", "\n", "\r")):
+            raise ValueError(
+                "base_dir must not contain Compose interpolation or newlines"
+            )
+        return self
+
+    @property
+    def base_dir(self) -> Path:
+        value = self.get("paths.base_dir")
+        return (
+            Path(value).expanduser()
+            if value
+            else Path.home() / "MinecraftServers" / self.get("profile")
+        ).resolve()

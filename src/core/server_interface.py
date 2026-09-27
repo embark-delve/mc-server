@@ -7,7 +7,7 @@ Defines the core operations that any Minecraft server implementation must suppor
 
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 class MinecraftServer(ABC):
@@ -54,7 +54,7 @@ class MinecraftServer(ABC):
         pass
 
     @abstractmethod
-    def get_status(self) -> Dict[str, Any]:
+    def get_status(self) -> dict[str, Any]:
         """
         Get the current status of the server
 
@@ -80,7 +80,7 @@ class MinecraftServer(ABC):
         pass
 
     @abstractmethod
-    def backup(self) -> Optional[Path]:
+    def backup(self) -> Path | None:
         """
         Create a backup of the server
 
@@ -90,7 +90,7 @@ class MinecraftServer(ABC):
         pass
 
     @abstractmethod
-    def restore(self, backup_path: Optional[Path] = None) -> bool:
+    def restore(self, backup_path: Path | None = None) -> bool:
         """
         Restore the server from a backup
 
@@ -104,7 +104,7 @@ class MinecraftServer(ABC):
         pass
 
     @abstractmethod
-    def get_logs(self, lines: int = 50) -> List[str]:
+    def get_logs(self, lines: int = 50) -> list[str]:
         """
         Get the most recent server logs
 
@@ -144,7 +144,7 @@ class MinecraftServer(ABC):
         pass
 
     @abstractmethod
-    def list_mods(self) -> List[Dict[str, str]]:
+    def list_mods(self) -> list[dict[str, str]]:
         """
         List installed mods
 
@@ -169,10 +169,10 @@ class MinecraftServer(ABC):
     @abstractmethod
     def update_server_configuration(
         self,
-        memory: Optional[str] = None,
-        minecraft_version: Optional[str] = None,
-        server_type: Optional[str] = None,
-        java_flags: Optional[str] = None,
+        memory: str | None = None,
+        minecraft_version: str | None = None,
+        server_type: str | None = None,
+        java_flags: str | None = None,
     ) -> None:
         """
         Update server configuration

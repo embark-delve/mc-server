@@ -1,0 +1,4 @@
+# Retired example RCON default in history; removed from current source.
+# Exact historical fingerprint only. New occurrences are NOT ignored.
+# See docs/development.md. Do not use the historical credential for any deployment.
+bd290837e9bc160590f9d5a1136df98056e5eff0:terraform/aws/modules/minecraft_server/variables.tf:hashicorp-tf-password:93

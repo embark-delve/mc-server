@@ -33,13 +33,13 @@ variable "key_name" {
 variable "allowed_cidr_blocks" {
   description = "CIDR blocks allowed to connect to the Minecraft server"
   type        = list(string)
-  default     = ["0.0.0.0/0"]
+  default     = []
 }
 
 variable "allowed_ssh_cidr_blocks" {
   description = "CIDR blocks allowed to connect via SSH"
   type        = list(string)
-  default     = ["0.0.0.0/0"]
+  default     = []
 }
 
 variable "root_volume_size" {
@@ -73,35 +73,14 @@ variable "enable_backups" {
 }
 
 variable "docker_compose_content" {
-  description = "Content of the docker-compose.yml file"
-  type        = string
-  default     = <<-EOT
-    version: '3'
-    
-    services:
-      minecraft:
-        image: itzg/minecraft-server
-        container_name: minecraft-server
-        ports:
-          - "25565:25565"
-        environment:
-          EULA: "TRUE"
-          MEMORY: "2G"
-          TYPE: "PAPER"
-          VERSION: "1.20.4"
-          ENABLE_RCON: "true"
-          RCON_PASSWORD: "minecraft"
-          RCON_PORT: 25575
-          ALLOW_NETHER: "true"
-          ENABLE_COMMAND_BLOCK: "true"
-          DIFFICULTY: "normal"
-          MODE: "survival"
-          MOTD: "Minecraft Server - Powered by Terraform and Docker"
-          SPAWN_PROTECTION: "0"
-        volumes:
-          - ./data:/data
-        restart: unless-stopped
-        tty: true
-        stdin_open: true
-  EOT
-} 
+  description = "Explicit reviewed Compose configuration, including private secrets and EULA choice"
+  type = string
+  default = ""
+  sensitive = true
+}
+
+variable "cloud_deployment_reviewed" {
+  description = "Legacy cloud deployment is disabled pending a separate security review"
+  type = bool
+  default = false
+}

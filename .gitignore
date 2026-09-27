@@ -73,4 +73,60 @@ start_output.log
 .Spotlight-V100
 .Trashes
 ehthumbs.db
-Thumbs.db 
+Thumbs.db
+# Private profile configuration / secrets
+*.secret
+config.local.yml
+profiles/*.local.yml
+runtime.json
+profile.json
+data.rollback/
+
+# All real env variants; only scrubbed templates belong in Git
+.env.*
+!.env.example
+!.env.*.example
+*.env
+*.env.*
+!.env.example
+!.env.*.example
+.envrc
+
+# Local administration, authentication, and deployment state
+.clubhouse-*.json
+.clubhouse-*.json.lock
+.operation.lock
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+credentials.json
+secrets/
+compose.yaml
+compose.yml
+config.private.yml
+
+# Tool/runtime state
+.tools/
+node_modules/
+.npm/
+.pre-commit-cache/
+coverage/
+htmlcov/
+coverage.xml
+*.tsbuildinfo
+
+# Infrastructure state may contain plaintext credentials
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+
+# Local recordings/transcripts and runtime archives
+.specstory/
+*.zip
+*.tar.gz

@@ -1,0 +1,32 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________________ test_forge_start_save_backup_restore _____________________
+
+tmp_path = PosixPath('/private/var/folders/w2/5dl4n6wj7dqb_k8jbh05m0k80000gn/T/pytest-of-shamil/pytest-16/test_forge_start_save_backup_r0')
+
+    def test_forge_start_save_backup_restore(tmp_path):
+        server = profile(tmp_path, "integration-source")
+        restored = profile(tmp_path, "integration-restored")
+        try:
+            assert server.start()
+            assert server.get_status()["health"] == "healthy"
+            assert server.verify_security()["verified"] is True
+            assert "players" in server.execute_command("list").lower()
+            server.execute_command("forceload add 0 0")
+            server.execute_command("setblock 0 100 0 minecraft:diamond_block")
+            server.execute_command("save-all flush")
+            assert server.stop()
+            backup = server.backup()
+            assert restored.restore(backup)
+            assert restored.start()
+            assert restored.verify_security()["verified"] is True
+            response = restored.execute_command(
+                "execute if block 0 100 0 minecraft:diamond_block run say restore-marker-ok"
+            )
+>           assert "restore-marker-ok" in response
+E           AssertionError: assert 'restore-marker-ok' in ''
+
+tests/integration/test_docker_lifecycle.py:60: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/test_docker_lifecycle.py::test_forge_start_save_backup_restore
+1 failed in 168.99s (0:02:48)

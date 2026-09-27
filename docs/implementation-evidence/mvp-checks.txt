@@ -1,0 +1,11 @@
+2026-09-27 — final single-admin management MVP
+Default pytest run: 100 passed, 2 skipped (Docker game and opt-in loopback HTTP integration).
+Separately enabled MC_WEB_INTEGRATION=1 real CLI/Uvicorn HTTP test: 1 passed in 1.54s.
+Ruff lint: pass. Ruff format: 40 files formatted. Mypy: pass, 23 source files.
+JavaScript syntax: node --check passed. git diff --check: passed.
+Wheel and sdist built; current wheel installed into /tmp/mc-wheel-validation.
+Installed CLI help saved separately. Runtime dependency audit: no known vulnerabilities.
+Browser: final self-service setup form and Minecraft-only player controls rendered and navigated.
+Game server: NOT started. Docker missing, user EULA acceptance and Minecraft username pending.
+No user's EULA was accepted; no real world or real admin account was created by the agent.
+The loopback dashboard preview remains available on 127.0.0.1:8765.

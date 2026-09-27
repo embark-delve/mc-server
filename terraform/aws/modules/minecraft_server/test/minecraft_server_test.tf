@@ -19,14 +19,14 @@ provider "aws" {
 
 module "main" {
   source = "../"
-  
+
   # Required variables with test values
   name_prefix = "test-minecraft"
   vpc_id      = "vpc-12345678"
   subnet_id   = "subnet-12345678"
   ami_id      = "ami-12345678"
   key_name    = "test-key"
-  
+
   # Optional variables with non-default values for testing
   instance_type          = "t3.small"
   allowed_cidr_blocks    = ["10.0.0.0/8"]
@@ -39,7 +39,7 @@ module "main" {
 # Test that the security group is created with the correct name
 resource "test_assertions" "security_group" {
   component = "security_group"
-  
+
   equal "name" {
     description = "Security group name includes the prefix"
     got         = aws_security_group.minecraft.name
@@ -50,16 +50,16 @@ resource "test_assertions" "security_group" {
 # Test that an EC2 instance is created with the right instance type
 resource "test_assertions" "instance" {
   component = "instance"
-  
+
   equal "instance_type" {
     description = "Instance type is correctly set"
     got         = aws_instance.minecraft.instance_type
     want        = var.instance_type
   }
-  
+
   equal "volume_size" {
     description = "Root volume size is correctly set"
     got         = aws_instance.minecraft.root_block_device[0].volume_size
     want        = var.root_volume_size
   }
-} 
+}

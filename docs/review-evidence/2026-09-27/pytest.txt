@@ -1,0 +1,246 @@
+..............FFFFFFFFFFFF....x..........                                [100%]
+=================================== FAILURES ===================================
+_________________________ TestMain.test_main_function __________________________
+tests/test_main.py:81: in test_main_function
+    main_module.main()
+minecraft-server.py:128: in main
+    manager = MinecraftServerManager(
+src/minecraft_server_manager.py:86: in __init__
+    raise ValueError(f"Unsupported server type: {server_type}")
+E   ValueError: Unsupported server type: paper
+----------------------------- Captured stdout call -----------------------------
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ Minecraft Server Manager                                                     │
+╰──────────────────────────────────────────────────────────────────────────────╯
+__________________ TestMain.test_main_function_error_handling __________________
+tests/test_main.py:140: in test_main_function_error_handling
+    main_module.main()
+minecraft-server.py:128: in main
+    manager = MinecraftServerManager(
+src/minecraft_server_manager.py:86: in __init__
+    raise ValueError(f"Unsupported server type: {server_type}")
+E   ValueError: Unsupported server type: paper
+----------------------------- Captured stdout call -----------------------------
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ Minecraft Server Manager                                                     │
+╰──────────────────────────────────────────────────────────────────────────────╯
+_________________ TestMain.test_main_function_unknown_command __________________
+tests/test_main.py:175: in test_main_function_unknown_command
+    main_module.main()
+minecraft-server.py:128: in main
+    manager = MinecraftServerManager(
+src/minecraft_server_manager.py:86: in __init__
+    raise ValueError(f"Unsupported server type: {server_type}")
+E   ValueError: Unsupported server type: paper
+----------------------------- Captured stdout call -----------------------------
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ Minecraft Server Manager                                                     │
+╰──────────────────────────────────────────────────────────────────────────────╯
+______ TestServerInterface.test_docker_server_execute_command_not_running ______
+tests/test_server_interface.py:175: in test_docker_server_execute_command_not_running
+    server = DockerServer(base_dir=self.test_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/implementations/docker_server.py:104: in __init__
+    self.monitor = ServerMonitor(
+src/utils/monitoring.py:95: in __init__
+    self.metrics = self._initialize_metrics()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/utils/monitoring.py:213: in _initialize_metrics
+    metrics["player_count"] = prom.Gauge(
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/metrics.py:427: in __init__
+    super().__init__(
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/metrics.py:136: in __init__
+    registry.register(self)
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/registry.py:51: in register
+    raise DuplicateTimeseries(duplicates)
+E   prometheus_client.registry.DuplicateTimeseries: Duplicated timeseries in CollectorRegistry: {'minecraft_player_count'}
+------------------------------ Captured log call -------------------------------
+ERROR    monitoring:monitoring.py:267 Failed to start Prometheus metrics server: [Errno 1] Operation not permitted
+________ TestServerInterface.test_docker_server_execute_command_running ________
+tests/test_server_interface.py:195: in test_docker_server_execute_command_running
+    server = DockerServer(base_dir=self.test_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/implementations/docker_server.py:67: in __init__
+    super().__init__(
+src/core/base_server.py:91: in __init__
+    self.monitor = ServerMonitor(
+src/utils/monitoring.py:95: in __init__
+    self.metrics = self._initialize_metrics()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/utils/monitoring.py:213: in _initialize_metrics
+    metrics["player_count"] = prom.Gauge(
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/metrics.py:427: in __init__
+    super().__init__(
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/metrics.py:136: in __init__
+    registry.register(self)
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/registry.py:51: in register
+    raise DuplicateTimeseries(duplicates)
+E   prometheus_client.registry.DuplicateTimeseries: Duplicated timeseries in CollectorRegistry: {'minecraft_player_count'}
+___________ TestServerInterface.test_docker_server_is_running_false ____________
+tests/test_server_interface.py:83: in test_docker_server_is_running_false
+    server = DockerServer(base_dir=self.test_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/implementations/docker_server.py:67: in __init__
+    super().__init__(
+src/core/base_server.py:91: in __init__
+    self.monitor = ServerMonitor(
+src/utils/monitoring.py:95: in __init__
+    self.metrics = self._initialize_metrics()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/utils/monitoring.py:213: in _initialize_metrics
+    metrics["player_count"] = prom.Gauge(
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/metrics.py:427: in __init__
+    super().__init__(
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/metrics.py:136: in __init__
+    registry.register(self)
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/registry.py:51: in register
+    raise DuplicateTimeseries(duplicates)
+E   prometheus_client.registry.DuplicateTimeseries: Duplicated timeseries in CollectorRegistry: {'minecraft_player_count'}
+____________ TestServerInterface.test_docker_server_is_running_true ____________
+tests/test_server_interface.py:68: in test_docker_server_is_running_true
+    server = DockerServer(base_dir=self.test_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/implementations/docker_server.py:67: in __init__
+    super().__init__(
+src/core/base_server.py:91: in __init__
+    self.monitor = ServerMonitor(
+src/utils/monitoring.py:95: in __init__
+    self.metrics = self._initialize_metrics()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/utils/monitoring.py:213: in _initialize_metrics
+    metrics["player_count"] = prom.Gauge(
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/metrics.py:427: in __init__
+    super().__init__(
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/metrics.py:136: in __init__
+    registry.register(self)
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/registry.py:51: in register
+    raise DuplicateTimeseries(duplicates)
+E   prometheus_client.registry.DuplicateTimeseries: Duplicated timeseries in CollectorRegistry: {'minecraft_player_count'}
+________________ TestServerInterface.test_docker_server_restart ________________
+tests/test_server_interface.py:161: in test_docker_server_restart
+    server = DockerServer(base_dir=self.test_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/implementations/docker_server.py:67: in __init__
+    super().__init__(
+src/core/base_server.py:91: in __init__
+    self.monitor = ServerMonitor(
+src/utils/monitoring.py:95: in __init__
+    self.metrics = self._initialize_metrics()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/utils/monitoring.py:213: in _initialize_metrics
+    metrics["player_count"] = prom.Gauge(
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/metrics.py:427: in __init__
+    super().__init__(
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/metrics.py:136: in __init__
+    registry.register(self)
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/registry.py:51: in register
+    raise DuplicateTimeseries(duplicates)
+E   prometheus_client.registry.DuplicateTimeseries: Duplicated timeseries in CollectorRegistry: {'minecraft_player_count'}
+______ TestServerInterface.test_docker_server_start_when_already_running _______
+tests/test_server_interface.py:114: in test_docker_server_start_when_already_running
+    server = DockerServer(base_dir=self.test_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/implementations/docker_server.py:67: in __init__
+    super().__init__(
+src/core/base_server.py:91: in __init__
+    self.monitor = ServerMonitor(
+src/utils/monitoring.py:95: in __init__
+    self.metrics = self._initialize_metrics()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/utils/monitoring.py:213: in _initialize_metrics
+    metrics["player_count"] = prom.Gauge(
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/metrics.py:427: in __init__
+    super().__init__(
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/metrics.py:136: in __init__
+    registry.register(self)
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/registry.py:51: in register
+    raise DuplicateTimeseries(duplicates)
+E   prometheus_client.registry.DuplicateTimeseries: Duplicated timeseries in CollectorRegistry: {'minecraft_player_count'}
+________ TestServerInterface.test_docker_server_start_when_not_running _________
+tests/test_server_interface.py:97: in test_docker_server_start_when_not_running
+    server = DockerServer(base_dir=self.test_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/implementations/docker_server.py:67: in __init__
+    super().__init__(
+src/core/base_server.py:91: in __init__
+    self.monitor = ServerMonitor(
+src/utils/monitoring.py:95: in __init__
+    self.metrics = self._initialize_metrics()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/utils/monitoring.py:213: in _initialize_metrics
+    metrics["player_count"] = prom.Gauge(
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/metrics.py:427: in __init__
+    super().__init__(
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/metrics.py:136: in __init__
+    registry.register(self)
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/registry.py:51: in register
+    raise DuplicateTimeseries(duplicates)
+E   prometheus_client.registry.DuplicateTimeseries: Duplicated timeseries in CollectorRegistry: {'minecraft_player_count'}
+_________ TestServerInterface.test_docker_server_stop_when_not_running _________
+tests/test_server_interface.py:146: in test_docker_server_stop_when_not_running
+    server = DockerServer(base_dir=self.test_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/implementations/docker_server.py:67: in __init__
+    super().__init__(
+src/core/base_server.py:91: in __init__
+    self.monitor = ServerMonitor(
+src/utils/monitoring.py:95: in __init__
+    self.metrics = self._initialize_metrics()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/utils/monitoring.py:213: in _initialize_metrics
+    metrics["player_count"] = prom.Gauge(
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/metrics.py:427: in __init__
+    super().__init__(
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/metrics.py:136: in __init__
+    registry.register(self)
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/registry.py:51: in register
+    raise DuplicateTimeseries(duplicates)
+E   prometheus_client.registry.DuplicateTimeseries: Duplicated timeseries in CollectorRegistry: {'minecraft_player_count'}
+___________ TestServerInterface.test_docker_server_stop_when_running ___________
+tests/test_server_interface.py:131: in test_docker_server_stop_when_running
+    server = DockerServer(base_dir=self.test_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/implementations/docker_server.py:67: in __init__
+    super().__init__(
+src/core/base_server.py:91: in __init__
+    self.monitor = ServerMonitor(
+src/utils/monitoring.py:95: in __init__
+    self.metrics = self._initialize_metrics()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/utils/monitoring.py:213: in _initialize_metrics
+    metrics["player_count"] = prom.Gauge(
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/metrics.py:427: in __init__
+    super().__init__(
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/metrics.py:136: in __init__
+    registry.register(self)
+/private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/prometheus_client/registry.py:51: in register
+    raise DuplicateTimeseries(duplicates)
+E   prometheus_client.registry.DuplicateTimeseries: Duplicated timeseries in CollectorRegistry: {'minecraft_player_count'}
+=============================== warnings summary ===============================
+tests/commands/test_command_registry.py::test_function_1
+  /private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/_pytest/python.py:171: PytestReturnNotNoneWarning: Test functions should return None, but tests/commands/test_command_registry.py::test_function_1 returned <class 'str'>.
+  Did you mean to use `assert` instead of `return`?
+  See https://docs.pytest.org/en/stable/how-to/assert.html#return-not-none for more information.
+    warnings.warn(
+
+tests/commands/test_command_registry.py::test_function_2
+  /private/tmp/mc-server-review-20260927/lib/python3.13/site-packages/_pytest/python.py:171: PytestReturnNotNoneWarning: Test functions should return None, but tests/commands/test_command_registry.py::test_function_2 returned <class 'str'>.
+  Did you mean to use `assert` instead of `return`?
+  See https://docs.pytest.org/en/stable/how-to/assert.html#return-not-none for more information.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_main.py::TestMain::test_main_function - ValueError: Unsuppo...
+FAILED tests/test_main.py::TestMain::test_main_function_error_handling - Valu...
+FAILED tests/test_main.py::TestMain::test_main_function_unknown_command - Val...
+FAILED tests/test_server_interface.py::TestServerInterface::test_docker_server_execute_command_not_running
+FAILED tests/test_server_interface.py::TestServerInterface::test_docker_server_execute_command_running
+FAILED tests/test_server_interface.py::TestServerInterface::test_docker_server_is_running_false
+FAILED tests/test_server_interface.py::TestServerInterface::test_docker_server_is_running_true
+FAILED tests/test_server_interface.py::TestServerInterface::test_docker_server_restart
+FAILED tests/test_server_interface.py::TestServerInterface::test_docker_server_start_when_already_running
+FAILED tests/test_server_interface.py::TestServerInterface::test_docker_server_start_when_not_running
+FAILED tests/test_server_interface.py::TestServerInterface::test_docker_server_stop_when_not_running
+FAILED tests/test_server_interface.py::TestServerInterface::test_docker_server_stop_when_running
+12 failed, 28 passed, 1 xfailed, 2 warnings in 6.75s

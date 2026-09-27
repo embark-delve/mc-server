@@ -1,97 +1,62 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
 
 [project]
 name = "minecraft-server-manager"
-version = "1.0.0"
-description = "A Python tool for managing Minecraft servers across Docker, AWS and Kubernetes"
-authors = [
-    {name = "Minecraft Server Manager Team", email = "example@example.com"}
-]
+version = "2.0.0"
+description = "Safe local Minecraft Forge server management"
 readme = "README.md"
-requires-python = ">=3.8"
-license = {text = "MIT"}
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Environment :: Console",
-    "Intended Audience :: System Administrators",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Topic :: Games/Entertainment",
-    "Topic :: System :: Systems Administration",
-]
+requires-python = ">=3.13"
 dependencies = [
-    "pathlib>=1.0.1",
-    "typing-extensions>=4.0.0",
-    "boto3>=1.28.0",
-    "botocore>=1.31.0",
-    "requests>=2.28.0",
-    "schedule>=1.2.0",
-]
-
-[project.optional-dependencies]
-dev = [
-    "pytest>=7.3.1",
-    "pytest-cov>=4.1.0",
-    "black>=23.3.0",
-    "ruff>=0.0.286",
-    "mypy>=1.3.0",
-    "isort>=5.12.0",
-    "types-requests>=2.31.0.0",
-    "types-PyYAML>=6.0.12.11",
-    "pre-commit>=3.3.3",
-]
-docs = [
-    "mkdocs>=1.5.2",
-    "mkdocs-material>=9.2.8",
-    "mkdocstrings>=0.22.0",
-    "mkdocstrings-python>=1.7.3",
+    "PyYAML>=6.0.3,<7",
+    "rich>=13.9,<16",
+    "starlette>=0.49,<2",
+    "uvicorn>=0.35,<1",
 ]
 
 [project.scripts]
-minecraft-server = "src.minecraft_manager:main"
+minecraft-server = "src.cli:main"
 
-[tool.setuptools]
+[dependency-groups]
+dev = [
+    "pytest>=8.3,<10",
+    "pytest-cov>=6,<8",
+    "ruff>=0.9,<1",
+    "mypy>=1.15,<3",
+    "types-PyYAML>=6.0",
+    "pip-audit>=2.9,<3",
+    "httpx>=0.28,<1",
+    "pre-commit>=4,<5",
+    "pre-commit-hooks>=6,<7",
+    "bandit[toml]>=1.8,<2",
+]
+
+[tool.hatch.build.targets.wheel]
 packages = ["src"]
 
-[tool.black]
-line-length = 88
-target-version = ["py38", "py39", "py310", "py311"]
-include = '\.pyi?$'
-
 [tool.ruff]
+target-version = "py313"
 line-length = 88
-target-version = "py38"
-select = ["E", "F", "B", "I", "W", "C4", "SIM", "ARG", "ERA", "PL", "RUF", "UP"]
-ignore = []
+extend-exclude = ["docs", ".specstory", "*.md"]
 
-[tool.ruff.isort]
-known-first-party = ["src"]
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "B", "S", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S311", "S106", "S104", "S108"]
 
 [tool.mypy]
-python_version = "3.8"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
+python_version = "3.13"
 check_untyped_defs = true
-disallow_untyped_decorators = true
-no_implicit_optional = true
-strict_optional = true
-
-[[tool.mypy.overrides]]
-module = "tests.*"
-disallow_untyped_defs = false
-disallow_incomplete_defs = false
+warn_unused_ignores = true
+disallow_untyped_defs = true
+exclude = ["docs", "tests"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-python_files = "test_*.py"
-python_classes = "Test*"
-python_functions = "test_*"
-addopts = "--cov=src --cov-report=term --cov-report=xml" 
+addopts = "-ra"
+markers = ["integration: requires a running Docker engine and network access"]
+
+[tool.bandit]
+exclude_dirs = ["tests", "docs", ".venv", ".tools"]

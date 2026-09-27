@@ -1,0 +1,11 @@
+Validation on 2026-09-27 using Python 3.13.0 on macOS arm64 and uv.lock:
+
+ruff check .: All checks passed
+ruff format --check .: 34 files already formatted
+mypy src: Success: no issues found in 20 source files
+pytest -q: 77 passed, 1 skipped (Docker/EULA/username prerequisites)
+uv build: source distribution and wheel built
+Fresh installed wheel CLI from /tmp: --help succeeded
+git diff --check: passed
+
+Live Minecraft/modpack/container scan: NOT RUN. See implementation-status.md.

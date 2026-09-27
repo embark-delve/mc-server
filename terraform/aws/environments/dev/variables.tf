@@ -24,13 +24,13 @@ variable "instance_type" {
 variable "allowed_cidr_blocks" {
   description = "CIDR blocks allowed to connect to the Minecraft server"
   type        = list(string)
-  default     = ["0.0.0.0/0"]
+  default     = []
 }
 
 variable "allowed_ssh_cidr_blocks" {
   description = "CIDR blocks allowed to connect via SSH"
   type        = list(string)
-  default     = ["0.0.0.0/0"]
+  default     = []
 }
 
 variable "root_volume_size" {
@@ -49,4 +49,4 @@ variable "enable_backups" {
   description = "Whether to enable automated backups"
   type        = bool
   default     = true
-} 
+}

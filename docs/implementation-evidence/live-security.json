@@ -1,0 +1,8 @@
+{
+  "verified": true,
+  "online_mode": true,
+  "allowlist_enforced": true,
+  "approved_players": 3,
+  "game_bind_address": "127.0.0.1",
+  "management_ports_published": false
+}

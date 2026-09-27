@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Block & Bloom · Your world clubhouse</title>
+    <link rel="stylesheet" href="/assets/style.css" />
+    <script defer src="/assets/app.js"></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to your world</a>
+    <aside class="sidebar">
+      <a class="brand" href="/"
+        ><span class="brand-icon">B<span>✦</span></span
+        ><span>block & bloom<small>THE WORLD CLUBHOUSE</small></span></a
+      >
+      <div class="nav-label">YOUR CORNER OF THE OVERWORLD</div>
+      <nav aria-label="Main navigation">
+        <button class="nav active" data-view="world" aria-current="page">
+          <span>▧</span> My world <b>01</b></button
+        ><button class="nav" data-view="join"><span>↗</span> How to join</button
+        ><button class="nav" data-view="players" id="players-nav" hidden>
+          <span>♧</span> Players</button
+        ><button class="nav" data-view="care" id="care-nav" hidden>
+          <span>♧</span> World care
+        </button>
+      </nav>
+      <div class="side-note">
+        <span class="little-flower">✳</span
+        ><strong>Big ideas.<br />Little blocks.</strong>
+        <p>A cozy place to build<br />something together.</p>
+      </div>
+      <footer>
+        <span class="dot"></span> Private laptop clubhouse<small
+          >Minecraft Java Edition</small
+        >
+      </footer>
+    </aside>
+    <div class="shell">
+      <header>
+        <span>YOUR NEXT ADVENTURE STARTS HERE</span>
+        <div class="header-right">
+          <span class="access-badge" id="role">Private access</span
+          ><button class="text-button" id="lock">Lock clubhouse ↗</button>
+        </div>
+      </header>
+      <main id="main">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">A LITTLE WORLD. ENDLESS POSSIBILITIES.</p>
+            <h1>Let's make something great<span>.</span></h1>
+            <p>Gather your people. Bring your imagination.</p>
+          </div>
+          <span class="edition">JAVA<br /><b>EDITION</b></span>
+        </div>
+        <div
+          id="notice"
+          class="notice"
+          role="status"
+          aria-live="polite"
+          hidden
+        ></div>
+        <section id="locked" class="card locked" hidden>
+          <span class="kicker">YOUR INVITATION AWAITS</span>
+          <h2>Welcome to the clubhouse.</h2>
+          <p>
+            Sign in with the single server admin account, or open the local
+            owner link printed by the CLI.
+          </p>
+          <form id="login-form" class="account-form">
+            <label
+              >Website username<input
+                id="login-name"
+                autocomplete="username"
+                required
+                maxlength="32" /></label
+            ><label
+              >Password<input
+                id="login-password"
+                type="password"
+                autocomplete="current-password"
+                required
+                maxlength="128" /></label
+            ><button class="primary" type="submit">
+              Enter the clubhouse ↗
+            </button>
+          </form>
+          <p class="form-hint">
+            Only the server manager needs this login. Players join Minecraft
+            directly with their own Minecraft accounts.
+          </p>
+        </section>
+        <div id="dashboard">
+          <section id="setup-card" class="card" hidden>
+            <span class="kicker">YOUR FIRST ADVENTURE</span>
+            <h2>Let's set up your world.</h2>
+            <p>
+              Safe settings are already picked: Minecraft 1.20.1, Forge 47.4.23,
+              and access only for players you allow.
+            </p>
+            <form id="setup-form" class="account-form">
+              <label
+                >Your Minecraft Java username<input
+                  id="setup-name"
+                  required
+                  pattern="[A-Za-z0-9_]{3,16}"
+                  maxlength="16"
+                  autocomplete="off" /></label
+              ><label class="check-label"
+                ><input id="setup-eula" type="checkbox" required /> I have read
+                and accept the
+                <a
+                  href="https://aka.ms/MinecraftEULA"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Minecraft EULA</a
+                >.</label
+              ><button class="primary" type="submit">Create my world ↗</button>
+            </form>
+            <p class="form-hint">
+              Setup prepares the world. Docker must be running before you can
+              start playing. No public network access is enabled.
+            </p>
+          </section>
+          <section data-panel="world">
+            <div class="hero">
+              <div class="hero-copy">
+                <div class="world-label">
+                  <span class="world-number">01</span> YOUR HOME WORLD
+                </div>
+                <h2 id="world-name">The Overworld</h2>
+                <p>
+                  A place for new paths, little gardens,<br />and very ambitious
+                  treehouses.
+                </p>
+                <div class="status-pill">
+                  <span class="dot" id="status-dot"></span
+                  ><span id="world-status">Checking your world…</span>
+                </div>
+                <button class="primary" id="start" disabled>
+                  <span>▶</span> Start adventure <span>↗</span>
+                </button>
+                <p class="button-hint" id="start-hint">
+                  Your world stays on your laptop.
+                </p>
+              </div>
+              <img
+                class="landscape"
+                src="/assets/landscape.svg"
+                alt="A block-built island with a little cottage, pine trees, a winding path and flowers floating in a mint sky"
+              /><span class="scene-caption">ROOM TO GROW. ROOM TO ROAM.</span>
+            </div>
+            <div class="stats">
+              <article>
+                <span class="stat-icon">◈</span>
+                <div>
+                  <small>THE FOUNDATION</small
+                  ><strong id="version">Minecraft —</strong
+                  ><span id="forge">Forge —</span>
+                </div>
+              </article>
+              <article>
+                <span class="stat-icon">⌂</span>
+                <div>
+                  <small>WHERE IT LIVES</small
+                  ><strong>Right here, at home</strong
+                  ><span>Game server runs in Docker</span>
+                </div>
+              </article>
+              <article>
+                <span class="stat-icon">♡</span>
+                <div>
+                  <small>WHO CAN PLAY</small
+                  ><strong>Invited friends only</strong
+                  ><span id="access-status"
+                    >Account + allowlist checks configured</span
+                  >
+                </div>
+              </article>
+            </div>
+            <div class="bottom-grid">
+              <article class="card join-card">
+                <span class="kicker">BRING YOUR PICKAXE</span>
+                <h2>Your next stop: the world.</h2>
+                <p>
+                  Open Minecraft, add your server,<br />and make yourself at
+                  home.
+                </p>
+                <button class="secondary" data-view="join">
+                  Show me how to join <span>↗</span></button
+                ><span class="card-doodle" aria-hidden="true">↗</span>
+              </article>
+              <article class="card checklist">
+                <span class="kicker">BEFORE THE ADVENTURE</span>
+                <h2>A little ready-check</h2>
+                <ul>
+                  <li>
+                    <span id="check-setup">○</span> Your world has been set up
+                  </li>
+                  <li>
+                    <span id="check-docker">○</span> Docker is ready to help
+                  </li>
+                  <li>
+                    <span id="check-ready">○</span> The world is awake and ready
+                  </li>
+                </ul>
+                <p>Your world, your next adventure.</p>
+              </article>
+            </div>
+          </section>
+          <section data-panel="join" hidden>
+            <div class="section-intro">
+              <span class="kicker">LET'S GET YOU THERE</span>
+              <h2>Three small steps. One big adventure.</h2>
+              <p>
+                These instructions connect from this laptop. Every player needs
+                the same approved modpack.
+              </p>
+            </div>
+            <div class="steps">
+              <article class="card">
+                <span class="step">01</span>
+                <h2>Wake up your world</h2>
+                <p>
+                  Go to My world and choose Start adventure. Wait until it says
+                  “Ready to explore.”
+                </p>
+                <button class="secondary" data-view="world">
+                  Back to my world ↗
+                </button>
+              </article>
+              <article class="card">
+                <span class="step">02</span>
+                <h2>Open Minecraft Java</h2>
+                <p>
+                  Use Minecraft <b id="join-version">1.20.1</b>, Forge
+                  <b id="join-forge">47.4.23</b>, and the same mods as your
+                  server. Choose Multiplayer → Add Server.
+                </p>
+              </article>
+              <article class="card">
+                <span class="step">03</span>
+                <h2>Meet you inside</h2>
+                <p>
+                  Give the server any name you like. Paste this into Server
+                  Address, then choose Done and Join Server.
+                </p>
+                <button class="address" id="copy" title="Copy server address">
+                  <span id="address">127.0.0.1:25565</span><span>Copy ↗</span>
+                </button>
+              </article>
+            </div>
+            <div class="notice">
+              Not on the list yet? Ask a admin to add your exact Minecraft
+              username to the allowlist. A connection from another device needs
+              a separately configured LAN setup.
+            </div>
+          </section>
+          <section data-panel="players" hidden>
+            <div class="section-intro">
+              <span class="kicker">YOUR WORLD. YOUR GUEST LIST.</span>
+              <h2>Players</h2>
+              <p>
+                Add friends by their exact Minecraft Java username. They do not
+                need a website account.
+              </p>
+            </div>
+            <div class="care-grid">
+              <article class="card">
+                <h2>Add a friend</h2>
+                <form id="player-form" class="account-form">
+                  <label
+                    >Minecraft Java username<input
+                      id="player-name"
+                      required
+                      pattern="[A-Za-z0-9_]{3,16}"
+                      autocomplete="off"
+                      maxlength="16" /></label
+                  ><button class="primary" type="submit">
+                    Allow this player ↗
+                  </button>
+                </form>
+                <p class="form-hint">
+                  Minecraft verifies their account when they join. Only allowed
+                  players can enter your world.
+                </p>
+              </article>
+              <article class="card">
+                <h2>Who can join</h2>
+                <ul id="users" class="inventory"></ul>
+                <p>
+                  Ban blocks access and disconnects the player when the game is
+                  running. Remove takes them off your allowlist. Their builds
+                  stay in the world.
+                </p>
+              </article>
+            </div>
+          </section>
+          <section data-panel="care" hidden>
+            <div class="section-intro">
+              <span class="kicker">WORLD TOOLS</span>
+              <h2>A little care goes a long way.</h2>
+              <p>
+                Save the world before a break. Keep recovery copies before
+                changing mods.
+              </p>
+            </div>
+            <div class="care-grid">
+              <article class="card">
+                <h2>End today's adventure</h2>
+                <p>
+                  Let everyone know before closing. The server saves the world
+                  and stops gently.
+                </p>
+                <button id="stop" class="secondary">Save & stop world</button>
+              </article>
+              <article class="card">
+                <h2>Make a recovery copy</h2>
+                <p>
+                  Stop the world first for a consistent backup. Restores stay in
+                  the local CLI to protect your progress.
+                </p>
+                <button id="backup" class="secondary">Create backup</button>
+              </article>
+            </div>
+            <div class="care-grid">
+              <article class="card">
+                <span class="kicker">RECOVERY SHELF</span>
+                <h2>World backups</h2>
+                <ul id="backups" class="inventory"></ul>
+              </article>
+              <article class="card">
+                <span class="kicker">THE BUILDING BLOCKS</span>
+                <h2>Installed mods</h2>
+                <p>
+                  All installed mods start enabled. Stop the world to toggle
+                  individual mods. Disabling a dependency can prevent startup;
+                  back up before changing content mods.
+                </p>
+                <ul id="mods" class="inventory"></ul>
+              </article>
+            </div>
+            <article class="card safety">
+              <span>◈</span>
+              <div>
+                <h2>Private by design</h2>
+                <p>
+                  This dashboard listens only on this laptop. The browser cannot
+                  send arbitrary server commands, edit files, or access the
+                  Docker API. Keep your admin link private.
+                </p>
+              </div>
+            </article>
+          </section>
+        </div>
+        <footer class="page-footer">
+          <span>MADE FOR THE THINGS YOU'LL BUILD TOGETHER.</span
+          ><span>A family clubhouse · Not an official Minecraft product</span>
+        </footer>
+      </main>
+    </div>
+    <dialog id="confirm">
+      <form method="dialog">
+        <span class="kicker">A QUICK CHECK</span>
+        <h2 id="confirm-title">Ready?</h2>
+        <p id="confirm-copy"></p>
+        <div class="dialog-actions">
+          <button value="cancel" class="secondary">Not now</button
+          ><button value="confirm" class="primary">Yes, continue</button>
+        </div>
+      </form>
+    </dialog>
+  </body>
+</html>

@@ -4,18 +4,16 @@
 Tests for the command registry
 """
 
-import pytest
-
-from src.commands import register, get_handler, get_available_commands
+from src.commands import get_available_commands, get_handler, register
 
 
 # Test functions to be registered
-def test_function_1():
-    return "test_function_1"
+def sample_function_1():
+    return "sample_function_1"
 
 
-def test_function_2():
-    return "test_function_2"
+def sample_function_2():
+    return "sample_function_2"
 
 
 class TestCommandRegistry:
@@ -24,25 +22,25 @@ class TestCommandRegistry:
     def test_register_decorator(self):
         """Test registering a command with the decorator"""
         # Register a test function
-        decorated_function = register("test_command")(test_function_1)
+        decorated_function = register("test_command")(sample_function_1)
 
         # The decorator should return the original function
-        assert decorated_function is test_function_1
+        assert decorated_function is sample_function_1
 
         # The function should be registered
         handler = get_handler("test_command")
-        assert handler is test_function_1
-        assert handler() == "test_function_1"
+        assert handler is sample_function_1
+        assert handler() == "sample_function_1"
 
     def test_get_handler(self):
         """Test getting a command handler"""
         # Register a test function
-        register("another_command")(test_function_2)
+        register("another_command")(sample_function_2)
 
         # Get the handler
         handler = get_handler("another_command")
-        assert handler is test_function_2
-        assert handler() == "test_function_2"
+        assert handler is sample_function_2
+        assert handler() == "sample_function_2"
 
         # Getting a nonexistent handler should return None
         assert get_handler("nonexistent_command") is None
@@ -58,8 +56,8 @@ class TestCommandRegistry:
 
         # Register a new command
         @register("third_command")
-        def test_function_3():
-            return "test_function_3"
+        def sample_function_3():
+            return "sample_function_3"
 
         # Should include the new command
         commands = get_available_commands()

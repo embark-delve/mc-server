@@ -2,13 +2,13 @@
 Command registry for Minecraft Server Manager
 """
 
-from typing import Any, Callable, Dict, List, Optional
+from collections.abc import Callable
 
 # Type for command handler functions
 CommandHandler = Callable[..., None]
 
 # Registry of available commands
-_registry: Dict[str, CommandHandler] = {}
+_registry: dict[str, CommandHandler] = {}
 
 
 def register(command_name: str) -> Callable[[CommandHandler], CommandHandler]:
@@ -21,13 +21,15 @@ def register(command_name: str) -> Callable[[CommandHandler], CommandHandler]:
     Returns:
         Decorator function
     """
+
     def decorator(handler: CommandHandler) -> CommandHandler:
         _registry[command_name] = handler
         return handler
+
     return decorator
 
 
-def get_handler(command_name: str) -> Optional[CommandHandler]:
+def get_handler(command_name: str) -> CommandHandler | None:
     """
     Get a command handler by name
 
@@ -40,7 +42,7 @@ def get_handler(command_name: str) -> Optional[CommandHandler]:
     return _registry.get(command_name)
 
 
-def get_available_commands() -> List[str]:
+def get_available_commands() -> list[str]:
     """
     Get a list of available commands
 

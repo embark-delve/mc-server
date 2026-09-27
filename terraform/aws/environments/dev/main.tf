@@ -57,9 +57,9 @@ module "minecraft_server" {
   root_volume_size       = var.root_volume_size
   allocate_elastic_ip    = var.allocate_elastic_ip
   enable_backups         = var.enable_backups
-  
+
   tags = {
     Environment = "dev"
     Name        = "${var.name_prefix}-server"
   }
-} 
+}
