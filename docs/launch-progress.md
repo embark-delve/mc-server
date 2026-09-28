@@ -1,3 +1,5 @@
+> Historical baseline launch record (before LAN forwarding, mod installation and the UI reorganization). For current state use [implementation status](implementation-status.md), [installed mods](installed-mods.md), and [UI review](web-ui-review.md). Counts and addresses below describe that earlier run.
+
 # Launch and MVP verification — 2026-09-27
 
 ## Authorized configuration
@@ -20,7 +22,7 @@ Clean CLI stop and backup passed. A separate backup triggered through the actual
 
 The disposable Docker integration test passed in 169.29 seconds: startup, live security checks, persistent scoreboard write, clean stop, backup, restore into a different profile, startup, live security checks, and retrieval of the original scoreboard value. Its containers were removed by scoped test cleanup. The first attempt failed an unreliable chat-output assertion; that output is retained separately, and the final test asserts explicit write/read results.
 
-The final real-world start is exercised through the browser. Final status/security snapshots are in `implementation-evidence/live-status.json` and `live-security.json`; the browser preview is at http://127.0.0.1:8765/.
+The real-world start was exercised through the browser. Final status/security snapshots are in `implementation-evidence/live-status.json` and `live-security.json`; the browser preview is at http://127.0.0.1:8765/.
 
 ## Mod-management MVP
 

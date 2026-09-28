@@ -1,3 +1,5 @@
+> Historical validation snapshots. Superseded for current behavior by [UI review](web-ui-review.md) and [implementation status](implementation-status.md). Earlier blockers and test counts below are preserved as evidence, not current setup requirements.
+
 # Live validation update
 
 Docker is now installed; EULA acceptance and all three usernames were supplied. Base Forge started, passed the live security check, and completed clean-stop and CLI/browser backups. See [current launch progress](launch-progress.md) for the final restore result. The earlier blockers below are historical.

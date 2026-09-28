@@ -7,7 +7,9 @@ One server admin, no player website accounts, no website invitations, and no chi
 The local “Block & Bloom” dashboard contains:
 
 - A setup form: Minecraft username, explicit EULA acceptance, safe preselected Forge settings.
-- World status, start, graceful stop, stopped-world backup, joining instructions and address copying.
+- Server status, start, graceful stop, restart, recent logs, stopped-world backups, joining instructions and address copying.
+- A dedicated Mods page with installed/enabled counts, search and stopped-server switches.
+- Settings containing collapsed admin-password recovery, separate from everyday server controls.
 - A Players page: add a Minecraft username to the allowlist, ban, unban, remove, and re-add. No website credentials for players.
 - One admin login, with a local owner bootstrap link for first setup and recovery.
 

@@ -15,9 +15,16 @@ function notice(message) {
   $("notice").hidden = !message;
 }
 function navigate(next) {
-  if (["care", "players"].includes(next) && state?.role !== "admin") return;
+  if (
+    ["care", "players", "mods", "logs", "settings"].includes(next) &&
+    state?.role !== "admin"
+  )
+    return;
   view = next;
+  $("setup-card").hidden = next !== "world" || !!state?.initialized;
   if (next === "players") loadUsers();
+  if (next === "logs") loadLogs();
+  if (next !== "settings") $("admin-password-card").open = false;
   document.querySelectorAll("[data-panel]").forEach((el) => {
     el.hidden = el.dataset.panel !== next;
   });
@@ -62,12 +69,16 @@ async function api(path, options = {}) {
 }
 function render(s) {
   state = s;
-  $("setup-card").hidden = s.initialized;
+  $("setup-card").hidden = s.initialized || view !== "world";
   $("role").textContent =
     s.role === "admin" ? "Server manager" : "Server manager";
-  $("care-nav").hidden = s.role !== "admin";
-  $("players-nav").hidden = s.role !== "admin";
-  if (["care", "players"].includes(view) && s.role !== "admin")
+  document.querySelectorAll("[data-admin-nav]").forEach((el) => {
+    el.hidden = s.role !== "admin";
+  });
+  if (
+    ["care", "players", "mods", "logs", "settings"].includes(view) &&
+    s.role !== "admin"
+  )
     navigate("world");
   $("world-name").textContent =
     s.profile === "forge" ? "The Overworld" : s.profile;
@@ -96,17 +107,12 @@ function render(s) {
               : "Resting until your next adventure";
   $("start").disabled =
     pending || busy || s.running || !s.available || !s.initialized;
-  $("start").textContent = ready
-    ? "✓ World is ready"
-    : busy
-      ? "Working on your world…"
-      : s.running
-        ? "World is waking up…"
-        : "▶  Start adventure  ↗";
+  $("start").textContent = "Start server";
   $("start-hint").textContent = ready
     ? "Head to How to join. Your adventure awaits."
     : "Your world stays on your laptop.";
   $("stop").disabled = pending || busy || !s.running;
+  $("restart").disabled = pending || busy || !s.running;
   $("backup").disabled =
     pending || busy || s.running || !s.available || !s.initialized;
   $("check-setup").textContent = s.initialized ? "✓" : "○";
@@ -120,6 +126,8 @@ function render(s) {
     "No recovery copies yet. Stop the world, then create your first backup.",
   );
   renderMods(s);
+  $("mod-summary").textContent =
+    `${s.mods.length} installed · ${s.mods.filter((m) => m.enabled).length} enabled. ${s.running ? "Stop the server before changing mods." : "Changes apply on the next start."}`;
   notice(
     s.security_error ||
       s.operation.message ||
@@ -135,8 +143,9 @@ async function refresh() {
   $("dashboard").hidden = !token;
   if (!token) {
     $("role").textContent = "Private access";
-    $("care-nav").hidden = true;
-    $("players-nav").hidden = true;
+    document.querySelectorAll("[data-admin-nav]").forEach((el) => {
+      el.hidden = true;
+    });
     return;
   }
   try {
@@ -145,6 +154,7 @@ async function refresh() {
     notice(err.message);
     $("start").disabled = true;
     $("stop").disabled = true;
+    $("restart").disabled = true;
     $("backup").disabled = true;
     if (!token) {
       $("locked").hidden = false;
@@ -171,17 +181,21 @@ async function act(action) {
 }
 $("start").addEventListener("click", () => act("start"));
 let confirmAction;
-for (const action of ["stop", "backup"])
+for (const action of ["stop", "restart", "backup"])
   $(action).addEventListener("click", () => {
     confirmAction = action;
     $("confirm-title").textContent =
-      action === "stop"
-        ? "Time for a little break?"
-        : "Keep a copy of this world?";
+      action === "restart"
+        ? "Save and restart the server?"
+        : action === "stop"
+          ? "Save and stop the server?"
+          : "Keep a copy of this world?";
     $("confirm-copy").textContent =
-      action === "stop"
-        ? `Everyone on ${state.profile} will be disconnected after the world saves. Make sure they know first.`
-        : `Create a recovery copy of ${state.profile}. The world must stay stopped until the copy is complete.`;
+      action === "restart"
+        ? "The world will save, players will disconnect, and the server will start again."
+        : action === "stop"
+          ? `Everyone on ${state.profile} will be disconnected after the world saves. Make sure they know first.`
+          : `Create a recovery copy of ${state.profile}. The world must stay stopped until the copy is complete.`;
     $("confirm").showModal();
   });
 $("confirm").addEventListener("close", () => {
@@ -342,7 +356,11 @@ let modAction = null;
 function renderMods(s) {
   const list = $("mods");
   list.replaceChildren();
-  for (const mod of s.mods) {
+  const query = $("mod-search").value.trim().toLowerCase();
+  const matches = s.mods.filter((mod) =>
+    mod.name.toLowerCase().includes(query),
+  );
+  for (const mod of matches) {
     const li = document.createElement("li");
     const label = document.createElement("span");
     label.textContent = mod.name;
@@ -370,11 +388,13 @@ function renderMods(s) {
     li.append(button);
     list.append(li);
   }
-  if (!s.mods.length)
+  if (!matches.length)
     inventory(
       "mods",
       [],
-      "No mods installed yet. Installed server mods are enabled by default.",
+      s.mods.length
+        ? "No mods match your search."
+        : "No mods installed yet. Install reviewed JARs with the CLI.",
     );
 }
 async function changeMod(data) {
@@ -393,3 +413,49 @@ async function changeMod(data) {
     notice(err.message);
   }
 }
+
+$("admin-password-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const button = event.submitter;
+  button.disabled = true;
+  try {
+    const result = await api("/api/admin/password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        password: $("admin-new-password").value,
+        confirmation: $("admin-confirm-password").value,
+      }),
+    });
+    $("admin-password-form").reset();
+    token = "";
+    state = null;
+    sessionStorage.removeItem("clubhouse-token");
+    $("login-name").value = result.username;
+    await refresh();
+    notice(
+      `Password saved. Sign in as ${result.username} with your new password.`,
+    );
+  } catch (err) {
+    $("admin-password-message").textContent = err.message;
+  } finally {
+    button.disabled = false;
+  }
+});
+
+$("mod-search").addEventListener("input", () => {
+  if (state) renderMods(state);
+});
+async function loadLogs() {
+  $("refresh-logs").disabled = true;
+  try {
+    const result = await api("/api/logs");
+    $("server-logs").textContent =
+      result.lines.join("\n") || "No server logs yet.";
+  } catch (err) {
+    $("server-logs").textContent = err.message;
+  } finally {
+    $("refresh-logs").disabled = false;
+  }
+}
+$("refresh-logs").addEventListener("click", loadLogs);

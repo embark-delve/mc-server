@@ -1,6 +1,6 @@
 # Server administration
 
-This is the current supported workflow: Minecraft runs in Docker; the CLI and single-admin web dashboard run on the laptop. Players never need website accounts. The default bind is loopback, so only this laptop can connect. See [remote access](remote-access.md) before allowing other devices.
+This is the current supported workflow: Minecraft runs in Docker; the CLI and single-admin web dashboard run on the laptop. Players never need website accounts. The current laptop profile explicitly enables the LAN game binding for owner-configured router forwarding. The dashboard remains local-only. New configurations default to loopback. See [remote access](remote-access.md) for connection instructions and verification limits.
 
 ## Install and start
 
@@ -41,7 +41,7 @@ uv run --locked minecraft-server restart
 uv run --locked minecraft-server security
 ```
 
-The dashboard provides start, graceful stop, backups, joining instructions, player access, and mod switches. Stop saves and waits for a clean exit instead of force-killing the server. Keep the laptop awake during play. Exiting the dashboard does not stop the Minecraft container; stop the game explicitly before shutting down Docker or the laptop.
+The dashboard provides start, graceful stop, restart, recent logs, backups, joining instructions, player access, and mod switches. Stop saves and waits for a clean exit instead of force-killing the server. Keep the laptop awake during play. Exiting the dashboard does not stop the Minecraft container; stop the game explicitly before shutting down Docker or the laptop.
 
 `security` inspects actual port mappings, server authentication/whitelist settings, allowed players and operators. It is a configuration check, not a substitute for a real allowed-player login and unapproved-player rejection test. A failure needs investigation before play.
 
@@ -70,7 +70,7 @@ uv run --locked minecraft-server mods-disable example.jar
 uv run --locked minecraft-server mods-enable example.jar
 ```
 
-Installed server mods default to enabled. World care offers the same switches. Disabled files remain in `data/disabled-mods` and are backed up. Changes while running or after an unclean stop are refused. Back up before changing content mods; disabling a dependency can prevent startup. Client-only rendering mods, shaders and resource packs belong on clients. See [the requested modpack](forge-modpack.md) for unresolved compatibility work. Do not claim the full pack is installed just because Forge is healthy.
+Installed server mods default to enabled. **Mods** offers the same switches, an installed/enabled count, and filename search. Disabled files remain in `data/disabled-mods` and are backed up. Changes while running or after an unclean stop are refused. Back up before changing content mods; disabling a dependency can prevent startup. Client-only rendering mods, shaders and resource packs belong on clients. See [installed versions](installed-mods.md) for the current server files and [the requested modpack](forge-modpack.md) for unresolved compatibility work. Do not claim the full pack is installed just because Forge is healthy.
 
 ## Backup and restore
 
@@ -92,3 +92,11 @@ Restore validates into staging and retains the previous data as `data.rollback`;
 - Cannot join: confirm exact Java username, Minecraft/Forge/modpack versions and server health; other devices cannot reach a loopback-only bind.
 - Lost admin password: rerun `admin owner`; no Microsoft account recovery is involved.
 - CLI/UI conflicts: wait for the existing operation. Do not delete locks or bypass the manager to mutate live data.
+
+## Recover website sign-in
+
+Use the private local owner link printed when `minecraft-server web` starts. Open **Settings** in the authenticated dashboard, then expand **Set or reset your website admin password**. Enter a new password of 15–128 characters twice and save it, then sign in with the displayed username (normally `owner`). The endpoint requires an authenticated administrator and the matching local Origin; anonymous callers cannot reset credentials. Existing password sessions are revoked. The CLI reset remains available. Never share the owner link or your password.
+
+## Website navigation
+
+Use **Server** for Start, Save & stop, and Restart. **Mods** lists installed mods with search and stopped-server toggles. **Players** manages allowed/banned players. **Backups** creates and lists recovery copies. **Logs** shows recent Minecraft output. **Join** shows connection instructions. **Settings** contains admin password management. See [UI review](web-ui-review.md) for current capabilities and validation.
