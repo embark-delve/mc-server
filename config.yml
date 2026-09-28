@@ -1,33 +1,30 @@
-# Minecraft Server Manager Configuration
-
-# Docker container settings
-container:
-  name: minecraft-server
-  docker_compose_cmd: ["docker", "compose"]
-
-# Server settings
+# Minecraft 1.20.1 / Forge 47.4.23. Java 25 is supported by Forge >=47.4.9.
+# Full modpack compatibility must still be tested with exact JAR versions.
+profile: forge
 server:
+  type: docker
+  flavor: forge
+  version: "1.20.1"
+  forge_version: "47.4.23"
+  java_version: java25
+  image: itzg/minecraft-server:java25
+  # The first successful pull is locked to a digest in the private profile.
+  memory: 4G
+  container_memory: 6G
+  cpus: 2.0
+  bind_address: "127.0.0.1"
+  allow_lan: false
   port: 25565
-  rcon_port: 25575
-  rcon_password: minecraft
-  memory: 2G
-  type: PAPER
-  version: 1.20.4
-  difficulty: normal
-  mode: survival
-
-# Backup settings
-backup:
-  max_backups: 10 # Number of backups to keep
-  schedule: "0 3 * * *" # Cron schedule for auto backups (3am daily)
-
-# Plugin settings
-plugins:
-  auto_restart_on_change: true # Whether to restart server when plugins are installed/removed
-
-# Paths
+  allowlist: [MineBuilder006, MountFuji42, Nebulic_]
+  operators: [MineBuilder006, MountFuji42]
+  eula: false # init --accept-eula records agreement explicitly.
+  max_players: 8
+  view_distance: 8
+  simulation_distance: 6
+  startup_timeout: 600
+  stop_timeout: 120
 paths:
-  data_dir: data
-  plugins_dir: plugins
-  config_dir: config
-  backups_dir: backups
+  base_dir: null # Defaults to ~/MinecraftServers/forge, outside this checkout.
+backup:
+  max_backups: 10
+  max_restore_bytes: 21474836480

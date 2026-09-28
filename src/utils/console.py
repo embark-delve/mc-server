@@ -4,7 +4,7 @@
 Console utilities for terminal output formatting
 """
 
-from typing import Any, Dict
+from typing import Any
 
 from rich import box
 from rich.console import Console as RichConsole
@@ -68,7 +68,7 @@ class Console:
         Console._console.print(Panel(title, border_style="blue", expand=True))
 
     @staticmethod
-    def print_status(status_data: Dict[str, Any]) -> None:
+    def print_status(status_data: dict[str, Any]) -> None:
         """
         Print a status dictionary in a formatted table
 

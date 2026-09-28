@@ -1,0 +1,11 @@
+{
+  "profile": "forge",
+  "state": "running",
+  "running": true,
+  "health": "healthy",
+  "minecraft_version": "1.20.1",
+  "forge_version": "47.4.23",
+  "java": "java25",
+  "data_directory": "/Users/shamil/MinecraftServers/forge/data",
+  "connection": "127.0.0.1:25565"
+}

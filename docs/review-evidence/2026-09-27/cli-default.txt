@@ -1,0 +1,19 @@
+2026-09-27 16:10:54,690 - src.utils.config - INFO - Loaded configuration from config.yml
+2026-09-27 16:10:54,690 - src.utils.config - INFO - Loaded configuration from environment variables
+2026-09-27 16:10:54,690 - src.utils.config - INFO - Loaded configuration from command-line arguments
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ Minecraft Server Manager                                                     │
+╰──────────────────────────────────────────────────────────────────────────────╯
+Traceback (most recent call last):
+  File "/private/tmp/mc-server-review-20260927/source/minecraft-server.py", line 154, in <module>
+    main()
+    ~~~~^^
+  File "/private/tmp/mc-server-review-20260927/source/minecraft-server.py", line 128, in main
+    manager = MinecraftServerManager(
+        server_type=config.get("server.type"),
+    ...<3 lines>...
+        auto_shutdown_timeout=config.get("auto_shutdown.timeout"),
+    )
+  File "/private/tmp/mc-server-review-20260927/source/src/minecraft_server_manager.py", line 86, in __init__
+    raise ValueError(f"Unsupported server type: {server_type}")
+ValueError: Unsupported server type: paper

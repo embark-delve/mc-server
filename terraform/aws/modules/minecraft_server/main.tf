@@ -1,4 +1,10 @@
 resource "aws_security_group" "minecraft" {
+  lifecycle {
+    precondition {
+      condition = var.cloud_deployment_reviewed && length(var.docker_compose_content) > 0
+      error_message = "Legacy cloud deployment is disabled. Complete a separate security review first."
+    }
+  }
   name        = "${var.name_prefix}-minecraft-sg"
   description = "Allow Minecraft traffic"
   vpc_id      = var.vpc_id
@@ -40,7 +46,7 @@ resource "aws_instance" "minecraft" {
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.minecraft.id]
   subnet_id              = var.subnet_id
-  
+
   root_block_device {
     volume_size = var.root_volume_size
     volume_type = var.root_volume_type
@@ -85,11 +91,11 @@ resource "aws_eip" "minecraft" {
   count    = var.allocate_elastic_ip ? 1 : 0
   instance = aws_instance.minecraft.id
   domain   = "vpc"
-  
+
   tags = merge(
     var.tags,
     {
       Name = "${var.name_prefix}-minecraft-eip"
     }
   )
-} 
+}

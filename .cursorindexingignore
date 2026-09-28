@@ -83,4 +83,4 @@ kubernetes/secrets/
 .docker/
 
 # Cursor specific
-.cursor/ 
+.cursor/

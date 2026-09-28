@@ -1,70 +1,47 @@
-#!/usr/bin/env python3
+"""Bounded subprocess execution without shell interpretation."""
 
-"""
-Command executor utility for running shell commands
-"""
-
-import subprocess
+import shutil
+import subprocess  # nosec B404
 from pathlib import Path
-from typing import List, Optional, Union
-
-from src.utils.console import Console
 
 
 class CommandExecutor:
-    """Utility class for executing shell commands"""
-
     @staticmethod
     def run(
-        cmd: Union[List[str], str],
-        cwd: Optional[Path] = None,
-        capture_output: bool = False,
+        cmd: list[str],
+        cwd: Path | None = None,
+        capture_output: bool = True,
         check: bool = True,
-        shell: bool = False,
-        verbose: bool = True,
-    ) -> subprocess.CompletedProcess:
-        """
-        Run a shell command and handle errors
-
-        Args:
-            cmd: The command to run (list or string)
-            cwd: Working directory to run the command in
-            capture_output: Whether to capture command output
-            check: Whether to check for command success
-            shell: Whether to run the command in a shell
-            verbose: Whether to print command details
-
-        Returns:
-            CompletedProcess: Result of the command execution
-
-        Raises:
-            subprocess.CalledProcessError: If the command fails and check is True
-        """
-        # Convert string command to list if not using shell
-        if not shell and isinstance(cmd, str):
-            cmd = cmd.split()
-
-        # Print command info if verbose
-        if verbose:
-            cmd_str = cmd if isinstance(cmd, str) else " ".join(cmd)
-            Console.print_info(f"Running: {cmd_str}")
-
+        timeout: float = 60,
+        verbose: bool = False,
+    ) -> subprocess.CompletedProcess[str]:
+        if (
+            not isinstance(cmd, list)
+            or not cmd
+            or any(not isinstance(x, str) for x in cmd)
+        ):
+            raise ValueError("Commands must be a nonempty list of arguments")
+        if cmd[0] == "docker" and shutil.which("docker") is None:
+            bundled = Path("/Applications/Docker.app/Contents/Resources/bin/docker")
+            if bundled.is_file():
+                cmd = [str(bundled), *cmd[1:]]
         try:
-            result = subprocess.run(
+            return subprocess.run(  # noqa: S603 # nosec B603
                 cmd,
                 cwd=cwd,
-                check=check,
-                text=True,
-                shell=shell,
                 capture_output=capture_output,
+                text=True,
+                check=check,
+                timeout=timeout,
             )
-            return result
-        except subprocess.CalledProcessError as e:
-            if verbose:
-                Console.print_error(f"Error executing command: {e}")
-                if capture_output:
-                    Console.print_warning(f"STDOUT: {e.stdout}")
-                    Console.print_error(f"STDERR: {e.stderr}")
-            if check:
-                raise
-            return e
+        except FileNotFoundError as exc:
+            raise RuntimeError(f"Executable not found: {cmd[0]}") from exc
+        except subprocess.TimeoutExpired as exc:
+            raise RuntimeError(
+                f"Operation timed out after {timeout}s: {cmd[0]}"
+            ) from exc
+        except subprocess.CalledProcessError as exc:
+            # Arguments may contain a console command; do not echo them.
+            raise RuntimeError(
+                f"{cmd[0]} failed (exit {exc.returncode}): {exc.stderr or 'no diagnostic'}"
+            ) from exc

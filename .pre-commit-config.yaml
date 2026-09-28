@@ -1,60 +1,132 @@
+minimum_pre_commit_version: '4.0.0'
+default_install_hook_types: [pre-commit, pre-push]
+default_stages: [pre-commit]
+exclude: ^docs/(review-evidence|implementation-evidence)/
 repos:
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+  - repo: local
     hooks:
-      - id: trailing-whitespace
-      - id: end-of-file-fixer
-      - id: check-yaml
-      - id: check-added-large-files
+      - id: private-files
+        name: Block private/runtime files
+        entry: uv run --locked python scripts/check_private_files.py
+        language: system
       - id: check-ast
+        name: Python syntax
+        entry: uv run --locked check-ast
+        language: system
+        types: [python]
+      - id: trailing-whitespace
+        name: Trim trailing whitespace
+        entry: uv run --locked trailing-whitespace-fixer
+        language: system
+        types: [text]
+      - id: end-of-file
+        name: Final newline
+        entry: uv run --locked end-of-file-fixer
+        language: system
+        types: [text]
+      - id: merge-conflict
+        name: Check merge conflicts
+        entry: uv run --locked check-merge-conflict
+        language: system
+        types: [text]
+      - id: check-yaml
+        name: Check YAML
+        entry: uv run --locked check-yaml --allow-multiple-documents
+        language: system
+        types: [yaml]
       - id: check-json
-      - id: check-merge-conflict
-      - id: detect-private-key
-
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: "v0.0.286"
-    hooks:
-      - id: ruff
-        args: [--fix, --exit-non-zero-on-fix]
-
-  - repo: https://github.com/psf/black
-    rev: 23.7.0
-    hooks:
-      - id: black
-
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.5.1
-    hooks:
+        name: Check JSON
+        entry: uv run --locked check-json
+        language: system
+        types: [json]
+      - id: check-toml
+        name: Check TOML
+        entry: uv run --locked check-toml
+        language: system
+        types: [toml]
+      - id: check-private-key
+        name: Detect private keys
+        entry: uv run --locked detect-private-key
+        language: system
+        types: [text]
+        exclude: ^$
+      - id: large-files
+        name: Reject large new files
+        entry: uv run --locked check-added-large-files --maxkb=1000
+        language: system
+      - id: case-conflict
+        name: Check case-conflicting paths
+        entry: uv run --locked check-case-conflict
+        language: system
+      - id: symlinks
+        name: Check broken symlinks
+        entry: uv run --locked check-symlinks
+        language: system
+        types: [symlink]
+      - id: ruff-check
+        name: Ruff lint
+        entry: uv run --locked ruff check
+        language: system
+        types: [python]
+      - id: ruff-format
+        name: Ruff formatting
+        entry: uv run --locked ruff format --check
+        language: system
+        types: [python]
       - id: mypy
-        additional_dependencies: [types-requests, types-PyYAML]
-        args: [--ignore-missing-imports]
-        files: ^src/
-
-  # Terraform specific hooks
-  - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.83.0
-    hooks:
-      - id: terraform_fmt
-        args:
-          - --args=-recursive
-          - --args=-check
-        files: ^terraform/
-      - id: terraform_validate
-        files: ^terraform/
-      - id: terraform_tflint
-        args:
-          - --args=--config=__GIT_WORKING_DIR__/terraform/.tflint.hcl
-        files: ^terraform/
-      - id: terraform_docs
-        args:
-          - --args=--config=.terraform-docs.yml
-        files: ^terraform/
-      - id: terraform_tfsec
-        args:
-          - --args=--config-file=__GIT_WORKING_DIR__/terraform/tfsec.yml
-        files: ^terraform/
-      - id: terraform_checkov
-        args:
-          - --args=--quiet
-          - --args=--framework terraform
-        files: ^terraform/
+        name: Python type checks
+        entry: uv run --locked mypy src scripts
+        language: system
+        pass_filenames: false
+        types: [python]
+      - id: bandit
+        name: Bandit production security scan
+        entry: uv run --locked bandit -c pyproject.toml -r src scripts -q
+        language: system
+        pass_filenames: false
+        types: [python]
+      - id: uv-lock
+        name: Validate Python lockfile
+        entry: uv lock --check
+        language: system
+        pass_filenames: false
+        files: ^(pyproject.toml|uv.lock)$
+      - id: frontend-lint
+        name: ESLint browser JavaScript
+        entry: uv run --locked python scripts/node_tools.py lint
+        language: system
+        pass_filenames: false
+        files: \.(js|mjs)$|^package.*\.json$
+      - id: frontend-format
+        name: Prettier UI formatting
+        entry: uv run --locked python scripts/node_tools.py format-check
+        language: system
+        pass_filenames: false
+        files: ^src/web/static/|^package.json$|^eslint.config.mjs$
+      - id: gitleaks
+        name: Gitleaks staged secrets (redacted)
+        entry: gitleaks git --pre-commit --staged --redact --no-banner
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: pytest
+        name: Offline regression tests
+        entry: uv run --locked pytest -q
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-push]
+      - id: python-audit
+        name: Python dependency vulnerability audit
+        entry: uv run --locked pip-audit --skip-editable
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-push]
+      - id: node-audit
+        name: Node dependency vulnerability audit
+        entry: uv run --locked python scripts/node_tools.py audit
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-push]

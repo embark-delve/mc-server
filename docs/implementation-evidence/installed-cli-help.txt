@@ -1,0 +1,32 @@
+usage: minecraft-server [-h] [--config CONFIG] [--profile PROFILE]
+                        [--base-dir BASE_DIR] [--port PORT] [--memory MEMORY]
+                        [--type {docker}] [--version VERSION]
+                        [--flavor {forge,paper,vanilla}] [--debug]
+                        [--disable-auto-shutdown]
+                        {init,start,stop,restart,status,security,backup,backups,config,render,mods-list,players,admin,setup,web,restore,logs,console,mods-install,mods-remove} ...
+
+Manage private local Minecraft servers
+
+positional arguments:
+  {init,start,stop,restart,status,security,backup,backups,config,render,mods-list,players,admin,setup,web,restore,logs,console,mods-install,mods-remove}
+    init                Create an empty private profile
+    players             Ban/remove Minecraft players, including configured
+                        allowlist members
+    admin               Set or replace the single local administrator
+    setup               Prepare a private world with safe defaults
+    web                 Open the private, laptop-only family dashboard
+    restore             Restore a stopped profile, preserving data.rollback
+    mods-install        Install a reviewed local Forge JAR while stopped
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG
+  --profile PROFILE
+  --base-dir BASE_DIR
+  --port PORT
+  --memory MEMORY
+  --type {docker}
+  --version VERSION
+  --flavor {forge,paper,vanilla}
+  --debug
+  --disable-auto-shutdown

@@ -5,7 +5,7 @@ metadata:
   labels:
     app: minecraft
 spec:
-  replicas: 1
+  replicas: 0 # Disabled: legacy deployment requires a separate review
   selector:
     matchLabels:
       app: minecraft
@@ -18,14 +18,14 @@ spec:
     spec:
       containers:
         - name: minecraft
-          image: itzg/minecraft-server:latest
+          image: itzg/minecraft-server:java25
           env:
             - name: EULA
-              value: "TRUE"
+              value: "FALSE"
             - name: TYPE
-              value: "PAPER"
+              value: "FORGE"
             - name: VERSION
-              value: "1.20.4"
+              value: "1.20.1"
             - name: MEMORY
               value: "2G"
             - name: DIFFICULTY
@@ -39,7 +39,10 @@ spec:
             - name: ENABLE_RCON
               value: "true"
             - name: RCON_PASSWORD
-              value: "minecraft" # In production, use a SecretKeyRef
+              valueFrom:
+                secretKeyRef:
+                  name: minecraft-rcon
+                  key: password
             - name: MOTD
               value: "Minecraft Server - Powered by Kubernetes"
           ports:
@@ -69,7 +72,7 @@ metadata:
   labels:
     app: minecraft
 spec:
-  type: LoadBalancer # Change to NodePort for local deployments
+  type: ClusterIP # Private; legacy deployment remains disabled
   ports:
     - port: 25565
       targetPort: 25565
