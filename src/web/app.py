@@ -117,6 +117,23 @@ def create_app(
         sessions[credential] = {**user, "expires": now + 8 * 3600}
         return JSONResponse({"token": credential})
 
+    async def admin_password(request: Request) -> Response:
+        if role(request) != "admin":
+            return JSONResponse({"error": "Open the local owner link first."}, 403)
+        try:
+            body = await payload(request)
+            if body.get("password") != body.get("confirmation"):
+                raise ValueError("The two passwords do not match.")
+            current = manager.accounts.read()["admin"]
+            username = current["username"] if current else "owner"
+            await run_in_threadpool(
+                manager.accounts.set_admin, username, body.get("password", "")
+            )
+        except (ValueError, UnicodeError) as exc:
+            return JSONResponse({"error": str(exc)}, 400)
+        sessions.clear()
+        return JSONResponse({"username": username})
+
     async def logout(request: Request) -> Response:
         if request.headers.get("origin") != origin:
             return Response(status_code=403)
@@ -234,7 +251,7 @@ def create_app(
             "forge": cfg.get("server.forge_version"),
             "java": cfg.get("server.java_version"),
             "memory": cfg.get("server.memory"),
-            "connection": f"127.0.0.1:{cfg.get('server.port')}",
+            "connection": f"{cfg.get('server.bind_address')}:{cfg.get('server.port')}",
             "operation": dict(operation),
             "backups": [],
             "mods": [],
@@ -270,6 +287,17 @@ def create_app(
                 )
         return JSONResponse(result)
 
+    async def logs(request: Request) -> Response:
+        if role(request) != "admin":
+            return JSONResponse({"error": "Sign in as the server admin."}, 403)
+        try:
+            lines = await run_in_threadpool(manager.get_logs, 100)
+            return JSONResponse({"lines": [line[:4000] for line in lines[-100:]]})
+        except (RuntimeError, OSError, ValueError):
+            return JSONResponse(
+                {"error": "Logs unavailable. Check Docker Desktop."}, 503
+            )
+
     async def perform(action: str) -> None:
         try:
             result = await run_in_threadpool(getattr(manager, action))
@@ -280,6 +308,7 @@ def create_app(
                 message={
                     "start": "Your world is ready. Time to explore!",
                     "stop": "World saved. See you next adventure!",
+                    "restart": "Server restarted. Ready to join.",
                     "backup": "A new recovery copy is safely stored.",
                 }[action],
             )
@@ -303,7 +332,7 @@ def create_app(
         if request.headers.get("origin") != origin:
             return JSONResponse({"error": "Request origin refused."}, 403)
         selected = request.path_params["action"]
-        if selected not in {"start", "stop", "backup"}:
+        if selected not in {"start", "stop", "restart", "backup"}:
             return JSONResponse({"error": "Unknown action."}, 404)
         if selected != "start" and access != "admin":
             return JSONResponse({"error": "Sign in as the server admin."}, 403)
@@ -320,6 +349,7 @@ def create_app(
             message={
                 "start": "Waking up your world. The first visit can take several minutes.",
                 "stop": "Saving everyone's adventure before closing…",
+                "restart": "Saving and restarting the server…",
                 "backup": "Making a recovery copy of your stopped world…",
             }[selected],
         )
@@ -331,8 +361,10 @@ def create_app(
             Route("/", home),
             Route("/assets/{name}", asset),
             Route("/api/status", snapshot),
+            Route("/api/logs", logs),
             Route("/api/login", login, methods=["POST"]),
             Route("/api/logout", logout, methods=["POST"]),
+            Route("/api/admin/password", admin_password, methods=["POST"]),
             Route("/api/players", players, methods=["GET", "POST"]),
             Route("/api/setup", setup, methods=["POST"]),
             Route("/api/mods", mods, methods=["POST"]),

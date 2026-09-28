@@ -1,10 +1,10 @@
 # Minecraft Server Manager
 
-A local, command-line manager for **Minecraft Java Edition 1.20.1 / Forge 47.4.23**, targeting **Java 25**. It runs the game in Docker and keeps each server's files outside this repository.
+A local CLI and single-admin web manager for **Minecraft Java Edition 1.20.1 / Forge 47.4.23**, targeting **Java 25**. It runs the game in Docker and keeps each server's files outside this repository.
 
-The original prototype has been replaced with a smaller supported local path. AWS, Kubernetes, legacy shell management, mock mod downloads, automatic shutdown and persistent metrics are disabled. No web UI is required for a private laptop server.
+The original prototype has been replaced with a smaller supported local path. AWS, Kubernetes, legacy shell management, mock mod downloads, automatic shutdown and persistent metrics are disabled. The web dashboard provides the everyday server controls; advanced restore and JAR installation remain in the CLI.
 
-**Validation status:** code-level safety tests and packaging checks are automated. The full requested modpack and real Docker gameplay still require validation; see [implementation status](docs/implementation-status.md). Do not treat a passing unit suite as proof that the modpack loads.
+**Validation status:** code-level safety tests and packaging checks are automated. The installed 13-JAR mod subset starts cleanly in Docker; full wishlist compatibility and actual client admission/rejection still require validation; see [implementation status](docs/implementation-status.md). Do not treat a passing unit suite as proof that the modpack loads.
 
 ## Install
 
@@ -20,6 +20,8 @@ docker compose version
 `pyproject.toml` defines dependencies; `uv.lock` pins the resolved set. There is no maintained requirements.txt. Python dependencies, Java, Minecraft, Forge and individual mods have separate version contracts.
 
 ## Configure and initialize
+
+The checked-in `config.yml` describes this laptop, including its explicitly enabled LAN bind and player list. For a new installation, change those values first; use `127.0.0.1` and `allow_lan: false` until remote access is intentionally configured.
 
 Edit `config.yml`: add your exact Minecraft username to `server.allowlist`, select a heap/container budget your laptop can support, and optionally set `paths.base_dir` to an empty dedicated directory. Default storage is `~/MinecraftServers/forge`. The initial 4G heap / 6G container values are configurable starting values, not a measured recommendation for your laptop.
 
@@ -48,7 +50,7 @@ uv run --locked minecraft-server backup
 uv run --locked minecraft-server backups
 ```
 
-Connect from the Java Edition client at `127.0.0.1:25565`. Default networking is loopback only, online authentication and allowlisting are enabled, and RCON is not published. To allow trusted LAN access, explicitly set `server.allow_lan: true` and a suitable `server.bind_address`; review the host firewall first.
+Connect from the Java Edition client using the configured `server.bind_address:25565` on this laptop/LAN, or the router’s public address for remote players. This laptop configuration explicitly enables a LAN game binding for owner-configured TCP port forwarding. Authentication and allowlisting remain enabled; the dashboard stays localhost-only and RCON is not published. See [remote access](docs/remote-access.md) for validation limits and how to disable forwarding. New configurations default to loopback unless explicitly changed.
 
 The first start downloads the configured image and records its immutable digest in `runtime.json`. Later starts use that digest. Game/Forge/Java/image changes are refused once a world has a runtime lock: test upgrades in a separate profile. Startup succeeds only after Minecraft's health check passes. Stop waits for a clean game exit and refuses to force-kill if saving exceeds the deadline. A failed startup can leave a container running for diagnosis; use logs/status and stop explicitly.
 
@@ -56,7 +58,7 @@ Stop before closing the laptop, quitting Docker Desktop, backing up, restoring, 
 
 ## Mods and client content
 
-See the complete requested list and unresolved choices in [the Forge pack plan](docs/forge-modpack.md). **Exact pack exports/JAR versions are still needed.** Embeddium and Oculus are client-side; resource packs and shaders belong in the client. A NeoForge artifact is not automatically a Forge artifact. Do not install every listed item on the server indiscriminately.
+See the complete requested list and unresolved choices in [the Forge pack plan](docs/forge-modpack.md). The [installed version manifest](docs/installed-mods.md) records the 13 server JARs already installed and verified. Exact client matching and the remaining wishlist are still pending. Embeddium and Oculus are client-side; resource packs and shaders belong in the client. A NeoForge artifact is not automatically a Forge artifact. Do not install every listed item on the server indiscriminately.
 
 The current supported install path is a reviewed local Forge JAR with an expected SHA-256 from a trusted manifest/source:
 
@@ -123,7 +125,7 @@ The original review and older guides are historical. The review's line numbers r
 uv run --locked minecraft-server web
 ```
 
-Open the owner bootstrap link printed in your terminal, or configure the single admin with `uv run --locked minecraft-server admin owner` and sign in. The dashboard is laptop-only. Anyone using the admin login can set up the world, add/ban/remove Minecraft players, start/stop, and create backups. There are no player website accounts or grown-up approval gates. Keep the owner link private.
+Open the owner bootstrap link printed in your terminal, or configure the single admin with `uv run --locked minecraft-server admin owner` and sign in. The dashboard is laptop-only. Anyone using the admin login can set up the world, add/ban/remove Minecraft players, start/stop/restart, view logs, toggle installed mods, and create backups. There are no player website accounts or grown-up approval gates. Keep the owner link private.
 
 Minecraft still runs in Docker. The CLI/web manager runs on the laptop; the dashboard does not expose or mount a Docker socket. A working Docker engine, your explicit EULA acceptance, an approved username allowlist, and a validated modpack are needed before live play.
 
@@ -133,6 +135,6 @@ After starting the game, inspect its actual access controls:
 uv run --locked minecraft-server security
 ```
 
-See [UI design](docs/clubhouse-design.md), [authentication and Docker boundaries](docs/web-ui-security.md), and [verification evidence and remaining live tests](docs/web-ui-validation.md).
+Use **Server**, **Mods**, **Players**, **Backups**, **Logs**, **Join**, and **Settings**. Password changes are in Settings only. See [current UI capabilities](docs/web-ui-review.md), [security boundaries](docs/web-ui-security.md), and the [documentation index](docs/README.md).
 
 See [accounts and invitations](docs/accounts-and-invitations.md) for single-admin setup and Minecraft player controls. Website credentials do not replace Minecraft/Microsoft authentication.

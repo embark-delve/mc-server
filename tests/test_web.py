@@ -179,3 +179,84 @@ def test_mod_controls_require_admin_and_stopped_backend(web, monkeypatch):
     toggle.assert_called_once_with("test.jar", False)
     toggle.side_effect = RuntimeError("Stop the server")
     assert client.post("/api/mods", json=body, headers=headers()).status_code == 409
+
+
+def test_admin_password_recovery_requires_auth_and_origin(web):
+    client, manager = web
+    body = {
+        "password": "new private owner password",
+        "confirmation": "new private owner password",
+    }
+    assert client.post("/api/admin/password", json=body).status_code == 403
+    assert (
+        client.post(
+            "/api/admin/password",
+            json=body,
+            headers={**headers(), "Origin": "https://evil.example"},
+        ).status_code
+        == 400
+    )
+    assert (
+        client.post(
+            "/api/admin/password",
+            json={**body, "confirmation": "wrong"},
+            headers=headers(),
+        ).status_code
+        == 400
+    )
+    old = client.post(
+        "/api/login",
+        json={"username": "owner", "password": "a long admin password"},
+        headers={"Origin": ORIGIN},
+    ).json()["token"]
+    response = client.post("/api/admin/password", json=body, headers=headers())
+    assert response.status_code == 200
+    assert response.json() == {"username": "owner"}
+    assert client.get("/api/players", headers=headers(old)).status_code == 403
+    assert manager.accounts.authenticate("owner", "a long admin password") is None
+    login = client.post(
+        "/api/login",
+        json={"username": "owner", "password": body["password"]},
+        headers={"Origin": ORIGIN},
+    )
+    assert login.status_code == 200
+    assert (
+        client.get("/api/players", headers=headers(login.json()["token"])).status_code
+        == 200
+    )
+
+
+def test_logs_are_admin_only_bounded_and_fail_closed(web, monkeypatch):
+    client, manager = web
+    get_logs = Mock(return_value=["x" * 5000] * 110)
+    monkeypatch.setattr(manager, "get_logs", get_logs)
+    assert client.get("/api/logs").status_code == 403
+    response = client.get("/api/logs", headers=headers())
+    assert len(response.json()["lines"]) == 100
+    assert len(response.json()["lines"][0]) == 4000
+    get_logs.assert_called_once_with(100)
+    get_logs.side_effect = RuntimeError("private backend detail")
+    response = client.get("/api/logs", headers=headers())
+    assert response.status_code == 503
+    assert "private backend detail" not in response.text
+
+
+@pytest.mark.parametrize("action", ["stop", "restart"])
+def test_lifecycle_requires_confirmation_and_runs_backend(web, monkeypatch, action):
+    client, manager = web
+    restart = Mock(return_value=True)
+    monkeypatch.setattr(manager, action, restart)
+    assert client.post(f"/api/actions/{action}").status_code == 401
+    assert (
+        client.post(
+            f"/api/actions/{action}",
+            headers={**headers(), "X-Confirm-Profile": "wrong"},
+        ).status_code
+        == 400
+    )
+    assert client.post(f"/api/actions/{action}", headers=headers()).status_code == 202
+    for _ in range(100):
+        if restart.called:
+            break
+        time.sleep(0.01)
+    restart.assert_called_once_with()

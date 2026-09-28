@@ -888,3 +888,38 @@ dialog p {
 #mods button[aria-checked="true"] {
   background: #e0e9cd;
 }
+
+.server-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+.server-actions button {
+  margin: 0;
+}
+.log-output {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 65vh;
+  overflow: auto;
+  font-size: 12px;
+}
+#mods li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+#mods li span {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+#mods li button {
+  flex-shrink: 0;
+}
+#mod-search {
+  max-width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+}

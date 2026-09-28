@@ -12,8 +12,9 @@ server:
   memory: 4G
   container_memory: 6G
   cpus: 2.0
-  bind_address: "127.0.0.1"
-  allow_lan: false
+  # Router forwards TCP 25565 to this laptop address (reserve it in DHCP).
+  bind_address: "192.168.0.104"
+  allow_lan: true
   port: 25565
   allowlist: [MineBuilder006, MountFuji42, Nebulic_]
   operators: [MineBuilder006, MountFuji42]

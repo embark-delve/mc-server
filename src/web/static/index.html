@@ -17,12 +17,31 @@
       <div class="nav-label">YOUR CORNER OF THE OVERWORLD</div>
       <nav aria-label="Main navigation">
         <button class="nav active" data-view="world" aria-current="page">
-          <span>▧</span> My world <b>01</b></button
-        ><button class="nav" data-view="join"><span>↗</span> How to join</button
-        ><button class="nav" data-view="players" id="players-nav" hidden>
-          <span>♧</span> Players</button
-        ><button class="nav" data-view="care" id="care-nav" hidden>
-          <span>♧</span> World care
+          Server
+        </button>
+        <button class="nav" data-view="mods" data-admin-nav hidden>Mods</button>
+        <button
+          class="nav"
+          data-view="players"
+          id="players-nav"
+          data-admin-nav
+          hidden
+        >
+          Players
+        </button>
+        <button
+          class="nav"
+          data-view="care"
+          id="care-nav"
+          data-admin-nav
+          hidden
+        >
+          Backups
+        </button>
+        <button class="nav" data-view="logs" data-admin-nav hidden>Logs</button>
+        <button class="nav" data-view="join">Join</button>
+        <button class="nav" data-view="settings" data-admin-nav hidden>
+          Settings
         </button>
       </nav>
       <div class="side-note">
@@ -61,7 +80,7 @@
           hidden
         ></div>
         <section id="locked" class="card locked" hidden>
-          <span class="kicker">YOUR INVITATION AWAITS</span>
+          <span class="kicker">ADMIN SIGN-IN</span>
           <h2>Welcome to the clubhouse.</h2>
           <p>
             Sign in with the single server admin account, or open the local
@@ -90,7 +109,47 @@
             directly with their own Minecraft accounts.
           </p>
         </section>
-        <div id="dashboard">
+        <div id="dashboard" hidden>
+          <section data-panel="settings" hidden>
+            <div class="section-intro">
+              <h2>Settings</h2>
+              <p>
+                Manage your website admin account. Players use their own
+                Minecraft accounts.
+              </p>
+            </div>
+            <details class="card" id="admin-password-card">
+              <summary>Set or reset your website admin password</summary>
+              <p>
+                Choose a password for future sign-ins. This does not change
+                Minecraft accounts.
+              </p>
+              <form id="admin-password-form" class="account-form">
+                <label
+                  >New admin password<input
+                    id="admin-new-password"
+                    type="password"
+                    autocomplete="new-password"
+                    minlength="15"
+                    maxlength="128"
+                    required
+                /></label>
+                <label
+                  >Confirm admin password<input
+                    id="admin-confirm-password"
+                    type="password"
+                    autocomplete="new-password"
+                    minlength="15"
+                    maxlength="128"
+                    required
+                /></label>
+                <button class="primary" type="submit">
+                  Save admin password
+                </button>
+              </form>
+              <p id="admin-password-message" role="status"></p>
+            </details>
+          </section>
           <section id="setup-card" class="card" hidden>
             <span class="kicker">YOUR FIRST ADVENTURE</span>
             <h2>Let's set up your world.</h2>
@@ -137,9 +196,16 @@
                   <span class="dot" id="status-dot"></span
                   ><span id="world-status">Checking your world…</span>
                 </div>
-                <button class="primary" id="start" disabled>
-                  <span>▶</span> Start adventure <span>↗</span>
-                </button>
+                <div class="server-actions">
+                  <button class="primary" id="start" disabled>
+                    <span>▶</span> Start adventure <span>↗</span>
+                  </button>
+                  <button id="stop" class="secondary" disabled>
+                    Save &amp; stop</button
+                  ><button id="restart" class="secondary" disabled>
+                    Restart
+                  </button>
+                </div>
                 <p class="button-hint" id="start-hint">
                   Your world stays on your laptop.
                 </p>
@@ -213,8 +279,8 @@
               <span class="kicker">LET'S GET YOU THERE</span>
               <h2>Three small steps. One big adventure.</h2>
               <p>
-                These instructions connect from this laptop. Every player needs
-                the same approved modpack.
+                Use this address on the laptop or your local network. Every
+                player needs the same approved modpack.
               </p>
             </div>
             <div class="steps">
@@ -222,11 +288,11 @@
                 <span class="step">01</span>
                 <h2>Wake up your world</h2>
                 <p>
-                  Go to My world and choose Start adventure. Wait until it says
+                  Go to Server and choose Start server. Wait until it says
                   “Ready to explore.”
                 </p>
                 <button class="secondary" data-view="world">
-                  Back to my world ↗
+                  Back to server ↗
                 </button>
               </article>
               <article class="card">
@@ -251,9 +317,10 @@
               </article>
             </div>
             <div class="notice">
-              Not on the list yet? Ask a admin to add your exact Minecraft
+              Not on the list yet? Ask an admin to add your exact Minecraft
               username to the allowlist. A connection from another device needs
-              a separately configured LAN setup.
+              the router’s public address and game port if port forwarding is
+              configured.
             </div>
           </section>
           <section data-panel="players" hidden>
@@ -296,24 +363,51 @@
               </article>
             </div>
           </section>
+          <section data-panel="mods" hidden>
+            <div class="section-intro">
+              <h2>Mods</h2>
+              <p id="mod-summary"></p>
+              <label
+                >Find a mod
+                <input
+                  id="mod-search"
+                  type="search"
+                  placeholder="Search filenames"
+              /></label>
+            </div>
+            <article class="card">
+              <span class="kicker">THE BUILDING BLOCKS</span>
+              <h2>Installed mods</h2>
+              <p>
+                All installed mods start enabled. Stop the world to toggle
+                individual mods. Disabling a dependency can prevent startup;
+                back up before changing content mods.
+              </p>
+              <ul id="mods" class="inventory"></ul>
+            </article>
+          </section>
+          <section data-panel="logs" hidden>
+            <div class="section-intro">
+              <h2>Server logs</h2>
+              <p>
+                Latest 100 lines from Minecraft. Refresh after a problem to see
+                what happened.
+              </p>
+              <button class="secondary" id="refresh-logs">Refresh logs</button>
+            </div>
+            <pre id="server-logs" class="card log-output" tabindex="0">
+Open this page to load logs.</pre>
+          </section>
           <section data-panel="care" hidden>
             <div class="section-intro">
               <span class="kicker">WORLD TOOLS</span>
-              <h2>A little care goes a long way.</h2>
+              <h2>Backups</h2>
               <p>
                 Save the world before a break. Keep recovery copies before
                 changing mods.
               </p>
             </div>
             <div class="care-grid">
-              <article class="card">
-                <h2>End today's adventure</h2>
-                <p>
-                  Let everyone know before closing. The server saves the world
-                  and stops gently.
-                </p>
-                <button id="stop" class="secondary">Save & stop world</button>
-              </article>
               <article class="card">
                 <h2>Make a recovery copy</h2>
                 <p>
@@ -328,16 +422,6 @@
                 <span class="kicker">RECOVERY SHELF</span>
                 <h2>World backups</h2>
                 <ul id="backups" class="inventory"></ul>
-              </article>
-              <article class="card">
-                <span class="kicker">THE BUILDING BLOCKS</span>
-                <h2>Installed mods</h2>
-                <p>
-                  All installed mods start enabled. Stop the world to toggle
-                  individual mods. Disabling a dependency can prevent startup;
-                  back up before changing content mods.
-                </p>
-                <ul id="mods" class="inventory"></ul>
               </article>
             </div>
             <article class="card safety">

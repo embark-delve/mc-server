@@ -1,0 +1,145 @@
+[
+  {
+    "project": "easy-npc",
+    "version_id": "KWOV0VKY",
+    "version": "7.12.1",
+    "filename": "easy_npc_bundle-forge-1.20.1-7.12.1.jar",
+    "minecraft": "1.20.1",
+    "loader": "forge",
+    "url": "https://cdn.modrinth.com/data/CgGEe1h3/versions/KWOV0VKY/easy_npc_bundle-forge-1.20.1-7.12.1.jar",
+    "sha512": "e360ddc158ed3c6db6c27ec6439cd6aa0b1bd5afd64ce7de988c19631d4411f0d76b8e5a9ff19d495231d89e8c616c7c568cd8f5e8ddcf39e86323315ddf1fb3",
+    "sha256": "6c63fd0dd7838f247593c09e44158b45f54e4250b66f0081e488a7805402a1c5"
+  },
+  {
+    "project": "easy-npc-config-ui",
+    "version_id": "swcRILIX",
+    "version": "7.12.1",
+    "filename": "easy_npc_config_ui-forge-1.20.1-7.12.1.jar",
+    "minecraft": "1.20.1",
+    "loader": "forge",
+    "url": "https://cdn.modrinth.com/data/uTGjf7vA/versions/swcRILIX/easy_npc_config_ui-forge-1.20.1-7.12.1.jar",
+    "sha512": "a162bfbdeb4e47f6a7e0f75a3cead0b1f5477fccb6c30d045df9345ff4ea402ba4016a67c820e07c4f9d0c7c5bd116c6468b673308a748bd3951e11d7b37f935",
+    "sha256": "5fde33611f3522b136717cf99bac1d3a83cdf220c18c4205416afbff663b3445"
+  },
+  {
+    "project": "easy-npc-core",
+    "version_id": "b2koOKsW",
+    "version": "7.12.1",
+    "filename": "easy_npc-forge-1.20.1-7.12.1.jar",
+    "minecraft": "1.20.1",
+    "loader": "forge",
+    "url": "https://cdn.modrinth.com/data/Epm6R3P2/versions/b2koOKsW/easy_npc-forge-1.20.1-7.12.1.jar",
+    "sha512": "ca9c9de4192018580bf466be6d31aaf226587c5c6d0883dc447cd5e3dacfc7818a43091ea96ed167a453057fed8ad6840433f8f1d332eb7166921a66212b9692",
+    "sha256": "433a0b9dc054ec90f1b0549abbc4b4b51f3e523c797968da0559920ec30a61ca"
+  },
+  {
+    "project": "farmers-delight",
+    "version_id": "SiIpcZzM",
+    "version": "1.20.1-1.3.4",
+    "filename": "FarmersDelight-1.20.1-1.3.4.jar",
+    "minecraft": "1.20.1",
+    "loader": "forge",
+    "url": "https://cdn.modrinth.com/data/R2OftAxM/versions/SiIpcZzM/FarmersDelight-1.20.1-1.3.4.jar",
+    "sha512": "932ae0ab95fa0755bb5a79fbf1d1e31d0e86f3c0f5186796ed06973a3019a618ee8c66a4eae5b901909aed6232abb2bd3b1ff0e1905f74fc70644fada94a80b5",
+    "sha256": "34f03eb671ea1ca579b00c98e4541404cb96d1a292014aed9cc5eb45ad8afbce"
+  },
+  {
+    "project": "carry-on",
+    "version_id": "edGQD16r",
+    "version": "2.1.2.7",
+    "filename": "carryon-forge-1.20.1-2.1.2.7.jar",
+    "minecraft": "1.20.1",
+    "loader": "forge",
+    "url": "https://cdn.modrinth.com/data/joEfVgkn/versions/edGQD16r/carryon-forge-1.20.1-2.1.2.7.jar",
+    "sha512": "4f75afb703dd71c322d4e2e27d28d7ab4afeb0c242bcee6d1eb5fef59ee4347352f1ca55f1826743957d2e95a951ed13884356485b0a979b14010915079e2c29",
+    "sha256": "d7470921fc5ff988788d43409083f62478aecc91f4b81d7e6b63c80c933d4613"
+  },
+  {
+    "project": "sophisticated-backpacks",
+    "version_id": "u2NNJgIW",
+    "version": "1.20.1-3.26.4.2172",
+    "filename": "sophisticatedbackpacks-1.20.1-3.26.4.2172.jar",
+    "minecraft": "1.20.1",
+    "loader": "forge",
+    "url": "https://cdn.modrinth.com/data/TyCTlI4b/versions/u2NNJgIW/sophisticatedbackpacks-1.20.1-3.26.4.2172.jar",
+    "sha512": "88dc2088114f62eda46429300e5e035efe9e4a1208fbe4131224951ff16f42083c9c883cb10f8011941cbb4017fcc098c762ec51921cd840d1c87bce49598d89",
+    "sha256": "8d351f715ed4d28a597e77a4d9843964dc1fa3f6820f38cbed9a9ca7fa98a7b9"
+  },
+  {
+    "project": "sophisticated-core",
+    "version_id": "7LbBi96J",
+    "version": "1.20.1-1.5.2.2346",
+    "filename": "sophisticatedcore-1.20.1-1.5.2.2346.jar",
+    "minecraft": "1.20.1",
+    "loader": "forge",
+    "url": "https://cdn.modrinth.com/data/nmoqTijg/versions/7LbBi96J/sophisticatedcore-1.20.1-1.5.2.2346.jar",
+    "sha512": "a085957df06965b5b00f5b0e44012fb231838dd403c9b1f4b50ec6f72b350961395821757074ca7b405715d4741fe1d243ad0e23b85b4f1c5008bf36cb57e2e1",
+    "sha256": "95de587c81918c0f991cbf208387747f288b286d81f4ab63ada7220d6093fa71"
+  },
+  {
+    "project": "chipped",
+    "version_id": "pi3f4er3",
+    "version": "3.0.7",
+    "filename": "chipped-forge-1.20.1-3.0.7.jar",
+    "minecraft": "1.20.1",
+    "loader": "forge",
+    "url": "https://cdn.modrinth.com/data/BAscRYKm/versions/pi3f4er3/chipped-forge-1.20.1-3.0.7.jar",
+    "sha512": "be1871655e213cf488d5049058200e03655f63b5922b6031af142d79d8958dca6653e7fa501f1aa2fda5544ad44a4f593521a7927a516e99579406a23a187045",
+    "sha256": "300e02535342b710fb34409821de9d097b0d8b17f56a57a17d75d05c4c1c5b63"
+  },
+  {
+    "project": "resourceful-lib",
+    "version_id": "OhsHaCcW",
+    "version": "2.1.29",
+    "filename": "resourcefullib-forge-1.20.1-2.1.29.jar",
+    "minecraft": "1.20.1",
+    "loader": "forge",
+    "url": "https://cdn.modrinth.com/data/G1hIVOrD/versions/OhsHaCcW/resourcefullib-forge-1.20.1-2.1.29.jar",
+    "sha512": "8dbe951d431545a7d18081a8b11a52a248e6d8ff9862ae6462b0f5a6f57ff523af12704c3adb071ae99a7c5c1dd895bd7875dea59f9c4956c1597a668b6e8820",
+    "sha256": "b13afb95231d88e1caea5a045967e0fc291b29020b0d26ad39e6f9e9a551fee8"
+  },
+  {
+    "project": "migueleconomy",
+    "version_id": "YWgCwGim",
+    "version": "1.1.4",
+    "filename": "migueleconomy-1.1.4.jar",
+    "minecraft": "1.20.1",
+    "loader": "forge",
+    "url": "https://cdn.modrinth.com/data/u4zmZo7I/versions/YWgCwGim/migueleconomy-1.1.4.jar",
+    "sha512": "c39cd37ada26fd0e00c6bbc4155309f962fee65118d209f7caeeaec0b6b598f1a14c3db66b2e05097e833750bd145c086107c90353809d7ca9e6f14aa6209ac8",
+    "sha256": "24c34f6ccd41303106bb00799c8431a41488c1968fd0de830db0dbf273d4c284"
+  },
+  {
+    "project": "migueleconomy-x-easynpc",
+    "version_id": "4IUPLF0v",
+    "version": "0.1.0-1.20.1",
+    "filename": "migueleconomy_easynpc-0.1.0-1.20.1.jar",
+    "minecraft": "1.20.1",
+    "loader": "forge",
+    "url": "https://cdn.modrinth.com/data/1nSZMgso/versions/4IUPLF0v/migueleconomy_easynpc-0.1.0-1.20.1.jar",
+    "sha512": "9a8f3eb3b01b257fa4fc405e96ff1db9edee6b4996188d8e8639f3232c561c8e4b1690787b9a537a37f869ed79a0dac35e63a4e79694a4b0f4623d147efa872e",
+    "sha256": "5d0ae7e16386c8fb43c42934025e2b0f140d390b4ad059603536e6d6529a9344"
+  },
+  {
+    "project": "waystones",
+    "version_id": "Y0IgdaoP",
+    "version": "14.1.21+forge-1.20.1",
+    "filename": "waystones-forge-1.20.1-14.1.21.jar",
+    "minecraft": "1.20.1",
+    "loader": "forge",
+    "url": "https://cdn.modrinth.com/data/LOpKHB2A/versions/Y0IgdaoP/waystones-forge-1.20.1-14.1.21.jar",
+    "sha512": "3798eef2f81c2f6066d9dc2dc22bbe9d1c4b62d5aa494c592ffe67ee7f4fb8021361505b3c0b1358d4f9af27e50b1f12d29afb3b4b0b362b5ab227e8be171047",
+    "sha256": "fd6fe3c645328ea7be5bc6723d02c881e34650e0cbd4527ba59e42fa4cbe3c80"
+  },
+  {
+    "project": "balm",
+    "version_id": "dDN38ae7",
+    "version": "7.3.44+forge-1.20.1",
+    "filename": "balm-forge-1.20.1-7.3.44.jar",
+    "minecraft": "1.20.1",
+    "loader": "forge",
+    "url": "https://cdn.modrinth.com/data/MBAkmtvl/versions/dDN38ae7/balm-forge-1.20.1-7.3.44.jar",
+    "sha512": "bdabc656c7f60d6476a7d8c3d1f7a3d174854c9c4a466a9ff9b220737b717bc8069229471f7cf7eac574ba15e1263b76da8fef2ed1a5273d53e1c9cbf041ad9b",
+    "sha256": "c9dc421214fa3eccdcd5ad4d8974a422acef09396f5ee0f6250ae44cf5902810"
+  }
+]
